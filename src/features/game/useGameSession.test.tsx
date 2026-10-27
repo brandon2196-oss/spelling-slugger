@@ -79,3 +79,16 @@ describe('useGameSession', () => {
     expect(rec.summary!.runs).toBe(1)
   })
 })
+
+describe('useGameSession when saving fails', () => {
+  it('rolls the state back, releases busy, and rejects so the screen can say so', async () => {
+    const failing: Store = { ...store, recordAttempt: vi.fn(() => Promise.reject(new Error('offline'))) }
+    const wrap = ({ children }: { children: ReactNode }) => <StoreContext.Provider value={failing}>{children}</StoreContext.Provider>
+    const h = renderHook(() => useGameSession(gameId), { wrapper: wrap })
+    await waitFor(() => expect(h.result.current.loading).toBe(false))
+    await expect(act(() => h.result.current.submit(words[0]!))).rejects.toThrow('SAVE_FAILED')
+    expect(h.result.current.state!.index).toBe(0)
+    expect(h.result.current.busy).toBe(false)
+    expect((await store.getGame(gameId))!.attempts).toHaveLength(0)
+  })
+})

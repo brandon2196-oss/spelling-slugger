@@ -198,11 +198,14 @@ alter table public.games enable row level security;
 alter table public.game_words enable row level security;
 alter table public.attempts enable row level security;
 
-create policy families_all on public.families
-  for all using (id in (select public.my_family_ids())) with check (id in (select public.my_family_ids()));
+-- families and family_members are READ-ONLY for clients: rows are created by the sign-up trigger
+-- and changed only through the SECURITY DEFINER functions above. A writable membership policy
+-- would let a signed-in user insert themselves into any family whose id they learned.
+create policy families_select on public.families
+  for select using (id in (select public.my_family_ids()));
 
-create policy family_members_all on public.family_members
-  for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy family_members_select on public.family_members
+  for select using (user_id = auth.uid());
 
 create policy players_all on public.players
   for all using (family_id in (select public.my_family_ids()))
@@ -228,8 +231,9 @@ create policy attempts_all on public.attempts
   for all using (game_id in (select id from public.games where player_id in (select public.my_player_ids())))
   with check (game_id in (select id from public.games where player_id in (select public.my_player_ids())));
 
--- Only signed-in users may call the RPCs.
-revoke execute on all functions in schema public from anon;
+-- Only signed-in users may call the RPCs. Postgres grants EXECUTE to PUBLIC on creation, so the
+-- revoke must name PUBLIC as well as anon or it does nothing.
+revoke execute on all functions in schema public from public, anon;
 grant execute on function public.my_family_ids(), public.my_player_ids(), public.set_parent_pin(text),
   public.verify_parent_pin(text), public.has_parent_pin(),
   public.record_attempt(uuid,int,int,text,boolean,text), public.set_active_list(uuid,uuid),

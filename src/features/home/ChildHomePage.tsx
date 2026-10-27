@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
 import { useStore } from '../../data/store'
+import { primeSpeech } from '../../audio/speech'
+import { sfx } from '../../audio/sfx'
 import type { GameRecord, WordList } from '../../data/types'
 import { resumeOrNull, startMissedWordsGame, startWeeklyGame } from '../game/startGame'
 import { PlayerPreview } from '../players/PlayerPreview'
@@ -61,7 +63,7 @@ export function ChildHomePage() {
               <p className="font-display text-2xl">Finish your game</p>
               <p>Word {Math.min(resume.attempts.filter((a) => a.outcome).length + 1, resume.words.length)} of {resume.words.length}</p>
             </div>
-            <Link to={`/game/${resume.id}`} className="btn-primary">Keep playing</Link>
+            <Link to={`/game/${resume.id}`} className="btn-primary" onClick={() => { primeSpeech(); sfx.unlock() }}>Keep playing</Link>
           </div>
         ) : null}
 

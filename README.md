@@ -47,8 +47,10 @@ to `.env.local` and fill in the Supabase values (see `supabase/README.md`).
   No audio files, no licensed art.
 
 ## Tests
-- `npm test` runs ~145 unit tests, including the 28 behaviors the spec lists.
+- `npm test` runs ~150 unit tests covering the spec's listed behaviors except family isolation
+  (test 22), which needs a real database: see the next two lines.
 - `npm run e2e` registers a family, sets the PIN, enters a list, plays a game with a mid-word
   reload, and checks the parent zone re-locks, on desktop and iPhone viewports.
 - `src/data/rls.integration.test.ts` proves family isolation against a real Supabase project and
-  runs only when `SUPABASE_TEST_*` variables are set.
+  runs only when `SUPABASE_TEST_*` variables are set. **It has not been run yet**; do that against a
+  throwaway project before sharing the app (steps in `docs/DEPLOY.md`).

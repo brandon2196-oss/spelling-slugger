@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
+import { isParentUnlocked } from '../parent/ParentGate'
 import { Banner } from '../../components/Banner'
 import { Button } from '../../components/Button'
 import { ColorPicker } from '../../components/ColorPicker'
@@ -131,10 +132,15 @@ export function PlayerEditorPage() {
           <div className="flex flex-wrap gap-3 items-center">
             <Button type="submit" size="lg">{existing ? 'Save changes' : 'Save player'}</Button>
             <Button variant="secondary" size="lg" onClick={() => navigate(-1)}>Cancel</Button>
-            {existing ? (
+            {existing && isParentUnlocked() ? (
               <Button variant="ghost" className="ml-auto text-red" onClick={() => setConfirmDelete(true)}>Delete player</Button>
             ) : null}
           </div>
+          {existing && !isParentUnlocked() ? (
+            <p className="text-sm text-ink/60">
+              Removing a player is done from the <Link to="/parent" className="underline">parent zone</Link>.
+            </p>
+          ) : null}
         </div>
       </form>
 

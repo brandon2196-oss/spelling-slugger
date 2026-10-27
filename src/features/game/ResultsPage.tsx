@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
 import { useStore } from '../../data/store'
+import { primeSpeech } from '../../audio/speech'
+import { sfx } from '../../audio/sfx'
 import type { GameRecord } from '../../data/types'
 import { rebuild } from '../../engine/replay'
 import { summarize } from '../../engine/results'
@@ -47,6 +49,8 @@ export function ResultsPage() {
   const newBest = best === null ? s.runs > 0 : s.runs > best
 
   async function playAgain() {
+    primeSpeech()
+    sfx.unlock()
     try {
       const g =
         record!.mode === 'weekly' && record!.listId ? await startWeeklyGame(store, record!.playerId, record!.listId)
@@ -58,6 +62,8 @@ export function ResultsPage() {
     }
   }
   async function practiceMissed() {
+    primeSpeech()
+    sfx.unlock()
     try {
       const g = await startMissedWordsGame(store, record!.playerId)
       navigate(`/game/${g.id}`)

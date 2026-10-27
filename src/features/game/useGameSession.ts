@@ -70,17 +70,27 @@ export function useGameSession(gameId: string | undefined): GameSession {
       setLastEvent(event)
 
       const position = current.index
-      if (event.kind === 'strike') {
-        const a = event.attemptsSoFar[event.attemptsSoFar.length - 1]!
-        await store.recordAttempt(gameId, { position, attemptNumber: a.attemptNumber, text: a.text, correct: false, outcome: null })
-      } else {
-        const a = event.attempts[event.attempts.length - 1]!
-        await store.recordAttempt(gameId, { position, attemptNumber: a.attemptNumber, text: a.text, correct: a.correct, outcome: event.outcome })
-        if (event.gameOver) {
-          await store.completeGame(gameId, summarize(next))
-          const rec = await store.getGame(gameId)
-          if (rec) setRecord(rec)
+      try {
+        if (event.kind === 'strike') {
+          const a = event.attemptsSoFar[event.attemptsSoFar.length - 1]!
+          await store.recordAttempt(gameId, { position, attemptNumber: a.attemptNumber, text: a.text, correct: false, outcome: null })
+        } else {
+          const a = event.attempts[event.attempts.length - 1]!
+          await store.recordAttempt(gameId, { position, attemptNumber: a.attemptNumber, text: a.text, correct: a.correct, outcome: event.outcome })
+          if (event.gameOver) {
+            await store.completeGame(gameId, summarize(next))
+            const rec = await store.getGame(gameId)
+            if (rec) setRecord(rec)
+          }
         }
+      } catch (err) {
+        // Nothing was saved (or we cannot be sure): undo the optimistic step so the screen and the
+        // store agree, and let the caller tell the child to try that swing again.
+        stateRef.current = current
+        setState(current)
+        setLastEvent(null)
+        setBusy(false)
+        throw new Error('SAVE_FAILED', { cause: err })
       }
       return event
     },

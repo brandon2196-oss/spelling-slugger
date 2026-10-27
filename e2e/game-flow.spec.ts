@@ -11,7 +11,16 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   await page.waitForURL(/\/game\/[^/]+$/)
   const input = page.getByLabel('Spell the word')
   await expect(input).toBeEnabled()
+  await page.locator('[data-field-ready="1"]').waitFor() // the stadium is drawn; plays will animate
   expect(await noHorizontalScroll(page)).toBe(true)
+
+  // phone held sideways: the batter and the keyboard must both be on screen without scrolling
+  const original = page.viewportSize()!
+  await page.setViewportSize({ width: 844, height: 390 })
+  const box = (await input.boundingBox())!
+  expect(box.y + box.height).toBeLessThanOrEqual(390)
+  await expect(page.locator('canvas')).toBeVisible()
+  await page.setViewportSize(original)
 
   // (27) the first word was spoken aloud, never shown
   await expect.poll(async () => (await spoken(page)).length).toBeGreaterThan(0)
@@ -33,18 +42,24 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   // (24) reload mid-word: same word, same strike count
   await page.reload()
   await expect(page.getByLabel('Spell the word')).toBeEnabled()
+  await page.locator('[data-field-ready="1"]').waitFor()
   await expect(page.getByTestId('strikes')).toHaveText('1')
   await expect(page.getByTestId('progress')).toContainText('Word 2 of 3')
 
-  // finish the game by typing whatever was spoken last
+  // finish the game by typing whatever was spoken last; word 2 is a single that moves the runner
+  // off second, word 3 a double that scores him — both vacate a base, which once froze the field
   for (let i = 0; i < 2; i++) {
     const words = await spoken(page)
     const word = words[words.length - 1]!
     const field = page.getByLabel('Spell the word')
     await field.fill(word)
     await field.press('Enter')
-    if (i === 0) await expect(page.getByTestId('progress')).toContainText('Word 3 of 3')
+    if (i === 0) {
+      await expect(page.getByTestId('progress')).toContainText('Word 3 of 3')
+      await expect(page.getByLabel('Spell the word')).toBeEnabled({ timeout: 10_000 })
+    }
   }
+  await expect(page.getByTestId('runs')).toHaveText('1')
   await page.waitForURL(/\/results$/)
   await expect(page.getByText(/run/)).toBeVisible()
   await expect(page.getByText('Final score').or(page.getByText('New personal best!'))).toBeVisible()

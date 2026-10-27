@@ -37,7 +37,7 @@ gh repo create spelling-slugger --private --source . --push
 4. Deploy. Copy the URL into Supabase → Authentication → URL Configuration (Site URL and `/reset`
    redirect), then redeploy once so `VITE_APP_URL` matches.
 
-Every later `git push` to `main` redeploys automatically. Her laptop needs nothing installed: it is a
+Every later `git push` to `main` redeploys automatically. The family's laptop needs nothing installed: it is a
 website, and "Add to Home Screen" / "Install app" in the browser makes it feel native.
 
 ## 4. Verify after the first deploy

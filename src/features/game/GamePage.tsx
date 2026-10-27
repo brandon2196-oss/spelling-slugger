@@ -7,7 +7,7 @@ import { Button } from '../../components/Button'
 import { Modal } from '../../components/Modal'
 import { Stadium } from '../../components/Page'
 import { currentWord } from '../../engine/game'
-import type { SubmitEvent } from '../../engine/types'
+import type { Bases, SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
 import { usePlayer } from '../players/usePlayers'
 import { Announcement } from './Announcement'
@@ -32,11 +32,19 @@ export function GamePage() {
   const [reveal, setReveal] = useState<{ word: string; gameOver: boolean } | null>(null)
   const [peek, setPeek] = useState(false)
   const [focusKey, setFocusKey] = useState(0)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  /** What the stadium shows. Lags the engine until the play animation has run (see onSubmit). */
+  const [fieldBases, setFieldBases] = useState<Bases | null>(null)
   const spokenIndex = useRef<number>(-1)
   const fieldRef = useRef<FieldController | null>(null)
   const canSpeak = speechAvailable()
 
   const word = state ? currentWord(state) : null
+
+  // On load (and reload) the field starts from the saved state.
+  useEffect(() => {
+    if (state && fieldBases === null) setFieldBases(state.bases)
+  }, [state, fieldBases])
 
   const hear = useCallback(
     (how: 'word' | 'slow' | 'sentence') => {
@@ -65,10 +73,26 @@ export function GamePage() {
   }
 
   async function onSubmit(text: string) {
-    const event: SubmitEvent = await submit(text)
+    setSaveError(null)
+    let event: SubmitEvent
+    try {
+      event = await submit(text)
+    } catch {
+      setSaveError("Couldn't save that swing. Check the connection and try again.")
+      setFocusKey((k) => k + 1)
+      return
+    }
     if (event.kind === 'ignored') return
     sfx.unlock()
-    await playSequence(fieldRef.current, sfx, announce, event)
+    try {
+      await playSequence(fieldRef.current, sfx, announce, event)
+    } catch (err) {
+      console.error('Field animation failed; continuing without it', err)
+      setAnnouncement(null)
+    } finally {
+      // Only now does the stadium learn the new base state; during the play the scene moved the runners itself.
+      if (event.kind === 'at-bat-complete') setFieldBases(event.basesAfter)
+    }
     if (event.kind === 'at-bat-complete' && event.outcome === 'strikeout') {
       setReveal({ word: event.correctSpelling, gameOver: event.gameOver })
       return // stays busy until the child taps Next
@@ -118,24 +142,24 @@ export function GamePage() {
           </div>
         </header>
 
-        <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(20rem,1fr)] lg:items-start">
-          <div className="relative overflow-hidden rounded-3xl">
+        <div className="game-grid mt-3 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(20rem,1fr)] lg:items-start">
+          <div className="game-field relative overflow-hidden rounded-3xl">
             <Suspense fallback={<div className="aspect-[4/3] w-full rounded-3xl bg-grass-dark" aria-hidden="true" />}>
               <Field
                 look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }}
-                bases={state.bases}
+                bases={fieldBases ?? state.bases}
                 controllerRef={fieldRef}
               />
             </Suspense>
             <Announcement text={announcement} />
           </div>
 
-          <div className="space-y-4">
-            <Scoreboard state={state} />
+          <div className="game-side flex flex-col gap-4">
+            <div className="game-score"><Scoreboard state={state} /></div>
 
-            <section aria-label="Your turn" className="rounded-3xl bg-chalk/10 border border-chalk/15 p-4 space-y-4">
+            <section aria-label="Your turn" className="game-turn rounded-3xl bg-chalk/10 border border-chalk/15 p-4 space-y-4">
               {canSpeak ? (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
+                <div className="game-hear grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
                   <Button variant="secondary" size="lg" onClick={() => hear('word')}>Hear word</Button>
                   <Button variant="secondary" onClick={() => hear('slow')}>Hear it slowly</Button>
                   <Button variant="secondary" onClick={() => hear('word')}>Repeat</Button>
@@ -148,6 +172,7 @@ export function GamePage() {
                 </div>
               )}
               <SpellingInput disabled={busy || !!reveal} onSubmit={onSubmit} focusKey={focusKey} />
+              {saveError ? <p role="alert" className="text-gold">{saveError}</p> : null}
             </section>
 
             {record.warnings.length ? (

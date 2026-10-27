@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router'
 import { Button } from '../../components/Button'
 import { Modal } from '../../components/Modal'
 import { useStore } from '../../data/store'
+import { primeSpeech } from '../../audio/speech'
+import { sfx } from '../../audio/sfx'
 import type { GameRecord } from '../../data/types'
 
 /**
@@ -17,6 +19,9 @@ export function useGuardedStart(playerId: string) {
 
   const start = useCallback(
     async (fn: () => Promise<GameRecord>) => {
+      // Called from a tap/click: iOS only unlocks speech and audio inside a user gesture.
+      primeSpeech()
+      sfx.unlock()
       setError(null)
       const existing = await store.findInProgressGame(playerId)
       if (existing) return setPending({ existing, start: fn })

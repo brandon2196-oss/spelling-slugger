@@ -210,7 +210,8 @@ export class FieldScene extends Phaser.Scene implements FieldController {
         fig = this.makeRunner({ x: FIELD.home.x, y: FIELD.home.y })
         this.batter.setVisible(false)
       } else {
-        fig = this.runners[from as RunnerBase]!
+        // If the display and the engine ever disagree, conjure the runner rather than crash the play.
+        fig = this.runners[from as RunnerBase] ?? this.makeRunner(basePoint(from))
         this.runners[from as RunnerBase] = null
       }
       for (const p of runnerPath(from, to)) {
@@ -220,13 +221,17 @@ export class FieldScene extends Phaser.Scene implements FieldController {
         await this.tween({ targets: fig, alpha: 0, scale: 1.1, duration: 250 })
         fig.destroy()
       } else {
+        this.runners[to as RunnerBase]?.destroy() // never leave a duplicate on the destination
         this.runners[to as RunnerBase] = fig
       }
     })
-    await Promise.all(jobs)
-    this.batter.setVisible(true)
-    this.batter.setAlpha(0)
-    await this.tween({ targets: this.batter, alpha: 1, duration: 200 })
+    try {
+      await Promise.all(jobs)
+    } finally {
+      this.batter.setVisible(true)
+      this.batter.setAlpha(0)
+      await this.tween({ targets: this.batter, alpha: 1, duration: 200 })
+    }
   }
 
   async playHit(outcome: 'single' | 'double', before: Bases, after: Bases, runs: number): Promise<void> {

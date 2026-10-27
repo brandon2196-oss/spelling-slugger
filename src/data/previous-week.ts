@@ -1,10 +1,10 @@
 import type { WordList } from './types'
 
 /**
- * How far back "the immediately preceding week" may reach. A gap longer than this means last
- * week's list was never entered, and spec §6 says not to fall back to an older week.
+ * How far back "the immediately preceding week" may reach: one skipped week (a holiday) is still
+ * "last week"; three weeks back is an older week, and spec §6 says not to fall back to one.
  */
-export const MAX_PRECEDING_GAP_DAYS = 21
+export const MAX_PRECEDING_GAP_DAYS = 14
 
 function daysBetween(a: string, b: string): number {
   return Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000)

@@ -10,6 +10,9 @@ import { seededRng } from '../../engine/rng'
 import { startWeeklyGame } from '../game/startGame'
 import { ChildHomePage } from './ChildHomePage'
 import { ListPickerPage } from './ListPickerPage'
+import { primeSpeech } from '../../audio/speech'
+
+vi.mock('../../audio/speech', async (orig) => ({ ...(await orig<typeof import('../../audio/speech')>()), primeSpeech: vi.fn() }))
 
 const cooper: NewPlayer = {
   name: 'Cooper', teamName: '', jerseyNumber: 7, hand: 'L',
@@ -69,6 +72,7 @@ describe('ListPickerPage', () => {
     mount(store, `/play/${playerId}/pick/practice`)
     await user.click(await screen.findByRole('button', { name: /Week A/ }))
     expect(await screen.findByText('game screen')).toBeInTheDocument()
+    expect(primeSpeech).toHaveBeenCalled() // iOS unlocks speech only from a tap
   })
 })
 

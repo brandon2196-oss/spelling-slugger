@@ -22,7 +22,11 @@ describe('findPrecedingList', () => {
     const lists = [list('a', '2026-10-05')]
     expect(findPrecedingList(lists, lists[0]!)).toBeNull()
   })
+  it('treats a list exactly three weeks back as missing, not last week', () => {
+    const lists = [list('a', '2026-09-28'), list('c', '2026-10-19')]
+    expect(findPrecedingList(lists, lists[1]!)).toBeNull()
+  })
   it('exposes the gap constant', () => {
-    expect(MAX_PRECEDING_GAP_DAYS).toBe(21)
+    expect(MAX_PRECEDING_GAP_DAYS).toBe(14)
   })
 })
