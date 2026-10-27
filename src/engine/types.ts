@@ -1,0 +1,65 @@
+/** Shared engine types. The engine is pure TypeScript: no React, no DOM, no I/O. */
+
+export type Hand = 'L' | 'R'
+
+export type Outcome = 'double' | 'single' | 'walk' | 'strikeout'
+
+export type WordSource = 'current' | 'review'
+
+export interface GameWord {
+  /** 0-based slot in this game's order. */
+  position: number
+  text: string
+  sentence: string | null
+  source: WordSource
+  /** Id of the list word this came from, kept for history only (no FK). */
+  sourceWordId: string | null
+}
+
+export interface Bases {
+  first: boolean
+  second: boolean
+  third: boolean
+}
+
+export interface Attempt {
+  attemptNumber: 1 | 2 | 3
+  text: string
+  correct: boolean
+}
+
+export interface AtBat {
+  position: number
+  inning: number
+  attempts: Attempt[]
+  strikes: number
+  outcome: Outcome | null
+  runsScored: number
+}
+
+export interface Tallies {
+  runs: number
+  hits: number
+  singles: number
+  doubles: number
+  walks: number
+  strikeouts: number
+  totalStrikes: number
+  firstTry: number
+  secondTry: number
+  thirdTry: number
+  missed: number
+}
+
+export interface GameState {
+  words: GameWord[]
+  /** Index of the word currently at bat. Equals words.length once complete. */
+  index: number
+  strikes: number
+  outs: number
+  inning: number
+  bases: Bases
+  tallies: Tallies
+  atBats: AtBat[]
+  status: 'active' | 'complete'
+}
