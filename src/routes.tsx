@@ -12,6 +12,7 @@ import { ParentIndex, ParentLayout } from './features/parent/ParentLayout'
 import { ListsPage } from './features/parent/ListsPage'
 import { ListEditorPage } from './features/parent/ListEditorPage'
 import { ChildHomePage } from './features/home/ChildHomePage'
+import { ListPickerPage } from './features/home/ListPickerPage'
 import { GamePage } from './features/game/GamePage'
 import { ResultsPage } from './features/game/ResultsPage'
 
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: '/players/new', element: <PlayerEditorPage /> },
       { path: '/players/:id/edit', element: <PlayerEditorPage /> },
       { path: '/play/:playerId', element: <ChildHomePage /> },
+      { path: '/play/:playerId/pick/:mode', element: <ListPickerPage /> },
       { path: '/game/:gameId', element: <GamePage /> },
       { path: '/game/:gameId/results', element: <ResultsPage /> },
       {

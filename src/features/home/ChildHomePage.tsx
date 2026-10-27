@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
 import { useStore } from '../../data/store'
@@ -7,15 +7,16 @@ import type { GameRecord, WordList } from '../../data/types'
 import { resumeOrNull, startMissedWordsGame, startWeeklyGame } from '../game/startGame'
 import { PlayerPreview } from '../players/PlayerPreview'
 import { usePlayer } from '../players/usePlayers'
+import { useGuardedStart } from './useGuardedStart'
 
 export function ChildHomePage() {
   const { playerId = '' } = useParams()
   const player = usePlayer(playerId)
   const store = useStore()
-  const navigate = useNavigate()
   const [active, setActive] = useState<WordList | null | undefined>(undefined)
   const [resume, setResume] = useState<GameRecord | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const { start, modal } = useGuardedStart(playerId)
 
   useEffect(() => {
     store.listWordLists(playerId).then((ls) => setActive(ls.find((l) => l.isActive) ?? null))
@@ -25,18 +26,16 @@ export function ChildHomePage() {
   if (player === undefined || active === undefined) return <Stadium className="p-8" aria-busy="true" />
   if (!player) return <Stadium className="p-8"><Link to="/players" className="btn-secondary">Back to players</Link></Stadium>
 
-  async function playWeek() {
+  function playWeek() {
     if (!active) return
-    const g = await startWeeklyGame(store, playerId, active.id)
-    navigate(`/game/${g.id}`)
+    void start(() => startWeeklyGame(store, playerId, active.id))
   }
   async function playMissed() {
-    try {
-      const g = await startMissedWordsGame(store, playerId)
-      navigate(`/game/${g.id}`)
-    } catch {
-      setNotice('No missed words yet. Nice!')
-    }
+    setNotice(null)
+    const games = await store.listGames(playerId, { status: 'complete' })
+    const anyMissed = games.some((g) => g.attempts.some((a) => !a.correct))
+    if (!anyMissed) return setNotice('No missed words yet. Nice!')
+    void start(() => startMissedWordsGame(store, playerId))
   }
 
   return (
@@ -83,6 +82,7 @@ export function ChildHomePage() {
           {notice ? <p className="text-center text-gold">{notice}</p> : null}
         </div>
       </div>
+      {modal}
     </Stadium>
   )
 }
