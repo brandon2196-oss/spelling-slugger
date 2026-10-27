@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap');
+@import './tokens.css';
+@import 'tailwindcss';
+
+@theme {
+  --color-grass: var(--grass);
+  --color-grass-dark: var(--grass-dark);
+  --color-dirt: var(--dirt);
+  --color-chalk: var(--chalk);
+  --color-navy: var(--navy);
+  --color-red: var(--red);
+  --color-gold: var(--gold);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-sky: var(--sky);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--font-display); }
