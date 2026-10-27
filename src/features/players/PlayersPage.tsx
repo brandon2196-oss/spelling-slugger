@@ -4,6 +4,7 @@ import { Stadium } from '../../components/Page'
 import { useAuth } from '../../data/auth'
 import { PlayerPreview } from './PlayerPreview'
 import { usePlayers } from './usePlayers'
+import { ShareButton } from '../share/ShareButton'
 
 export function PlayersPage() {
   const { players, loading } = usePlayers()
@@ -38,6 +39,10 @@ export function PlayersPage() {
         <div className="mt-8 flex flex-wrap gap-3 items-center justify-between">
           <Link to="/players/new" className="btn-secondary">Add a player</Link>
           <Button variant="ghost" onClick={() => void signOut()} className="text-chalk/70">Sign out</Button>
+        </div>
+        <div className="mt-10 border-t border-chalk/15 pt-6 text-chalk/80">
+          <p className="mb-2">Know another family who&apos;d like this?</p>
+          <ShareButton />
         </div>
       </div>
     </Stadium>

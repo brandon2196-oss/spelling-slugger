@@ -14,6 +14,7 @@ import { ListEditorPage } from './features/parent/ListEditorPage'
 import { HistoryPage } from './features/parent/HistoryPage'
 import { StatsPage } from './features/parent/StatsPage'
 import { GameDetailPage } from './features/parent/GameDetailPage'
+import { AccountPage } from './features/parent/AccountPage'
 import { ChildHomePage } from './features/home/ChildHomePage'
 import { ListPickerPage } from './features/home/ListPickerPage'
 import { GamePage } from './features/game/GamePage'
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
             ],
           },
           { path: 'games/:gameId', element: <GameDetailPage /> },
+          { path: 'account', element: <AccountPage /> },
         ],
       },
     ],
