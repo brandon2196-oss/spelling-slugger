@@ -2,19 +2,53 @@
 
 A baseball video game that runs on weekly spelling words. Kids hear a word, type it, and earn
 doubles, singles, walks, or strikeouts depending on how many tries it takes. Parents manage word
-lists and read progress. One private account per family.
+lists and read progress. One private account per family; kids never need an account.
+
+- Spec: [`docs/superpowers/specs/2026-10-26-spelling-slugger-spec.md`](docs/superpowers/specs/2026-10-26-spelling-slugger-spec.md)
+- Plan: [`docs/superpowers/plans/2026-10-26-spelling-slugger.md`](docs/superpowers/plans/2026-10-26-spelling-slugger.md)
+- Deploying and costs: [`docs/DEPLOY.md`](docs/DEPLOY.md) · Supabase setup: [`supabase/README.md`](supabase/README.md)
+- Privacy: [`docs/PRIVACY-NOTES.md`](docs/PRIVACY-NOTES.md)
+
+## Run it locally
+```bash
+npm install
+npm run dev
+```
+With no `.env.local`, the app runs in **local mode**: a fake sign-in and data kept in the browser,
+so you can click through everything without an account. To use real accounts, copy `.env.example`
+to `.env.local` and fill in the Supabase values (see `supabase/README.md`).
 
 ## Scripts
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Start the dev server (local mode, no account needed) |
-| `npm test` | Run the unit tests once |
-| `npm run test:watch` | Run the unit tests in watch mode |
-| `npm run typecheck` | Type-check the whole project |
-| `npm run build` | Production build into `dist/` |
+| `npm run dev` | Dev server at http://localhost:5173 |
+| `npm test` | Unit tests (engine, data layer, screens) |
+| `npm run e2e` | End-to-end tests in your installed Chrome, laptop and iPhone sizes |
+| `npm run typecheck` | Strict TypeScript check |
+| `npm run build` | Production build into `dist/` (also generates the PWA service worker) |
 | `npm run preview` | Serve the production build locally |
-| `npm run e2e` | Playwright end-to-end tests (iPhone and desktop) |
+| `npm run icons` | Regenerate PNG icons from `public/icon.svg` |
 
-Spec: `docs/superpowers/specs/2026-10-26-spelling-slugger-spec.md`.
-Plan: `docs/superpowers/plans/2026-10-26-spelling-slugger.md`.
+## How it is built
+- **`src/engine/`** is the whole rulebook, pure TypeScript with no React or DOM: grading
+  (`grade.ts`), baserunning with force logic (`bases.ts`), the at-bat/inning/game reducer
+  (`game.ts`), weekly word selection with review words (`selection.ts`), summaries (`results.ts`)
+  and replay of a saved attempt log (`replay.ts`). Every spec rule has a test here.
+- **`src/data/`** is one `Store` interface with two backends: `LocalStore` (localStorage) and
+  `SupabaseStore` (Postgres with row-level security, schema in `supabase/migrations/`). A game's
+  truth is its ordered attempt log; resuming replays it through the engine, so a refresh or a
+  double-submit can never score twice.
+- **`src/field/`** is the Phaser stadium. It only animates events the engine already decided.
+  `playSequence.ts` is the single place that maps an event to motion, sound and board text.
+- **`src/features/`** are the screens: welcome/auth, players and customization, the child's home
+  and game, and the PIN-gated parent zone (word lists, history, progress, account).
+- Sound is synthesized in `src/audio/sfx.ts`; words are read by the browser's own text-to-speech.
+  No audio files, no licensed art.
+
+## Tests
+- `npm test` runs ~145 unit tests, including the 28 behaviors the spec lists.
+- `npm run e2e` registers a family, sets the PIN, enters a list, plays a game with a mid-word
+  reload, and checks the parent zone re-locks, on desktop and iPhone viewports.
+- `src/data/rls.integration.test.ts` proves family isolation against a real Supabase project and
+  runs only when `SUPABASE_TEST_*` variables are set.
