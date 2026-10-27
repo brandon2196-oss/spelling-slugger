@@ -4,6 +4,9 @@ import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
 import { useStore } from '../../data/store'
 import type { GameRecord } from '../../data/types'
+import { rebuild } from '../../engine/replay'
+import { summarize } from '../../engine/results'
+import type { GameSummary } from '../../engine/results'
 import { startMissedWordsGame, startPracticeGame, startWeeklyGame } from './startGame'
 
 export function ResultsPage() {
@@ -11,6 +14,7 @@ export function ResultsPage() {
   const store = useStore()
   const navigate = useNavigate()
   const [record, setRecord] = useState<GameRecord | null | undefined>(undefined)
+  const [summary, setSummary] = useState<GameSummary | null>(null)
   const [best, setBest] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -18,13 +22,20 @@ export function ResultsPage() {
     store.getGame(gameId).then(async (g) => {
       setRecord(g)
       if (!g) return
+      // The saved summary can lag the final attempt by a network round-trip; the attempt log is
+      // the source of truth, so derive the summary from it when needed.
+      if (g.summary) setSummary(g.summary)
+      else {
+        const rebuilt = rebuild(g.words, g.attempts)
+        setSummary(rebuilt.status === 'complete' ? summarize(rebuilt) : null)
+      }
       const others = (await store.listGames(g.playerId, { mode: g.mode, status: 'complete' })).filter((x) => x.id !== g.id)
       setBest(others.length ? Math.max(...others.map((x) => x.summary?.runs ?? 0)) : null)
     })
   }, [store, gameId])
 
   if (record === undefined) return <Stadium className="p-8" aria-busy="true" />
-  if (!record || !record.summary) {
+  if (!record || !summary) {
     return (
       <Stadium className="p-8 text-center">
         <p className="text-2xl">No results for that game yet.</p>
@@ -32,7 +43,7 @@ export function ResultsPage() {
       </Stadium>
     )
   }
-  const s = record.summary
+  const s = summary
   const newBest = best === null ? s.runs > 0 : s.runs > best
 
   async function playAgain() {

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router'
 import { useAudioSettings } from '../../audio/settings'
 import { sfx } from '../../audio/sfx'
 import { primeSpeech, speakSentence, speakSlowly, speakWord, speechAvailable } from '../../audio/speech'
@@ -8,7 +8,7 @@ import { Modal } from '../../components/Modal'
 import { Stadium } from '../../components/Page'
 import { currentWord } from '../../engine/game'
 import type { SubmitEvent } from '../../engine/types'
-import { Field, type FieldController } from '../../field/Field'
+import type { FieldController } from '../../field/controller'
 import { usePlayer } from '../players/usePlayers'
 import { Announcement } from './Announcement'
 import { playSequence } from './playSequence'
@@ -18,6 +18,7 @@ import { wait } from './timing'
 import { useGameSession } from './useGameSession'
 
 const ANNOUNCE_MS = 1100
+const Field = lazy(() => import('../../field/Field').then((m) => ({ default: m.Field })))
 
 export function GamePage() {
   const { gameId } = useParams()
@@ -100,10 +101,9 @@ export function GamePage() {
       </Stadium>
     )
   }
-  if (state.status === 'complete' && !reveal) {
-    navigate(`/game/${gameId}/results`, { replace: true })
-    return null
-  }
+  // Already finished (e.g. reopened from history). While a submission is still saving, `busy`
+  // is true and onSubmit owns the navigation, so this never fires early.
+  if (state.status === 'complete' && !busy && !reveal) return <Navigate to={`/game/${gameId}/results`} replace />
 
   return (
     <Stadium className="px-3 py-4 sm:px-6">
@@ -120,11 +120,13 @@ export function GamePage() {
 
         <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(20rem,1fr)] lg:items-start">
           <div className="relative overflow-hidden rounded-3xl">
-            <Field
-              look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }}
-              bases={state.bases}
-              controllerRef={fieldRef}
-            />
+            <Suspense fallback={<div className="aspect-[4/3] w-full rounded-3xl bg-grass-dark" aria-hidden="true" />}>
+              <Field
+                look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }}
+                bases={state.bases}
+                controllerRef={fieldRef}
+              />
+            </Suspense>
             <Announcement text={announcement} />
           </div>
 

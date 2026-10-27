@@ -19,8 +19,12 @@ export function PinPad({ length = 4, onComplete, shakeKey = 0, disabled }: PinPa
     if (k === '⌫') return setPin((p) => p.slice(0, -1))
     if (!k || pin.length >= length) return
     const next = pin + k
-    setPin(next)
-    if (next.length === length) void onComplete(next)
+    if (next.length === length) {
+      setPin('')
+      void onComplete(next)
+    } else {
+      setPin(next)
+    }
   }
 
   useEffect(() => {
@@ -42,7 +46,7 @@ export function PinPad({ length = 4, onComplete, shakeKey = 0, disabled }: PinPa
       <div className="grid grid-cols-3 gap-2">
         {KEYS.map((k, i) =>
           k === '' ? (
-            <span key={i} />
+            <span key={`blank-${i}`} />
           ) : (
             <button
               key={k}

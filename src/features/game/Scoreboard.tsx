@@ -1,6 +1,6 @@
 import type { GameState } from '../../engine/types'
 
-function Dots({ n, max, label, color }: { n: number; max: number; label: string; color: string }) {
+function Dots({ n, max, label, color, testId }: { n: number; max: number; label: string; color: string; testId: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className="w-14 text-chalk/70 text-sm uppercase tracking-wider">{label}</span>
@@ -9,7 +9,7 @@ function Dots({ n, max, label, color }: { n: number; max: number; label: string;
           <span key={i} className={`h-4 w-4 rounded-full ${i < n ? color : 'bg-chalk/15'}`} />
         ))}
       </span>
-      <span className="sr-only">{n}</span>
+      <span className="sr-only" data-testid={testId}>{n}</span>
     </div>
   )
 }
@@ -20,17 +20,17 @@ export function Scoreboard({ state }: { state: GameState }) {
   return (
     <section aria-label="Scoreboard" className="rounded-3xl bg-navy border-4 border-gold/60 p-4 text-chalk shadow-[0_8px_0_#0a1630]">
       <div className="grid grid-cols-3 gap-2 text-center">
-        <Stat label="Runs" value={tallies.runs} big />
-        <Stat label="Hits" value={tallies.hits} />
-        <Stat label="Inning" value={state.inning} />
+        <Stat label="Runs" value={tallies.runs} big testId="runs" />
+        <Stat label="Hits" value={tallies.hits} testId="hits" />
+        <Stat label="Inning" value={state.inning} testId="inning" />
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
-          <Dots n={state.strikes} max={2} label="Strikes" color="bg-gold" />
-          <div data-testid="outs"><Dots n={state.outs} max={2} label="Outs" color="bg-red" /></div>
+          <Dots n={state.strikes} max={2} label="Strikes" color="bg-gold" testId="strikes" />
+          <Dots n={state.outs} max={2} label="Outs" color="bg-red" testId="outs" />
         </div>
         <Diamond bases={bases} />
-        <div className="text-right text-sm text-chalk/70">
+        <div className="text-right text-sm text-chalk/70" data-testid="progress">
           Word {Math.min(state.index + 1, state.words.length)} of {state.words.length}
         </div>
       </div>
@@ -38,11 +38,11 @@ export function Scoreboard({ state }: { state: GameState }) {
   )
 }
 
-function Stat({ label, value, big }: { label: string; value: number; big?: boolean }) {
+function Stat({ label, value, big, testId }: { label: string; value: number; big?: boolean; testId: string }) {
   return (
     <div className="rounded-xl bg-black/30 py-2">
       <div className="text-xs uppercase tracking-wider text-chalk/60">{label}</div>
-      <div className={`font-display text-gold leading-none ${big ? 'text-5xl' : 'text-3xl'}`}>{value}</div>
+      <div className={`font-display text-gold leading-none ${big ? 'text-5xl' : 'text-3xl'}`} data-testid={testId}>{value}</div>
     </div>
   )
 }
