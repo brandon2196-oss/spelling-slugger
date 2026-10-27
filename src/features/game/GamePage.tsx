@@ -8,10 +8,10 @@ import { Modal } from '../../components/Modal'
 import { Stadium } from '../../components/Page'
 import { currentWord } from '../../engine/game'
 import type { SubmitEvent } from '../../engine/types'
-import { Field } from '../../field/Field'
+import { Field, type FieldController } from '../../field/Field'
 import { usePlayer } from '../players/usePlayers'
 import { Announcement } from './Announcement'
-import { announcementsFor } from './announcements'
+import { playSequence } from './playSequence'
 import { Scoreboard } from './Scoreboard'
 import { SpellingInput } from './SpellingInput'
 import { wait } from './timing'
@@ -32,6 +32,7 @@ export function GamePage() {
   const [peek, setPeek] = useState(false)
   const [focusKey, setFocusKey] = useState(0)
   const spokenIndex = useRef<number>(-1)
+  const fieldRef = useRef<FieldController | null>(null)
   const canSpeak = speechAvailable()
 
   const word = state ? currentWord(state) : null
@@ -56,30 +57,22 @@ export function GamePage() {
     hear('word')
   }, [state, word, busy, reveal, hear])
 
-  async function playOut(event: SubmitEvent) {
-    for (const text of announcementsFor(event)) {
-      setAnnouncement(text)
-      await wait(ANNOUNCE_MS)
-    }
+  async function announce(text: string) {
+    setAnnouncement(text)
+    await wait(ANNOUNCE_MS)
     setAnnouncement(null)
   }
 
   async function onSubmit(text: string) {
-    const event = await submit(text)
+    const event: SubmitEvent = await submit(text)
     if (event.kind === 'ignored') return
     sfx.unlock()
-    if (event.kind === 'strike') sfx.strikeBuzz()
-    else if (event.outcome === 'strikeout') sfx.strikeBuzz()
-    else if (event.outcome === 'walk') sfx.walkChime()
-    else sfx.crack()
-    if (event.kind === 'at-bat-complete' && event.runsScored > 0) sfx.cheer()
-    await playOut(event)
+    await playSequence(fieldRef.current, sfx, announce, event)
     if (event.kind === 'at-bat-complete' && event.outcome === 'strikeout') {
       setReveal({ word: event.correctSpelling, gameOver: event.gameOver })
       return // stays busy until the child taps Next
     }
     if (event.kind === 'at-bat-complete' && event.gameOver) {
-      sfx.fanfare()
       navigate(`/game/${gameId}/results`, { replace: true })
       return
     }
@@ -127,7 +120,11 @@ export function GamePage() {
 
         <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(20rem,1fr)] lg:items-start">
           <div className="relative overflow-hidden rounded-3xl">
-            <Field look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }} bases={state.bases} />
+            <Field
+              look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }}
+              bases={state.bases}
+              controllerRef={fieldRef}
+            />
             <Announcement text={announcement} />
           </div>
 
