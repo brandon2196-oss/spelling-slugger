@@ -63,3 +63,22 @@ export interface GameState {
   atBats: AtBat[]
   status: 'active' | 'complete'
 }
+
+/** What happened when the child submitted a word. The UI animates FROM this; it never decides outcomes. */
+export type SubmitEvent =
+  | { kind: 'ignored'; reason: 'blank' | 'complete' }
+  | { kind: 'strike'; strike: 1 | 2; attemptsSoFar: Attempt[] }
+  | {
+      kind: 'at-bat-complete'
+      outcome: Outcome
+      attempts: Attempt[]
+      runsScored: number
+      basesBefore: Bases
+      basesAfter: Bases
+      outsAfter: number
+      inningEnded: boolean
+      nextInning: number
+      gameOver: boolean
+      correctSpelling: string
+      word: GameWord
+    }
