@@ -11,6 +11,9 @@ import { ParentGate } from './features/parent/ParentGate'
 import { ParentIndex, ParentLayout } from './features/parent/ParentLayout'
 import { ListsPage } from './features/parent/ListsPage'
 import { ListEditorPage } from './features/parent/ListEditorPage'
+import { ChildHomePage } from './features/home/ChildHomePage'
+import { GamePage } from './features/game/GamePage'
+import { ResultsPage } from './features/game/ResultsPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <WelcomePage /> },
@@ -24,6 +27,9 @@ export const router = createBrowserRouter([
       { path: '/players', element: <PlayersPage /> },
       { path: '/players/new', element: <PlayerEditorPage /> },
       { path: '/players/:id/edit', element: <PlayerEditorPage /> },
+      { path: '/play/:playerId', element: <ChildHomePage /> },
+      { path: '/game/:gameId', element: <GamePage /> },
+      { path: '/game/:gameId/results', element: <ResultsPage /> },
       {
         path: '/parent',
         element: <ParentGate />,

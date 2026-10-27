@@ -44,3 +44,12 @@ h1, h2, h3 { font-family: var(--font-display); }
   30%, 50%, 70% { transform: translateX(-6px); }
   40%, 60% { transform: translateX(6px); }
 }
+
+@keyframes announce {
+  0% { transform: scale(0.4); opacity: 0; }
+  25% { transform: scale(1.1); opacity: 1; }
+  40% { transform: scale(1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.announce { animation: announce .6s cubic-bezier(.2,1.4,.4,1) both; }
+@media (prefers-reduced-motion: reduce) { .announce { animation: none; } }
