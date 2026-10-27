@@ -37,3 +37,10 @@ h1, h2, h3 { font-family: var(--font-display); }
 .btn-secondary { background: var(--chalk); color: var(--navy); box-shadow: 0 5px 0 #c9bfa8; }
 .btn-primary:active, .btn-secondary:active { transform: translateY(3px); box-shadow: none; }
 .btn-primary:focus-visible, .btn-secondary:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+}

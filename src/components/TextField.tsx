@@ -1,9 +1,10 @@
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react'
+import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from 'react'
 
 export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: ReactNode
   hint?: ReactNode
   error?: string | null
+  ref?: Ref<HTMLInputElement>
 }
 
 export function TextField({ label, hint, error, className = '', id, ...rest }: TextFieldProps) {
