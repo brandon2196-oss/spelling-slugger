@@ -26,3 +26,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 h1, h2, h3 { font-family: var(--font-display); }
+
+/* Link-shaped buttons share the Button look. */
+.btn-primary, .btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font-family: var(--font-display); font-weight: 700; border-radius: 1rem; text-decoration: none;
+  padding: .75rem 1.5rem; min-height: 3.5rem; transition: transform .1s;
+}
+.btn-primary { background: var(--red); color: var(--chalk); box-shadow: 0 5px 0 #9a1a2b; }
+.btn-secondary { background: var(--chalk); color: var(--navy); box-shadow: 0 5px 0 #c9bfa8; }
+.btn-primary:active, .btn-secondary:active { transform: translateY(3px); box-shadow: none; }
+.btn-primary:focus-visible, .btn-secondary:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
