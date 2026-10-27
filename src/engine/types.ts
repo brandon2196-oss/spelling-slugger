@@ -66,7 +66,7 @@ export interface GameState {
 
 /** What happened when the child submitted a word. The UI animates FROM this; it never decides outcomes. */
 export type SubmitEvent =
-  | { kind: 'ignored'; reason: 'blank' | 'complete' }
+  | { kind: 'ignored'; reason: 'blank' | 'complete' | 'busy' }
   | { kind: 'strike'; strike: 1 | 2; attemptsSoFar: Attempt[] }
   | {
       kind: 'at-bat-complete'
