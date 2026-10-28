@@ -42,7 +42,7 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
-        codeSplitting: { groups: [{ name: 'phaser', test: /node_modules[\\/]phaser/ }] },
+        codeSplitting: { groups: [{ name: 'phaser', test: /node_modules[\\/]phaser/ }, { name: 'pdf', test: /node_modules[\\/]pdfjs-dist/ }] },
       },
     },
   },

@@ -58,7 +58,8 @@ export async function registerAndCreatePlayer(page: Page): Promise<string> {
 }
 
 /** Open the parent zone (setting the PIN 1234 the first time) and save a word list. */
-export async function addWordList(page: Page, playerId: string, words: string[]): Promise<void> {
+/** First visit to the parent zone: set the PIN 1234, land on the player's lists, open a new list. */
+export async function openNewList(page: Page, playerId: string): Promise<void> {
   await page.goto('/parent')
   await page.getByText('Set a parent PIN').waitFor()
   for (const d of '1234'.split('')) await page.getByRole('button', { name: d, exact: true }).click()
@@ -66,6 +67,10 @@ export async function addWordList(page: Page, playerId: string, words: string[])
   for (const d of '1234'.split('')) await page.getByRole('button', { name: d, exact: true }).click()
   await page.waitForURL(new RegExp(`/parent/players/${playerId}/lists$`))
   await page.getByRole('link', { name: 'New week' }).click()
+}
+
+export async function addWordList(page: Page, playerId: string, words: string[]): Promise<void> {
+  await openNewList(page, playerId)
   const input = page.getByLabel('Type a word and press Enter')
   for (const w of words) {
     await input.fill(w)
