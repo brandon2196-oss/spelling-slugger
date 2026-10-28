@@ -107,6 +107,32 @@ function parseCredentials(b: unknown, minPassword: number) {
 /** Express 5 types params as string | string[]; our routes have no repeat segments. */
 const param = (req: Request, name: string): string => String(req.params[name] ?? '')
 
+// ---------------------------------------------------------------- rate limiting
+/** Sliding-window counter per key, in memory (per instance). Enough to stop password and PIN guessing. */
+function limiter(max: number, windowMs: number) {
+  const hits = new Map<string, number[]>()
+  return {
+    /** Records an attempt; false when the key is over its limit. */
+    hit(key: string): boolean {
+      const now = Date.now()
+      const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs)
+      if (recent.length >= max) {
+        hits.set(key, recent)
+        return false
+      }
+      recent.push(now)
+      hits.set(key, recent)
+      if (hits.size > 10_000) for (const [k, v] of hits) if (v.every((t) => now - t >= windowMs)) hits.delete(k)
+      return true
+    },
+    reset(key: string) {
+      hits.delete(key)
+    },
+  }
+}
+const LOGIN_LIMIT = { max: 10, windowMs: 15 * 60_000 }
+const PIN_LIMIT = { max: 10, windowMs: 5 * 60_000 }
+
 // ---------------------------------------------------------------- cookies
 function readCookie(req: Request, name: string): string | null {
   const header = req.headers.cookie
@@ -128,6 +154,9 @@ export function createApp(db: Db, opts: AppOptions) {
       httpOnly: true, sameSite: 'lax', secure: opts.secureCookies, path: '/', maxAge: SESSION_DAYS * 86_400_000,
     })
   const clearSession = (res: Response) => res.clearCookie(SESSION_COOKIE, { path: '/' })
+
+  const loginLimiter = limiter(LOGIN_LIMIT.max, LOGIN_LIMIT.windowMs)
+  const pinLimiter = limiter(PIN_LIMIT.max, PIN_LIMIT.windowMs)
 
   interface Ctx { user: SessionUser; store: Store }
   const ctxOf = new WeakMap<Request, Ctx>()
@@ -171,8 +200,11 @@ export function createApp(db: Db, opts: AppOptions) {
   }))
   api.post('/auth/login', h(async (req, res) => {
     const { email, password } = parseCredentials(req.body, 1)
+    const key = `${req.ip ?? '?'}|${email.toLowerCase()}`
+    if (!loginLimiter.hit(key)) throw new HttpError(429, 'TOO_MANY_ATTEMPTS')
     const user = await authenticate(db, email, password)
     if (!user) throw new HttpError(401, 'INVALID_CREDENTIALS')
+    loginLimiter.reset(key)
     setSession(res, await createSession(db, user.userId))
     res.json({ user: { id: user.userId, email: user.email } })
   }))
@@ -271,7 +303,11 @@ export function createApp(db: Db, opts: AppOptions) {
   }))
   api.post('/pin/verify', h(async (req, res) => {
     const pin = str(isObj(req.body) ? req.body.pin : undefined, 4, 4)
-    res.json({ ok: await requireUser(req).store.verifyParentPin(pin) })
+    const { user, store } = requireUser(req)
+    if (!pinLimiter.hit(user.familyId)) throw new HttpError(429, 'TOO_MANY_ATTEMPTS')
+    const ok = await store.verifyParentPin(pin)
+    if (ok) pinLimiter.reset(user.familyId)
+    res.json({ ok })
   }))
   api.delete('/account', h(async (req, res) => {
     const { store } = requireUser(req)

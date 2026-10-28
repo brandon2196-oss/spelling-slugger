@@ -19,6 +19,10 @@ interface Props {
   onPasteInstead(): void
 }
 
+/** A real list has at least this many list-like words; fewer, with little other text, is a scan. */
+const MIN_LIKELY_WORDS = 3
+const MAX_OTHER_WHEN_SPARSE = 10
+
 const plural = (n: number) => (n === 1 ? '1 word' : `${n} words`)
 
 /** Drop zone → read the PDF in the browser → let the parent untick strays → add. Nothing is uploaded. */
@@ -32,8 +36,10 @@ export function PdfImport({ onAdd, onPasteInstead }: Props) {
     setPhase({ kind: 'reading', fileName: file.name })
     try {
       const result = await extractPdfLines(await file.arrayBuffer())
-      if (!result.hasText) return setPhase({ kind: 'scanned', fileName: file.name })
       const { likely, other } = extractCandidates(result.lines)
+      // Phone scanner apps stamp a footer ("Scanned by …") on an otherwise image-only page.
+      const sparse = likely.length < MIN_LIKELY_WORDS && other.length < MAX_OTHER_WHEN_SPARSE
+      if (!result.hasText || sparse) return setPhase({ kind: 'scanned', fileName: file.name })
       if (likely.length === 0 && other.length === 0) return setPhase({ kind: 'empty', fileName: file.name })
       setPhase({ kind: 'review', fileName: file.name, likely, other, selected: new Set(likely) })
     } catch {
@@ -140,7 +146,7 @@ export function PdfImport({ onAdd, onPasteInstead }: Props) {
 
   const message =
     phase.kind === 'scanned'
-      ? `${phase.fileName} is a picture of the words, not text, so it can't be read here.`
+      ? `${phase.fileName} is a picture of the words (a photo or scan), not text, so it can't be read here.`
       : phase.kind === 'empty'
         ? `No words were found in ${phase.fileName}.`
         : `Couldn't read ${phase.fileName}.`

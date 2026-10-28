@@ -60,6 +60,20 @@ describe('extractCandidates', () => {
     expect(other).toEqual(['Please', 'practice', 'every', 'night'])
   })
 
+  it('splits a numbered multi-column row at each interior number', () => {
+    const lines = ['1. apple 6. brave 11. candy 16. dream', '2. bend 7. cloud 12. dance 17. eagle']
+    expect(extractCandidates(lines).likely).toEqual(['apple', 'brave', 'candy', 'dream', 'bend', 'cloud', 'dance', 'eagle'])
+  })
+
+  it('keeps both words when two numbered definitions share a line', () => {
+    const { likely } = extractCandidates(['1. brave: showing courage 2. calm: not upset'])
+    expect(likely).toEqual(['brave', 'calm'])
+  })
+
+  it('does not split on bare numbers inside a title', () => {
+    expect(extractCandidates(['Week 9 Unit 3 Words', 'ocean']).likely).toEqual(['ocean'])
+  })
+
   it('returns empty for empty input', () => {
     expect(extractCandidates([])).toEqual({ likely: [], other: [] })
   })

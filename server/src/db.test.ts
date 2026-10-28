@@ -1,5 +1,6 @@
 // @vitest-environment node
-import { createTestDb, migrate, type Db } from './db'
+import { EventEmitter } from 'node:events'
+import { createPgDb, createTestDb, migrate, type Db } from './db'
 
 let db: Db
 beforeAll(async () => {
@@ -29,5 +30,34 @@ describe('migrate', () => {
     await expect(
       db.query('insert into users (family_id, email, password_hash) values ($1, $2, $3)', [fid, 'mom@example.com', 'y']),
     ).rejects.toThrow()
+  })
+})
+
+describe('createPgDb', () => {
+  it('survives an idle-connection error from the pool instead of crashing the process', async () => {
+    const pools: EventEmitter[] = []
+    vi.doMock('pg', () => ({
+      default: {
+        Pool: class extends EventEmitter {
+          constructor() { super(); pools.push(this) }
+          query = async () => ({ rows: [] })
+          end = async () => undefined
+        },
+      },
+    }))
+    const errors: unknown[] = []
+    const spy = vi.spyOn(console, 'error').mockImplementation((...a) => { errors.push(a) })
+    try {
+      const pg = createPgDb('postgres://x')
+      await pg.query('select 1')
+      expect(pools).toHaveLength(1)
+      // With no 'error' listener EventEmitter throws here, which in production exits the process.
+      expect(() => pools[0]!.emit('error', new Error('terminating connection due to idle timeout'))).not.toThrow()
+      expect(errors.length).toBeGreaterThan(0)
+      await pg.close()
+    } finally {
+      spy.mockRestore()
+      vi.doUnmock('pg')
+    }
   })
 })

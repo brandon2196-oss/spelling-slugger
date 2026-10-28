@@ -15,7 +15,8 @@ npm install
 npm run dev
 ```
 With no `.env.local`, the app runs in **local mode**: a fake sign-in and data kept in the browser,
-so you can click through everything without an account. To use real accounts, copy `.env.example`
+so you can click through everything without an account. Production builds talk to the app's own API
+(`server/`); see `docs/DEPLOY.md` for running it on Replit.
 
 ## Scripts
 

@@ -14,7 +14,12 @@ export type Queryable = Pick<Db, 'query'>
 
 export function createPgDb(connectionString: string): Db {
   // Lazy so the test build never loads `pg`.
-  const poolP = import('pg').then(({ default: pg }) => new pg.Pool({ connectionString, max: 5 }))
+  const poolP = import('pg').then(({ default: pg }) => {
+    const pool = new pg.Pool({ connectionString, max: 5 })
+    // Managed Postgres drops idle connections; without a listener that is an uncaught exception.
+    pool.on('error', (e) => console.error('pg pool: idle connection error', e.message))
+    return pool
+  })
   return {
     async query(sql, params) {
       const pool = await poolP

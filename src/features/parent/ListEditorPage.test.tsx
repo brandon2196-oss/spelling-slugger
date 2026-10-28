@@ -11,6 +11,7 @@ vi.mock('./import/pdfText', () => ({
     const name = new TextDecoder().decode(data)
     if (name === 'scanned') return { lines: [], pages: 1, hasText: false }
     if (name === 'broken') throw new Error('bad xref')
+    if (name === 'footer') return { lines: ['Scanned by CamScanner'], pages: 1, hasText: true }
     return { lines: ['Spelling Words', 'Week 9', 'cat', 'dog', 'bird', 'fish', 'frog', 'Please practice every night'], pages: 1, hasText: true }
   }),
 }))
@@ -119,6 +120,14 @@ describe('ListEditorPage', () => {
       expect(await screen.findByText(/picture of the words/i)).toBeInTheDocument()
       await user.click(screen.getByRole('button', { name: /paste instead/i }))
       expect(screen.getByLabelText(/paste words/i)).toBeInTheDocument()
+    })
+
+    it('treats a page whose only text is a scanner footer as a scan', async () => {
+      const user = userEvent.setup()
+      await setup()
+      await user.upload(await screen.findByLabelText(/choose a pdf/i), pdf('footer', 'IMG_0412.pdf'))
+      expect(await screen.findByText(/picture of the words/i)).toBeInTheDocument()
+      expect(screen.queryByText(/Found/)).not.toBeInTheDocument()
     })
 
     it('reports a PDF it cannot read and leaves the editor usable', async () => {

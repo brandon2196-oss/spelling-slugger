@@ -129,6 +129,28 @@ describe('auth', () => {
   })
 })
 
+describe('rate limits', () => {
+  it('locks login for an email after 10 failed attempts, even with the right password', async () => {
+    const { email: e } = await signedUp()
+    const c = client(base)
+    for (let i = 0; i < 10; i++) expect((await c.post('/api/auth/login', { email: e, password: 'wrong-password' })).status).toBe(401)
+    const locked = await c.post('/api/auth/login', { email: e, password: 'long-enough-pw' })
+    expect(locked.status).toBe(429)
+    expect(locked.body).toEqual({ error: 'TOO_MANY_ATTEMPTS' })
+    // another account is unaffected
+    const { c: other } = await signedUp()
+    expect((await other.get('/api/auth/me')).status).toBe(200)
+  })
+
+  it('locks PIN checks for a family after 10 wrong guesses', async () => {
+    const { c } = await signedUp()
+    await c.put('/api/pin', { pin: '1234' })
+    for (let i = 0; i < 10; i++) expect((await c.post('/api/pin/verify', { pin: '0000' })).body).toEqual({ ok: false })
+    const locked = await c.post('/api/pin/verify', { pin: '1234' })
+    expect(locked.status).toBe(429)
+  })
+})
+
 describe('players, lists, games over HTTP', () => {
   it('runs the whole weekly flow', async () => {
     const { c } = await signedUp()

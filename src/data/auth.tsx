@@ -142,6 +142,7 @@ export function authErrorMessage(e: unknown): string {
   if (msg === 'INVALID_CREDENTIALS') return "That email or password doesn't match."
   if (msg === 'EMAIL_TAKEN') return 'An account with that email already exists. Try signing in.'
   if (msg === 'UNAUTHENTICATED') return 'You are signed out. Please sign in again.'
+  if (msg === 'TOO_MANY_ATTEMPTS') return 'Too many tries. Wait a few minutes and try again.'
   if (msg === 'OFFLINE') return "Can't reach the server. Check the connection and try again."
   if (msg === 'INVALID_EMAIL') return 'That does not look like an email address.'
   if (msg === 'BAD_REQUEST') return 'Something in that form was not accepted. Check the fields and try again.'

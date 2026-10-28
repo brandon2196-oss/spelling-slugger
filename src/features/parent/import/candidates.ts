@@ -12,6 +12,8 @@ const HEADER_WORDS = new Set([
   'spelling', 'words', 'word', 'week', 'weeks', 'name', 'date', 'list', 'lists', 'unit', 'lesson',
   'grade', 'test', 'challenge', 'bonus', 'review', 'homework', 'teacher', 'mrs', 'mr', 'ms', 'miss',
   'page', 'due', 'vocabulary', 'quiz', 'dictation', 'pretest', 'posttest',
+  // phone scanner footers
+  'scanned', 'scan', 'camscanner', 'adobe',
 ])
 
 const NUMBERING = /^\s*(?:\d{1,2}\s*[.):]?|[•·\-–—*>])\s+/
@@ -46,11 +48,17 @@ function listEntries(line: string): string[] | null {
   return null
 }
 
+/** "1. apple 6. brave 11. candy" is three entries on one baseline (a multi-column sheet). */
+function splitNumbered(line: string): string[] {
+  if (!/^\d{1,2}[.)]\s/.test(line)) return [line]
+  return line.split(/\s+(?=\d{1,2}[.)]\s)/)
+}
+
 export function extractCandidates(lines: string[]): Candidates {
   const likely: string[] = []
   const other: string[] = []
 
-  for (const raw of lines) {
+  for (const raw of lines.flatMap((l) => splitNumbered(l.trim()))) {
     const line = raw.trim()
     if (!line) continue
     const entries = listEntries(line)

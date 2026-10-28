@@ -6,7 +6,8 @@ entrypoint = "server/src/index.ts"
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["sh", "-c", "npm ci && npm run build:all"]
+# --include=dev: the build itself needs vite and typescript even if NODE_ENV=production is set.
+build = ["sh", "-c", "npm ci --include=dev && npm run build:all"]
 run = ["npm", "start"]
 
 [[ports]]
