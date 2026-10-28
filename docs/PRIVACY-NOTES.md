@@ -3,8 +3,8 @@
 Written for the parent running this app, not as legal advice. Verify before sharing widely.
 
 ## What the app collects
-- **Parent:** email address and a password (hashed by Supabase; the app never sees it). Optional
-  4-digit parent PIN, stored as a bcrypt hash.
+- **Parent:** email address and a password, stored only as a salted scrypt hash on the server.
+  Optional 4-digit parent PIN, stored the same way.
 - **Child:** a first name or nickname, a team name, a jersey number, and avatar colors chosen from a
   fixed palette. No birthday, school, photo, address, or email.
 - **Gameplay:** the word lists a parent types or imports, every spelling attempt a child submits,
@@ -19,8 +19,9 @@ Written for the parent running this app, not as legal advice. Verify before shar
 - No ads, no payments, no subscriptions, no selling or sharing of data.
 - Children never create accounts, never enter an email, and are never shown to other families.
   There is no public profile or leaderboard.
-- One family cannot read another family's data. Postgres row-level security enforces this on the
-  server for every table; the frontend has no privileged key.
+- One family cannot read another family's data. The server scopes every database query to the
+  signed-in parent's family; the browser never talks to the database and holds no key. An
+  automated test (`server/src/app.test.ts`) checks this for every endpoint on every run.
 
 ## COPPA, in plain terms
 COPPA governs online collection of personal information from children under 13. The posture here:
@@ -40,6 +41,7 @@ Account → Delete account removes the family, every child, list, game and attem
 login, in one transaction. Deleting a single player removes everything under that player.
 
 ## Hosting
-Supabase (database and auth) and Vercel (static hosting) process the data. Both publish their own
-privacy and security documentation; the free tiers used here include encryption in transit (HTTPS)
-and at rest.
+The app runs as one service on Replit (an Autoscale deployment with a Replit-managed Postgres
+database) under the site owner's own account. Replit publishes its own privacy and security
+documentation; traffic is HTTPS and the database is encrypted at rest. Passwords and PINs are stored
+only as salted hashes. There are no analytics and no third-party services beyond Google Fonts.

@@ -1,5 +1,5 @@
 /**
- * LocalStore: everything in one localStorage blob. Used for development before a Supabase
+ * LocalStore: everything in one localStorage blob. Used for development and tests; the API store (api-store.ts) is the production one. Formerly a stand-in before a
  * project exists and for end-to-end tests. Single implicit family; no real security.
  */
 import type { GameSummary } from '../engine/results'

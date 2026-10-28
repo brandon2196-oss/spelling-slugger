@@ -1,62 +1,64 @@
-# Deploying Cooper's Spelling Slugger
+# Deploying Cooper's Spelling Slugger on Replit
 
-Three services, all on free tiers. Expected running cost: **$0/month**.
+Everything runs on Brandon's existing **Replit Core** plan: one Autoscale deployment (the Node server
+that serves the game and its API) plus a Replit Postgres database. No other vendor, no new
+subscription. GitHub holds the code; Replit pulls from it.
 
-| Piece | Service | Free tier | What it does |
-| --- | --- | --- | --- |
-| Database + accounts | Supabase | 500 MB database, 50k monthly active users, 2 projects | Stores families, players, word lists, games. Handles email/password sign-in and password-reset emails. |
-| Hosting | Vercel (Hobby) | 100 GB bandwidth/month, non-commercial use | Serves the app over HTTPS, redeploys on every push to `main`. |
-| Code | GitHub (private repo) | Unlimited private repos | Where you push changes from your Mac. |
+| Piece | Where | Notes |
+| --- | --- | --- |
+| Code | GitHub, private repo `brandon2196-oss/spelling-slugger` | Push from the Mac. |
+| App + API | Replit Autoscale deployment | `npm run build:all` then `npm start` (see `.replit`). Bills against Core usage; one family is near the floor. |
+| Database | Replit Postgres (production database) | Created from the Database tool; `DATABASE_URL` is injected. |
+| Domain | Your Extra Inning domain | Linked to the deployment under Deployments → Settings → Domains. |
 
-Things to know about the free tiers:
-- **Supabase pauses a free project after 7 days with no traffic.** Open the Supabase dashboard and click
-  "Restore" to wake it (takes about a minute). If a family hits the app while it is paused they see a
-  sign-in error until it wakes. The $25/month Pro plan removes the pause; not needed unless this
-  becomes a nuisance.
-- **Vercel Hobby is for non-commercial use.** This app has no payments or ads, so it qualifies.
-- A custom domain (for example `spellingslugger.com`) is optional, about $12/year from any registrar.
+## 1. Import the repo into Replit (one time)
+1. In Replit: **Create App → Import from GitHub** → pick `spelling-slugger`. Replit reads `.replit`
+   (Node 22, build and run commands, port 3000).
+2. Open the **Database** tool in the workspace and create a Postgres database. The workspace gets a
+   development database; the deployment gets its own production database on first publish.
+3. Press **Run** once in the workspace: it builds the frontend and server and starts on port 3000.
+   The webview should show the welcome screen. Register a test family to confirm the database works.
 
-## 1. Supabase (about 5 minutes)
-Follow [`../supabase/README.md`](../supabase/README.md): create the project, run the migration in the
-SQL editor, set the Auth URLs, copy the project URL and anon key.
+## 2. Publish
+1. **Deploy → Autoscale**. Build command and run command are pre-filled from `.replit`:
+   build `npm ci && npm run build:all`, run `npm start`.
+2. When asked about the database, choose to create / use the **production** database so real data
+   never lives in the dev database.
+3. Publish. The first URL is `https://<app>.<user>.replit.app`.
 
-## 2. GitHub
-From the project folder:
-```bash
-gh repo create spelling-slugger --private --source . --push
-```
+## 3. Put it on the Extra Inning domain
+Deployments → **Settings → Domains → Link a domain** → enter the hostname you want (for example a
+subdomain of the Extra Inning domain). Replit shows the DNS records to add at the registrar (an A or
+CNAME record plus a TXT verification record). After DNS propagates, Replit issues the certificate.
+Cookies and share links follow the host automatically; nothing in the code names the domain.
 
-## 3. Vercel
-1. https://vercel.com → Add New → Project → import `spelling-slugger` from GitHub.
-2. Framework preset: Vite (detected). Build command `npm run build`, output `dist` (defaults).
-3. Environment variables (Production and Preview):
-   - `VITE_STORE` = `supabase`
-   - `VITE_SUPABASE_URL` = your project URL
-   - `VITE_SUPABASE_ANON_KEY` = your anon key
-   - `VITE_APP_URL` = `https://<your-project>.vercel.app` (update after the first deploy, then redeploy)
-4. Deploy. Copy the URL into Supabase → Authentication → URL Configuration (Site URL and `/reset`
-   redirect), then redeploy once so `VITE_APP_URL` matches.
-
-Every later `git push` to `main` redeploys automatically. The family's laptop needs nothing installed: it is a
-website, and "Add to Home Screen" / "Install app" in the browser makes it feel native.
-
-## 4. Verify after the first deploy
-- Open the URL on an iPhone (Safari) and a laptop. Register a test family, add a list, play a game.
-- Share → Add to Home Screen on the iPhone; the icon and name should appear.
-- Run the family-isolation test once against the live project (use a second throwaway Supabase
-  project or accept that it creates and deletes two test users):
-  ```bash
-  SUPABASE_TEST_URL=... SUPABASE_TEST_ANON_KEY=... SUPABASE_TEST_SERVICE_KEY=... npm test
-  ```
+## 4. Verify after the first publish
+- Open the URL on an iPhone (Safari) and a laptop. Register a family, add a list (drop in a PDF),
+  play a game, check the parent zone and history.
+- Share → Add to Home Screen on the iPhone; icon and name should appear.
 - Delete the test family from Account → Delete account.
 
 ## Updating the app
 ```bash
-npm test && npm run build && git push
+npm test && npm run build:all && git push
 ```
-Vercel builds and publishes in about a minute. Installed home-screen copies pick up the new version
-on their next launch (the service worker auto-updates).
+Then in Replit: pull the latest `main` (Git pane → Pull) and **Republish**. Installed home-screen
+copies pick up the new version on their next launch.
 
-## Local development without Supabase
-`npm run dev` with no `.env.local` runs in **local mode**: a fake sign-in and localStorage data, so
-you can try everything on your own machine. Nothing in local mode is shared or backed up.
+## Password resets (no email provider)
+Resets are done by you, from the workspace **Shell**, against the production database:
+```bash
+npm run reset-password -- mom@example.com NewPassword123
+```
+The workspace shell uses the development database by default; to point it at production, copy the
+production `DATABASE_URL` from the Database tool's production tab into the command
+(`DATABASE_URL='postgres://…' npm run reset-password -- …`). The parent can then change the password
+under Parent zone → Account.
+
+## Local full-stack development (optional)
+No Postgres install needed: PGlite (Postgres compiled to WebAssembly) runs embedded.
+```bash
+npm run dev:api                 # server on :3000 with DATABASE_URL=pglite://.data/dev
+VITE_STORE=api npm run dev      # frontend on :5173, /api proxied to :3000
+```
+Plain `npm run dev` keeps running in local mode (no server) as before.

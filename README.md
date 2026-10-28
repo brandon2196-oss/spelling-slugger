@@ -6,7 +6,7 @@ lists and read progress. One private account per family; kids never need an acco
 
 - Spec: [`docs/superpowers/specs/2026-10-26-spelling-slugger-spec.md`](docs/superpowers/specs/2026-10-26-spelling-slugger-spec.md)
 - Plan: [`docs/superpowers/plans/2026-10-26-spelling-slugger.md`](docs/superpowers/plans/2026-10-26-spelling-slugger.md)
-- Deploying and costs: [`docs/DEPLOY.md`](docs/DEPLOY.md) · Supabase setup: [`supabase/README.md`](supabase/README.md)
+- Deploying on Replit and costs: [`docs/DEPLOY.md`](docs/DEPLOY.md)
 - Privacy: [`docs/PRIVACY-NOTES.md`](docs/PRIVACY-NOTES.md)
 
 ## Run it locally
@@ -16,7 +16,6 @@ npm run dev
 ```
 With no `.env.local`, the app runs in **local mode**: a fake sign-in and data kept in the browser,
 so you can click through everything without an account. To use real accounts, copy `.env.example`
-to `.env.local` and fill in the Supabase values (see `supabase/README.md`).
 
 ## Scripts
 
@@ -36,7 +35,7 @@ to `.env.local` and fill in the Supabase values (see `supabase/README.md`).
   (`game.ts`), weekly word selection with review words (`selection.ts`), summaries (`results.ts`)
   and replay of a saved attempt log (`replay.ts`). Every spec rule has a test here.
 - **`src/data/`** is one `Store` interface with two backends: `LocalStore` (localStorage) and
-  `SupabaseStore` (Postgres with row-level security, schema in `supabase/migrations/`). A game's
+  `ApiStore` (the app's own API in `server/`, Postgres schema in `server/migrations/`, every query scoped to the signed-in family). A game's
   truth is its ordered attempt log; resuming replays it through the engine, so a refresh or a
   double-submit can never score twice.
 - **`src/field/`** is the Phaser stadium. It only animates events the engine already decided.
@@ -55,6 +54,5 @@ to `.env.local` and fill in the Supabase values (see `supabase/README.md`).
   (test 22), which needs a real database: see the next two lines.
 - `npm run e2e` registers a family, sets the PIN, enters a list, plays a game with a mid-word
   reload, and checks the parent zone re-locks, on desktop and iPhone viewports.
-- `src/data/rls.integration.test.ts` proves family isolation against a real Supabase project and
-  runs only when `SUPABASE_TEST_*` variables are set. **It has not been run yet**; do that against a
-  throwaway project before sharing the app (steps in `docs/DEPLOY.md`).
+- `server/src/store.test.ts` and `server/src/app.test.ts` prove family isolation (spec test 22) against PGlite,
+  Postgres compiled to WebAssembly, so it runs in every `npm test` with nothing installed.

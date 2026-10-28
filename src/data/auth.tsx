@@ -1,5 +1,4 @@
-/** Parent authentication. One interface, two backends: localStorage (dev/tests) and Supabase. */
-import type { SupabaseClient } from '@supabase/supabase-js'
+/** Parent authentication. One interface, two backends: localStorage (dev/tests) and the app's API (api-auth.ts). */
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 export interface AuthUser {
@@ -86,42 +85,6 @@ export function createLocalAuth(): AuthBackend {
       const entry = Object.values(b.users).find((v) => v.id === b.current)
       if (entry) entry.pass = newPassword
       save(b)
-    },
-  }
-}
-
-// ---------------------------------------------------------------- supabase backend
-export function createSupabaseAuth(sb: SupabaseClient, appUrl: string): AuthBackend {
-  const toUser = (u: { id: string; email?: string } | null | undefined): AuthUser | null =>
-    u ? { id: u.id, email: u.email ?? null } : null
-  return {
-    async getUser() {
-      const { data } = await sb.auth.getSession()
-      return toUser(data.session?.user)
-    },
-    onChange(cb) {
-      const { data } = sb.auth.onAuthStateChange((_evt, session) => cb(toUser(session?.user)))
-      return () => data.subscription.unsubscribe()
-    },
-    async signIn(email, password) {
-      const { error } = await sb.auth.signInWithPassword({ email, password })
-      if (error) throw new Error(/invalid/i.test(error.message) ? 'INVALID_CREDENTIALS' : error.message)
-    },
-    async signUp(email, password) {
-      const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: appUrl } })
-      if (error) throw new Error(/registered|exists/i.test(error.message) ? 'EMAIL_TAKEN' : error.message)
-      return data.session ? 'signed_in' : 'confirm_email'
-    },
-    async signOut() {
-      await sb.auth.signOut()
-    },
-    async resetPassword(email) {
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${appUrl}/reset` })
-      if (error) throw new Error(error.message)
-    },
-    async updatePassword(newPassword) {
-      const { error } = await sb.auth.updateUser({ password: newPassword })
-      if (error) throw new Error(error.message)
     },
   }
 }
