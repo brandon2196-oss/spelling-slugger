@@ -3,12 +3,14 @@ import { Link, useParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
 import { useStore } from '../../data/store'
+import { useAudioSettings } from '../../audio/settings'
 import { primeSpeech } from '../../audio/speech'
 import { sfx } from '../../audio/sfx'
 import type { GameRecord, WordList } from '../../data/types'
 import { resumeOrNull, startMissedWordsGame, startWeeklyGame } from '../game/startGame'
 import { PlayerPreview } from '../players/PlayerPreview'
 import { usePlayer } from '../players/usePlayers'
+import { AnnouncerPicker } from './AnnouncerPicker'
 import { useGuardedStart } from './useGuardedStart'
 
 export function ChildHomePage() {
@@ -19,6 +21,7 @@ export function ChildHomePage() {
   const [resume, setResume] = useState<GameRecord | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const { start, modal } = useGuardedStart(playerId)
+  const audio = useAudioSettings()
 
   useEffect(() => {
     store.listWordLists(playerId).then((ls) => setActive(ls.find((l) => l.isActive) ?? null))
@@ -83,6 +86,11 @@ export function ChildHomePage() {
           </div>
           {notice ? <p className="text-center text-gold">{notice}</p> : null}
         </div>
+
+        <section aria-label="Announcer" className="mt-8">
+          <h2 className="pixel-text text-gold text-sm mb-3">In the booth tonight</h2>
+          <AnnouncerPicker value={audio.announcer} onChange={(id) => { primeSpeech(); sfx.unlock(); audio.set({ announcer: id }) }} />
+        </section>
       </div>
       {modal}
     </Stadium>

@@ -11,6 +11,9 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   await addWordList(page, playerId, ['cat', 'dog', 'sun'])
 
   await page.goto(`/play/${playerId}`)
+  // the booth: pick the laid-back announcer, then play
+  await page.getByRole('button', { name: /Smooth Eddie/ }).click()
+  await expect(page.getByRole('button', { name: /Smooth Eddie/ })).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: "Play this week's game" }).click()
   await page.waitForURL(/\/game\/[^/]+$/)
   const input = page.getByLabel('Spell the word')
@@ -26,16 +29,17 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   await expect(page.locator('canvas')).toBeVisible()
   await page.setViewportSize(original)
 
-  // (27) the first word was spoken aloud, never shown
-  await expect.poll(async () => (await spoken(page)).length).toBeGreaterThan(0)
-  const first = (await spoken(page))[0]!
+  // (27) the first word was spoken aloud, never shown. The announcer talks too (lines with spaces);
+  // the spelling word is the last single-token utterance.
+  await expect.poll(async () => (await spoken(page)).filter((t) => !/\s/.test(t)).length).toBeGreaterThan(0)
+  const first = (await spoken(page)).filter((t) => !/\s/.test(t)).at(-1)!
   await expect(page.locator('main')).not.toContainText(first)
 
   // a first-try double
   await input.fill(first)
   await input.press('Enter')
   await expect(page.getByTestId('hits')).toHaveText('1')
-  await expect(page.getByTestId('progress')).toContainText('Word 2 of 3')
+  await expect(page.getByTestId('progress')).toContainText('Word 2/3')
 
   // one wrong submission = one strike, however wrong it is
   await expect(input).toBeEnabled()
@@ -48,18 +52,18 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   await expect(page.getByLabel('Spell the word')).toBeEnabled()
   await page.locator('[data-field-ready="1"]').waitFor()
   await expect(page.getByTestId('strikes')).toHaveText('1')
-  await expect(page.getByTestId('progress')).toContainText('Word 2 of 3')
+  await expect(page.getByTestId('progress')).toContainText('Word 2/3')
 
   // finish the game by typing whatever was spoken last; word 2 is a single that moves the runner
   // off second, word 3 a double that scores him — both vacate a base, which once froze the field
   for (let i = 0; i < 2; i++) {
-    const words = await spoken(page)
+    const words = (await spoken(page)).filter((t) => !/\s/.test(t))
     const word = words[words.length - 1]!
     const field = page.getByLabel('Spell the word')
     await field.fill(word)
     await field.press('Enter')
     if (i === 0) {
-      await expect(page.getByTestId('progress')).toContainText('Word 3 of 3')
+      await expect(page.getByTestId('progress')).toContainText('Word 3/3')
       await expect(page.getByLabel('Spell the word')).toBeEnabled({ timeout: 10_000 })
     }
   }
@@ -75,6 +79,9 @@ test('the parent zone needs the PIN and shows the finished game', async ({ page 
   const playerId = await registerAndCreatePlayer(page)
   await addWordList(page, playerId, ['cat'])
   await page.goto(`/play/${playerId}`)
+  // the booth: pick the laid-back announcer, then play
+  await page.getByRole('button', { name: /Smooth Eddie/ }).click()
+  await expect(page.getByRole('button', { name: /Smooth Eddie/ })).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: "Play this week's game" }).click()
   const input = page.getByLabel('Spell the word')
   await expect(input).toBeEnabled()

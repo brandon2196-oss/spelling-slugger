@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router'
+import { ANNOUNCERS, announcerState, sayAs, type AnnounceEvent, type CommentaryContext } from '../../audio/announcer'
 import { useAudioSettings } from '../../audio/settings'
 import { sfx } from '../../audio/sfx'
 import { primeSpeech, speakSentence, speakSlowly, speakWord, speechAvailable } from '../../audio/speech'
@@ -10,9 +11,8 @@ import { currentWord } from '../../engine/game'
 import type { Bases, SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
 import { usePlayer } from '../players/usePlayers'
-import { Announcement } from './Announcement'
+import { Broadcast } from './Broadcast'
 import { playSequence } from './playSequence'
-import { Scoreboard } from './Scoreboard'
 import { SpellingInput } from './SpellingInput'
 import { wait } from './timing'
 import { useGameSession } from './useGameSession'
@@ -36,8 +36,17 @@ export function GamePage() {
   /** What the stadium shows. Lags the engine until the play animation has run (see onSubmit). */
   const [fieldBases, setFieldBases] = useState<Bases | null>(null)
   const spokenIndex = useRef<number>(-1)
+  const introDone = useRef(false)
   const fieldRef = useRef<FieldController | null>(null)
   const canSpeak = speechAvailable()
+  /** What the booth is doing right now: drives the mouth flap and the caption bar. */
+  const [booth, setBooth] = useState(announcerState.get())
+  useEffect(() => announcerState.subscribe(setBooth), [])
+  const persona = ANNOUNCERS[audio.announcer]
+  const commentary = useCallback(
+    (evt: AnnounceEvent, ctx: CommentaryContext) => sayAs(audio.announcer, evt, ctx),
+    [audio.announcer],
+  )
 
   const word = state ? currentWord(state) : null
 
@@ -58,13 +67,20 @@ export function GamePage() {
     [word, canSpeak],
   )
 
-  // Say each new word once, when it comes up and nothing is animating.
+  // Say each new word once, when it comes up and nothing is animating. A brand-new game gets the
+  // booth's welcome first; the word is read only after that line ends.
   useEffect(() => {
     if (!state || !word || busy || reveal) return
     if (spokenIndex.current === state.index) return
     spokenIndex.current = state.index
+    if (!introDone.current && state.index === 0 && state.atBats.every((ab) => ab.attempts.length === 0)) {
+      introDone.current = true
+      void sayAs(audio.announcer, 'gameStart', { runs: 0, inning: 1 }).finally(() => hear('word'))
+      return
+    }
+    introDone.current = true
     hear('word')
-  }, [state, word, busy, reveal, hear])
+  }, [state, word, busy, reveal, hear, audio.announcer])
 
   async function announce(text: string) {
     setAnnouncement(text)
@@ -85,7 +101,7 @@ export function GamePage() {
     if (event.kind === 'ignored') return
     sfx.unlock()
     try {
-      await playSequence(fieldRef.current, sfx, announce, event)
+      await playSequence(fieldRef.current, sfx, announce, event, commentary)
     } catch (err) {
       console.error('Field animation failed; continuing without it', err)
       setAnnouncement(null)
@@ -143,20 +159,26 @@ export function GamePage() {
         </header>
 
         <div className="game-grid mt-3 grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(20rem,1fr)] lg:items-start">
-          <div className="game-field relative overflow-hidden rounded-3xl">
-            <Suspense fallback={<div className="aspect-[4/3] w-full rounded-3xl bg-grass-dark" aria-hidden="true" />}>
-              <Field
-                look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }}
-                bases={fieldBases ?? state.bases}
-                controllerRef={fieldRef}
-              />
-            </Suspense>
-            <Announcement text={announcement} />
+          <div className="game-field relative">
+            <Broadcast
+              state={state}
+              player={{ name: player.name, jerseyNumber: player.jerseyNumber, teamName: player.teamName }}
+              mode={record.mode}
+              announcer={{ name: persona.name, portrait: persona.portrait, speaking: booth.speaking }}
+              caption={booth.line}
+              announcement={announcement}
+            >
+              <Suspense fallback={<div className="aspect-[4/3] w-full bg-grass-dark" aria-hidden="true" />}>
+                <Field
+                  look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }}
+                  bases={fieldBases ?? state.bases}
+                  controllerRef={fieldRef}
+                />
+              </Suspense>
+            </Broadcast>
           </div>
 
           <div className="game-side flex flex-col gap-4">
-            <div className="game-score"><Scoreboard state={state} /></div>
-
             <section aria-label="Your turn" className="game-turn rounded-3xl bg-chalk/10 border border-chalk/15 p-4 space-y-4">
               {canSpeak ? (
                 <div className="game-hear grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
