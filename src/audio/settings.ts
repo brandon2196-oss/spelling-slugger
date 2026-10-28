@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ANNOUNCERS, type AnnouncerId } from './announcer'
 import { setSpeechVolume } from './speech'
 import { sfx } from './sfx'
 
@@ -6,14 +7,20 @@ export interface AudioSettings {
   volume: number
   muted: boolean
   sfx: boolean
+  /** Who's in the booth. Device-level, like the volume. */
+  announcer: AnnouncerId
 }
 
 const KEY = 'slugger.audio'
-const DEFAULTS: AudioSettings = { volume: 1, muted: false, sfx: true }
+const DEFAULTS: AudioSettings = { volume: 1, muted: false, sfx: true, announcer: 'bigRed' }
 
-function read(): AudioSettings {
+/** Current settings from storage, for callers outside React (the sequence player, the booth). */
+export function readAudioSettings(): AudioSettings {
   try {
-    return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) ?? '{}') as Partial<AudioSettings>) }
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? '{}') as Partial<AudioSettings>
+    const merged = { ...DEFAULTS, ...stored }
+    if (!(merged.announcer in ANNOUNCERS)) merged.announcer = DEFAULTS.announcer
+    return merged
   } catch {
     return DEFAULTS
   }
@@ -27,7 +34,7 @@ function apply(s: AudioSettings): void {
 }
 
 export function useAudioSettings() {
-  const [settings, setSettings] = useState<AudioSettings>(read)
+  const [settings, setSettings] = useState<AudioSettings>(readAudioSettings)
   useEffect(() => apply(settings), [settings])
   const set = useCallback((patch: Partial<AudioSettings>) => {
     setSettings((prev) => {

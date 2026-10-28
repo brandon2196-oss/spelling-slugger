@@ -1,6 +1,6 @@
 import { afterEach, beforeEach } from 'vitest'
 
-type Utter = { text: string; rate: number; pitch: number; volume: number; onend: null | (() => void); onerror: null | ((e: unknown) => void) }
+type Utter = { text: string; rate: number; pitch: number; volume: number; voice: unknown; onstart: null | (() => void); onend: null | (() => void); onerror: null | ((e: unknown) => void) }
 
 function installFakeSpeech() {
   const spoken: Utter[] = []
@@ -16,6 +16,8 @@ function installFakeSpeech() {
     pitch = 1
     volume = 1
     lang = ''
+    voice: unknown = null
+    onstart: null | (() => void) = null
     onend: null | (() => void) = null
     onerror: null | ((e: unknown) => void) = null
     constructor(text: string) {
@@ -62,6 +64,26 @@ describe('speech wrapper', () => {
     const { umpire } = await import('./speech')
     const p = umpire('Strike one!')
     expect(fake.spoken[0]!.pitch).toBeLessThan(1)
+    fake.spoken[0]!.onend!()
+    await p
+  })
+
+  it('uses an explicitly passed voice instead of the default pick', async () => {
+    const { speak } = await import('./speech')
+    const voice = { name: 'Daniel', lang: 'en-GB' } as unknown as SpeechSynthesisVoice
+    const p = speak('Oh my stars', { voice })
+    expect(fake.spoken[0]!.voice).toBe(voice)
+    fake.spoken[0]!.onend!()
+    await p
+  })
+
+  it('calls onStart when the utterance begins', async () => {
+    const { speak } = await import('./speech')
+    const onStart = vi.fn()
+    const p = speak('hello', { onStart })
+    expect(onStart).not.toHaveBeenCalled()
+    fake.spoken[0]!.onstart!()
+    expect(onStart).toHaveBeenCalledTimes(1)
     fake.spoken[0]!.onend!()
     await p
   })

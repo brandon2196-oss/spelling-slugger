@@ -7,6 +7,10 @@ export interface SpeakOptions {
   rate?: number
   pitch?: number
   volume?: number
+  /** Use this voice instead of the default "clear English" pick (announcer personas). */
+  voice?: SpeechSynthesisVoice | null
+  /** Fired when the browser actually starts speaking (mouth animation). */
+  onStart?: () => void
 }
 
 function synth(): SpeechSynthesis | null {
@@ -22,6 +26,11 @@ export function speechAvailable(): boolean {
 let volume = 1
 export function setSpeechVolume(v: number): void {
   volume = Math.max(0, Math.min(1, v))
+}
+
+/** The browser's voice list (empty when speech is unavailable or voices haven't loaded yet). */
+export function availableVoices(): SpeechSynthesisVoice[] {
+  return synth()?.getVoices?.() ?? []
 }
 
 /** Prefer a clear English voice when the browser offers several. */
@@ -46,8 +55,9 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
     u.pitch = opts.pitch ?? 1
     u.volume = opts.volume ?? volume
     u.lang = 'en-US'
-    const voice = pickVoice(s)
+    const voice = opts.voice ?? pickVoice(s)
     if (voice) u.voice = voice
+    if (opts.onStart) u.onstart = () => opts.onStart?.()
     let done = false
     const finish = () => {
       if (done) return
