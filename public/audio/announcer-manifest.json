@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "clips": {
+    "bigRed": {
+      "gameStart": [
+        "/audio/announcers/bigRed/gameStart-00.mp3",
+        "/audio/announcers/bigRed/gameStart-01.mp3",
+        "/audio/announcers/bigRed/gameStart-02.mp3",
+        "/audio/announcers/bigRed/gameStart-03.mp3",
+        "/audio/announcers/bigRed/gameStart-04.mp3",
+        "/audio/announcers/bigRed/gameStart-05.mp3"
+      ],
+      "double": [
+        "/audio/announcers/bigRed/double-00.mp3",
+        "/audio/announcers/bigRed/double-01.mp3",
+        "/audio/announcers/bigRed/double-02.mp3",
+        "/audio/announcers/bigRed/double-03.mp3",
+        "/audio/announcers/bigRed/double-04.mp3",
+        "/audio/announcers/bigRed/double-05.mp3"
+      ],
+      "single": [
+        "/audio/announcers/bigRed/single-00.mp3",
+        "/audio/announcers/bigRed/single-01.mp3",
+        "/audio/announcers/bigRed/single-02.mp3",
+        "/audio/announcers/bigRed/single-03.mp3",
+        "/audio/announcers/bigRed/single-04.mp3",
+        "/audio/announcers/bigRed/single-05.mp3"
+      ],
+      "walk": [
+        "/audio/announcers/bigRed/walk-00.mp3",
+        "/audio/announcers/bigRed/walk-01.mp3",
+        "/audio/announcers/bigRed/walk-02.mp3",
+        "/audio/announcers/bigRed/walk-03.mp3",
+        "/audio/announcers/bigRed/walk-04.mp3"
+      ],
+      "strike1": [
+        "/audio/announcers/bigRed/strike1-00.mp3",
+        "/audio/announcers/bigRed/strike1-01.mp3",
+        "/audio/announcers/bigRed/strike1-02.mp3",
+        "/audio/announcers/bigRed/strike1-03.mp3",
+        "/audio/announcers/bigRed/strike1-04.mp3",
+        "/audio/announcers/bigRed/strike1-05.mp3"
+      ],
+      "strike2": [
+        "/audio/announcers/bigRed/strike2-00.mp3",
+        "/audio/announcers/bigRed/strike2-01.mp3",
+        "/audio/announcers/bigRed/strike2-02.mp3",
+        "/audio/announcers/bigRed/strike2-03.mp3",
+        "/audio/announcers/bigRed/strike2-04.mp3",
+        "/audio/announcers/bigRed/strike2-05.mp3"
+      ],
+      "strikeout": [
+        "/audio/announcers/bigRed/strikeout-00.mp3",
+        "/audio/announcers/bigRed/strikeout-01.mp3",
+        "/audio/announcers/bigRed/strikeout-02.mp3",
+        "/audio/announcers/bigRed/strikeout-03.mp3",
+        "/audio/announcers/bigRed/strikeout-04.mp3",
+        "/audio/announcers/bigRed/strikeout-05.mp3"
+      ],
+      "run": [
+        "/audio/announcers/bigRed/run-00.mp3",
+        "/audio/announcers/bigRed/run-01.mp3",
+        "/audio/announcers/bigRed/run-02.mp3",
+        "/audio/announcers/bigRed/run-03.mp3",
+        "/audio/announcers/bigRed/run-04.mp3",
+        "/audio/announcers/bigRed/run-05.mp3"
+      ],
+      "runs": [
+        "/audio/announcers/bigRed/runs-00.mp3",
+        "/audio/announcers/bigRed/runs-01.mp3",
+        "/audio/announcers/bigRed/runs-02.mp3",
+        "/audio/announcers/bigRed/runs-03.mp3",
+        "/audio/announcers/bigRed/runs-04.mp3",
+        "/audio/announcers/bigRed/runs-05.mp3"
+      ],
+      "inningEnd": [
+        "/audio/announcers/bigRed/inningEnd-00.mp3",
+        "/audio/announcers/bigRed/inningEnd-01.mp3",
+        "/audio/announcers/bigRed/inningEnd-02.mp3",
+        "/audio/announcers/bigRed/inningEnd-03.mp3",
+        "/audio/announcers/bigRed/inningEnd-04.mp3",
+        "/audio/announcers/bigRed/inningEnd-05.mp3"
+      ],
+      "gameOver": [
+        "/audio/announcers/bigRed/gameOver-00.mp3",
+        "/audio/announcers/bigRed/gameOver-01.mp3",
+        "/audio/announcers/bigRed/gameOver-02.mp3",
+        "/audio/announcers/bigRed/gameOver-03.mp3",
+        "/audio/announcers/bigRed/gameOver-04.mp3",
+        "/audio/announcers/bigRed/gameOver-05.mp3"
+      ]
+    },
+    "smoothEddie": {
+      "gameStart": [
+        "/audio/announcers/smoothEddie/gameStart-00.mp3",
+        "/audio/announcers/smoothEddie/gameStart-01.mp3",
+        "/audio/announcers/smoothEddie/gameStart-02.mp3",
+        "/audio/announcers/smoothEddie/gameStart-03.mp3",
+        "/audio/announcers/smoothEddie/gameStart-04.mp3",
+        "/audio/announcers/smoothEddie/gameStart-05.mp3"
+      ],
+      "double": [
+        "/audio/announcers/smoothEddie/double-00.mp3",
+        "/audio/announcers/smoothEddie/double-01.mp3",
+        "/audio/announcers/smoothEddie/double-02.mp3",
+        "/audio/announcers/smoothEddie/double-03.mp3",
+        "/audio/announcers/smoothEddie/double-04.mp3",
+        "/audio/announcers/smoothEddie/double-05.mp3"
+      ],
+      "single": [
+        "/audio/announcers/smoothEddie/single-00.mp3",
+        "/audio/announcers/smoothEddie/single-01.mp3",
+        "/audio/announcers/smoothEddie/single-02.mp3",
+        "/audio/announcers/smoothEddie/single-03.mp3",
+        "/audio/announcers/smoothEddie/single-04.mp3",
+        "/audio/announcers/smoothEddie/single-05.mp3"
+      ],
+      "walk": [
+        "/audio/announcers/smoothEddie/walk-00.mp3",
+        "/audio/announcers/smoothEddie/walk-01.mp3",
+        "/audio/announcers/smoothEddie/walk-02.mp3",
+        "/audio/announcers/smoothEddie/walk-03.mp3",
+        "/audio/announcers/smoothEddie/walk-04.mp3",
+        "/audio/announcers/smoothEddie/walk-05.mp3"
+      ],
+      "strike1": [
+        "/audio/announcers/smoothEddie/strike1-00.mp3",
+        "/audio/announcers/smoothEddie/strike1-01.mp3",
+        "/audio/announcers/smoothEddie/strike1-02.mp3",
+        "/audio/announcers/smoothEddie/strike1-03.mp3",
+        "/audio/announcers/smoothEddie/strike1-04.mp3",
+        "/audio/announcers/smoothEddie/strike1-05.mp3"
+      ],
+      "strike2": [
+        "/audio/announcers/smoothEddie/strike2-00.mp3",
+        "/audio/announcers/smoothEddie/strike2-01.mp3",
+        "/audio/announcers/smoothEddie/strike2-02.mp3",
+        "/audio/announcers/smoothEddie/strike2-03.mp3",
+        "/audio/announcers/smoothEddie/strike2-04.mp3",
+        "/audio/announcers/smoothEddie/strike2-05.mp3"
+      ],
+      "strikeout": [
+        "/audio/announcers/smoothEddie/strikeout-00.mp3",
+        "/audio/announcers/smoothEddie/strikeout-01.mp3",
+        "/audio/announcers/smoothEddie/strikeout-02.mp3",
+        "/audio/announcers/smoothEddie/strikeout-03.mp3",
+        "/audio/announcers/smoothEddie/strikeout-04.mp3",
+        "/audio/announcers/smoothEddie/strikeout-05.mp3"
+      ],
+      "run": [
+        "/audio/announcers/smoothEddie/run-00.mp3",
+        "/audio/announcers/smoothEddie/run-01.mp3",
+        "/audio/announcers/smoothEddie/run-02.mp3",
+        "/audio/announcers/smoothEddie/run-03.mp3",
+        "/audio/announcers/smoothEddie/run-04.mp3",
+        "/audio/announcers/smoothEddie/run-05.mp3"
+      ],
+      "runs": [
+        "/audio/announcers/smoothEddie/runs-00.mp3",
+        "/audio/announcers/smoothEddie/runs-01.mp3",
+        "/audio/announcers/smoothEddie/runs-02.mp3",
+        "/audio/announcers/smoothEddie/runs-03.mp3",
+        "/audio/announcers/smoothEddie/runs-04.mp3",
+        "/audio/announcers/smoothEddie/runs-05.mp3"
+      ],
+      "inningEnd": [
+        "/audio/announcers/smoothEddie/inningEnd-00.mp3",
+        "/audio/announcers/smoothEddie/inningEnd-01.mp3",
+        "/audio/announcers/smoothEddie/inningEnd-02.mp3",
+        "/audio/announcers/smoothEddie/inningEnd-03.mp3",
+        "/audio/announcers/smoothEddie/inningEnd-04.mp3",
+        "/audio/announcers/smoothEddie/inningEnd-05.mp3"
+      ],
+      "gameOver": [
+        "/audio/announcers/smoothEddie/gameOver-00.mp3",
+        "/audio/announcers/smoothEddie/gameOver-01.mp3",
+        "/audio/announcers/smoothEddie/gameOver-02.mp3",
+        "/audio/announcers/smoothEddie/gameOver-03.mp3",
+        "/audio/announcers/smoothEddie/gameOver-04.mp3",
+        "/audio/announcers/smoothEddie/gameOver-05.mp3"
+      ]
+    },
+    "quiet": {}
+  }
+}
