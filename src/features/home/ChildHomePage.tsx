@@ -6,6 +6,7 @@ import { useStore } from '../../data/store'
 import { useAudioSettings } from '../../audio/settings'
 import { primeSpeech } from '../../audio/speech'
 import { sfx } from '../../audio/sfx'
+import { preloadAudio } from '../../audio/preload'
 import type { GameRecord, WordList } from '../../data/types'
 import { resumeOrNull, startMissedWordsGame, startWeeklyGame } from '../game/startGame'
 import { PlayerPreview } from '../players/PlayerPreview'
@@ -22,6 +23,10 @@ export function ChildHomePage() {
   const [notice, setNotice] = useState<string | null>(null)
   const { start, modal } = useGuardedStart(playerId)
   const audio = useAudioSettings()
+
+  useEffect(() => {
+    void preloadAudio(audio.announcer)
+  }, [audio.announcer])
 
   useEffect(() => {
     store.listWordLists(playerId).then((ls) => setActive(ls.find((l) => l.isActive) ?? null))
