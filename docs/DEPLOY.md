@@ -49,11 +49,16 @@ Cookies and share links follow the host automatically; nothing in the code names
 - Delete the test family from Account → Delete account.
 
 ## Updating the app
+The Replit app receives code straight from the Mac over SSH (no GitHub login inside Replit). One-time
+setup on the Mac, with the SSH command from the app's Developer → SSH tool:
 ```bash
-npm test && npm run build:all && git push
+git remote add replit ssh://<repl-id>@ssh.worf.replit.dev:22/home/runner/workspace
 ```
-Then in Replit: pull the latest `main` (Git pane → Pull) and **Republish**. Installed home-screen
-copies pick up the new version on their next launch.
+Then every update is:
+```bash
+npm test && git push origin main && git push replit main
+```
+and in Replit: **Republish**. Installed home-screen copies pick up the new version on their next launch.
 
 ## Password resets (no email provider)
 Resets are done by you, from the workspace **Shell**, against the production database:

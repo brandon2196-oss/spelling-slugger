@@ -1,8 +1,24 @@
-# Replit configuration for Cooper's Spelling Slugger.
-# Workspace "Run" builds everything and serves it on :3000. Publishing uses an Autoscale deployment.
+# Replit configuration for Cooper's Spelling Slugger (Autoscale deployment + Replit Postgres).
 modules = ["nodejs-22"]
-run = ["sh", "-c", "npm run build:all && npm start"]
-entrypoint = "server/src/index.ts"
+
+[nix]
+channel = "stable-25_05"
+
+# Workspace "Run": install, build frontend + server, serve on :3000 (same as production).
+[workflows]
+runButton = "Spelling Slugger"
+
+[[workflows.workflow]]
+name = "Spelling Slugger"
+author = "user"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm ci --include=dev && npm run build:all && npm start"
+waitForPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"
