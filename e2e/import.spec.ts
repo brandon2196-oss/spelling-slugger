@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { openNewList, registerAndCreatePlayer, stubSpeech } from './helpers'
+import { cleanupFamily, openNewList, registerAndCreatePlayer, stubSpeech } from './helpers'
+
+test.afterEach(async ({ page }) => {
+  await cleanupFamily(page)
+})
 
 const fixture = (name: string) => new URL(`./fixtures/${name}.pdf`, import.meta.url).pathname
 

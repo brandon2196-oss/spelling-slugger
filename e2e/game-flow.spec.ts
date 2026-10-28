@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { addWordList, noHorizontalScroll, registerAndCreatePlayer, spoken, stubSpeech } from './helpers'
+import { addWordList, cleanupFamily, noHorizontalScroll, registerAndCreatePlayer, spoken, stubSpeech } from './helpers'
+
+test.afterEach(async ({ page }) => {
+  await cleanupFamily(page)
+})
 
 test('a family registers, adds words, and plays a game that survives a reload', async ({ page }) => {
   await stubSpeech(page)

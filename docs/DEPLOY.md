@@ -7,9 +7,12 @@ subscription. GitHub holds the code; Replit pulls from it.
 | Piece | Where | Notes |
 | --- | --- | --- |
 | Code | GitHub, private repo `brandon2196-oss/spelling-slugger` | Push from the Mac. |
-| App + API | Replit Autoscale deployment | `npm run build:all` then `npm start` (see `.replit`). Bills against Core usage; one family is near the floor. |
-| Database | Replit Postgres (production database) | Created from the Database tool; `DATABASE_URL` is injected. |
-| Domain | Your Extra Inning domain | Linked to the deployment under Deployments → Settings → Domains. |
+| Replit app | `extrainnings.zip` in Brandon's account (the old Extra Innings test site, replaced 2026-10-27; its last state is git tag `extrainnings-old` and a backup at `~/Documents/Personal-Projects/extrainnings-old-backup-2026-10-27.tgz`) | Receives code by `git push replit main` from the Mac. |
+| App + API | Replit Autoscale deployment, first published 2026-10-27 at https://extrainningszip.replit.app | `npm run build:all` then `npm start` (see `.replit`). Bills against Core usage; one family is near the floor. |
+| Database | Replit Postgres (production database, separate from the workspace's dev database) | `DATABASE_URL` is injected. Publishing shows a schema diff for approval; the migration is idempotent either way. |
+| Domain | Your Extra Inning domain | Linked under Publishing → Domains → Add a domain. |
+
+Status 2026-10-27: steps 1–2 below are DONE. Remaining: cap machines at 1, attach the domain.
 
 ## 1. Import the repo into Replit (one time)
 1. In Replit: **Create App → Import from GitHub** → pick `spelling-slugger`. Replit reads `.replit`
@@ -52,7 +55,7 @@ Cookies and share links follow the host automatically; nothing in the code names
 The Replit app receives code straight from the Mac over SSH (no GitHub login inside Replit). One-time
 setup on the Mac, with the SSH command from the app's Developer → SSH tool:
 ```bash
-git remote add replit ssh://<repl-id>@ssh.worf.replit.dev:22/home/runner/workspace
+git remote add replit ssh://8823e214-87fc-4925-b186-306f38fa996b@ssh.worf.replit.dev:22/home/runner/workspace
 ```
 Then every update is:
 ```bash

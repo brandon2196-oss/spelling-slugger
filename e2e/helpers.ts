@@ -80,3 +80,16 @@ export async function addWordList(page: Page, playerId: string, words: string[])
   await page.waitForURL(new RegExp(`/parent/players/${playerId}/lists$`))
   await page.getByText('Active', { exact: true }).waitFor()
 }
+
+/**
+ * Deletes the family the test registered, through the API with the page's own session cookie, so
+ * runs against a real server (the `api` project or a live site) leave nothing behind. In local mode
+ * there is no API and the call is ignored.
+ */
+export async function cleanupFamily(page: Page): Promise<void> {
+  try {
+    await page.request.delete('/api/account', { headers: { 'x-requested-with': 'slugger' }, timeout: 15_000 })
+  } catch {
+    /* local mode or already gone */
+  }
+}
