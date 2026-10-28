@@ -54,6 +54,12 @@ describe('extractCandidates', () => {
     expect(other).not.toContain('week')
   })
 
+  it('does not take a short instruction sentence as a row of words', () => {
+    const { likely, other } = extractCandidates(['Please practice every night', 'cat   dog   bird'])
+    expect(likely).toEqual(['cat', 'dog', 'bird'])
+    expect(other).toEqual(['Please', 'practice', 'every', 'night'])
+  })
+
   it('returns empty for empty input', () => {
     expect(extractCandidates([])).toEqual({ likely: [], other: [] })
   })

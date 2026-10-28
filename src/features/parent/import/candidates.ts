@@ -17,7 +17,7 @@ const HEADER_WORDS = new Set([
 const NUMBERING = /^\s*(?:\d{1,2}\s*[.):]?|[•·\-–—*>])\s+/
 /** "word: meaning" or "word - meaning" lines are definitions, not columns of words. */
 const DEFINITION = /[:–—]|\s-\s/
-const MAX_LIST_TOKENS = 4
+const MAX_LIST_TOKENS = 3
 const MAX_WORD_LENGTH = 20
 
 function clean(token: string): string {

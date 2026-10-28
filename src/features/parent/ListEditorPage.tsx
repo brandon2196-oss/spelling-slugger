@@ -7,6 +7,7 @@ import { useStore } from '../../data/store'
 import type { NewWord } from '../../data/types'
 import { normalize } from '../../engine/grade'
 import { mondayOf, prettyDate } from './dates'
+import { PdfImport } from './import/PdfImport'
 import { parseWordPaste } from './wordPaste'
 
 const TARGET = 15
@@ -21,6 +22,7 @@ export function ListEditorPage() {
   const [words, setWords] = useState<NewWord[]>([])
   const [draft, setDraft] = useState('')
   const [pasteOpen, setPasteOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(!listId)
   const [paste, setPaste] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -73,6 +75,13 @@ export function ListEditorPage() {
     inputRef.current?.focus()
   }
 
+  function applyImport(texts: string[], fileName: string) {
+    addWords(texts)
+    setNotice((n) => [`Added ${texts.length} words from ${fileName}.`, n].filter(Boolean).join(' '))
+    setImportOpen(false)
+    inputRef.current?.focus()
+  }
+
   function applyPaste() {
     const { words: parsed, dropped } = parseWordPaste(paste)
     addWords(parsed)
@@ -105,7 +114,7 @@ export function ListEditorPage() {
   return (
     <form onSubmit={onSubmit} className="max-w-2xl">
       <h1 className="text-3xl text-navy">{listId ? 'Edit word list' : "This week's words"}</h1>
-      <p className="text-ink/70 mb-6">Type a word and press Enter. Fifteen is the usual list; any number works.</p>
+      <p className="text-ink/70 mb-6">Drop in the teacher's PDF, or type a word and press Enter. Fifteen is the usual list; any number works.</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField label="Week starts" type="date" value={weekStart} onChange={(e) => setWeekStart(e.target.value)} required />
@@ -116,6 +125,12 @@ export function ListEditorPage() {
           onChange={(e) => { setTitleTouched(true); setTitle(e.target.value) }}
         />
       </div>
+
+      {importOpen ? (
+        <div className="mt-6">
+          <PdfImport onAdd={applyImport} onPasteInstead={() => { setImportOpen(false); setPasteOpen(true) }} />
+        </div>
+      ) : null}
 
       <div className="mt-6 flex items-end gap-2">
         <div className="flex-1">
@@ -136,10 +151,15 @@ export function ListEditorPage() {
         </Button>
       </div>
 
-      <div className="mt-2 flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setPasteOpen((o) => !o)} className="text-navy/80">
-          {pasteOpen ? 'Hide paste box' : 'Paste a whole list'}
-        </Button>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-x-4">
+          <Button variant="ghost" onClick={() => setImportOpen((o) => !o)} className="text-navy/80">
+            {importOpen ? 'Hide PDF import' : 'Import a PDF'}
+          </Button>
+          <Button variant="ghost" onClick={() => setPasteOpen((o) => !o)} className="text-navy/80">
+            {pasteOpen ? 'Hide paste box' : 'Paste a whole list'}
+          </Button>
+        </div>
         <span className={`rounded-full px-3 py-1 text-sm font-bold ${words.length >= TARGET ? 'bg-grass text-chalk' : 'bg-navy/10 text-navy'}`}>
           {words.length} / {TARGET}
         </span>
