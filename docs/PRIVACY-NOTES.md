@@ -12,8 +12,9 @@ Written for the parent running this app, not as legal advice. Verify before shar
 - **Imported PDFs:** the teacher's PDF is read inside the browser and never uploaded. Only the words
   the parent confirms are saved; the file itself is discarded.
 - **Device:** audio settings and the current parent-zone unlock live only in the browser
-  (localStorage / sessionStorage). No analytics, no advertising identifiers, no third-party scripts
-  other than Google Fonts.
+  (localStorage / sessionStorage). No advertising identifiers and no third-party scripts other than
+  Google Fonts. Replit's built-in, privacy-friendly analytics are switched on for the published app:
+  aggregate page-view counts for the site owner, not tied to a family or child.
 
 ## What the app does not do
 - No ads, no payments, no subscriptions, no selling or sharing of data.
@@ -44,4 +45,5 @@ login, in one transaction. Deleting a single player removes everything under tha
 The app runs as one service on Replit (an Autoscale deployment with a Replit-managed Postgres
 database) under the site owner's own account. Replit publishes its own privacy and security
 documentation; traffic is HTTPS and the database is encrypted at rest. Passwords and PINs are stored
-only as salted hashes. There are no analytics and no third-party services beyond Google Fonts.
+only as salted hashes. Apart from Replit's own aggregate analytics there are no third-party services
+beyond Google Fonts.
