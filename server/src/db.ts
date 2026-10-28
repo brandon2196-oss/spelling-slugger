@@ -6,8 +6,11 @@ export interface Db {
   query<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>
   /** Run a multi-statement script (migrations). */
   exec(sql: string): Promise<void>
+  /** Run `fn` inside one transaction; rolls back if it throws. */
+  tx<T>(fn: (q: Queryable) => Promise<T>): Promise<T>
   close(): Promise<void>
 }
+export type Queryable = Pick<Db, 'query'>
 
 export function createPgDb(connectionString: string): Db {
   // Lazy so the test build never loads `pg`.
@@ -21,6 +24,20 @@ export function createPgDb(connectionString: string): Db {
     async exec(sql) {
       const pool = await poolP
       await pool.query(sql)
+    },
+    async tx(fn) {
+      const client = await (await poolP).connect()
+      try {
+        await client.query('begin')
+        const out = await fn({ query: async (sql, params) => ({ rows: (await client.query(sql, params as never[])).rows }) })
+        await client.query('commit')
+        return out
+      } catch (e) {
+        await client.query('rollback').catch(() => undefined)
+        throw e
+      } finally {
+        client.release()
+      }
     },
     async close() {
       await (await poolP).end()
@@ -39,6 +56,9 @@ export async function createTestDb(): Promise<Db> {
     },
     async exec(sql) {
       await pg.exec(sql)
+    },
+    tx(fn) {
+      return pg.transaction((t) => fn({ query: async (sql, params) => ({ rows: (await t.query(sql, params)).rows as never[] }) }))
     },
     close: () => pg.close(),
   }
