@@ -178,5 +178,9 @@ export function authErrorMessage(e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e)
   if (msg === 'INVALID_CREDENTIALS') return "That email or password doesn't match."
   if (msg === 'EMAIL_TAKEN') return 'An account with that email already exists. Try signing in.'
+  if (msg === 'UNAUTHENTICATED') return 'You are signed out. Please sign in again.'
+  if (msg === 'OFFLINE') return "Can't reach the server. Check the connection and try again."
+  if (msg === 'INVALID_EMAIL') return 'That does not look like an email address.'
+  if (msg === 'BAD_REQUEST') return 'Something in that form was not accepted. Check the fields and try again.'
   return msg || 'Something went wrong. Please try again.'
 }

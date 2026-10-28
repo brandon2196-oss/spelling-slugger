@@ -6,7 +6,7 @@ import { TextField } from '../../components/TextField'
 import { Banner } from '../../components/Banner'
 import { AuthShell } from './AuthShell'
 
-/** Landing page for the Supabase recovery link; the session arrives in the URL hash. */
+/** Change password while signed in (kept at /reset for old bookmarks). */
 export function ResetPage() {
   const { updatePassword } = useAuth()
   const navigate = useNavigate()

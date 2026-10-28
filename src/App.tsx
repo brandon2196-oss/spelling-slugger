@@ -1,28 +1,27 @@
 import { useMemo } from 'react'
 import { RouterProvider } from 'react-router'
-import { AuthProvider, createLocalAuth, createSupabaseAuth } from './data/auth'
+import { createApiAuth } from './data/api-auth'
+import { createApiStore } from './data/api-store'
+import { AuthProvider, createLocalAuth } from './data/auth'
 import { createLocalStore } from './data/local-store'
 import { StoreContext } from './data/store'
-import { createSupabaseStore } from './data/supabase-store'
-import { getSupabase, supabaseConfigured } from './data/supabase-client'
 import { router } from './routes'
 
-const APP_URL = (import.meta.env.VITE_APP_URL as string | undefined) ?? window.location.origin
+export type Backend = 'local' | 'api'
 
-/** "supabase" when asked for or when configured; otherwise local mode so the app runs with no account. */
-export function chooseBackend(): 'local' | 'supabase' {
-  const wanted = import.meta.env.VITE_STORE as string | undefined
-  if (wanted === 'local') return 'local'
-  if (wanted === 'supabase') return 'supabase'
-  return supabaseConfigured() ? 'supabase' : 'local'
+/**
+ * VITE_STORE wins when set. Otherwise a production build talks to the app's own API and a dev
+ * server runs in local mode (localStorage, fake sign-in) so the app works with nothing else running.
+ */
+export function chooseBackend(env: { VITE_STORE?: string; PROD?: boolean } = import.meta.env): Backend {
+  if (env.VITE_STORE === 'local') return 'local'
+  if (env.VITE_STORE === 'api') return 'api'
+  return env.PROD ? 'api' : 'local'
 }
 
 export default function App() {
   const { auth, store } = useMemo(() => {
-    if (chooseBackend() === 'supabase') {
-      const sb = getSupabase()
-      return { auth: createSupabaseAuth(sb, APP_URL), store: createSupabaseStore(sb) }
-    }
+    if (chooseBackend() === 'api') return { auth: createApiAuth(), store: createApiStore() }
     return { auth: createLocalAuth(), store: createLocalStore() }
   }, [])
   return (
