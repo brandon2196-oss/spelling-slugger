@@ -33,6 +33,10 @@ export function Field({ look, bases, controllerRef }: FieldProps) {
       height: FIELD.height,
       backgroundColor: '#142850',
       transparent: false,
+      // True 16-bit: render at 320×240 with nearest-neighbour textures, let FIT scale the canvas up.
+      pixelArt: true,
+      roundPixels: true,
+      render: { antialias: false },
       scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
       scene: s,
       audio: { noAudio: true },
@@ -70,7 +74,7 @@ export function Field({ look, bases, controllerRef }: FieldProps) {
     <div
       ref={host}
       data-field-ready={ready ? '1' : undefined}
-      className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-navy [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full"
+      className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-navy [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full [&>canvas]:[image-rendering:pixelated]"
       aria-hidden="true"
     />
   )
