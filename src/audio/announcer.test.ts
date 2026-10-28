@@ -1,5 +1,7 @@
 import { afterEach, beforeEach } from 'vitest'
-import { ANNOUNCERS, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, previewLine, sayAs, type AnnounceEvent, type AnnouncerId, type CommentaryContext } from './announcer'
+import { setManifestForTests, type Manifest } from './manifest'
+import type { ClipPlayer } from './clips'
+import { ANNOUNCERS, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, pickLineIndex, previewLine, sayAs, setAnnouncerPlayerForTests, type AnnounceEvent, type AnnouncerId, type CommentaryContext } from './announcer'
 
 type Utter = { text: string; rate: number; pitch: number; volume: number; voice: unknown; onstart: null | (() => void); onend: null | (() => void); onerror: null | ((e: unknown) => void) }
 
@@ -118,64 +120,104 @@ describe('pickAnnouncerVoice', () => {
   })
 })
 
-describe('sayAs', () => {
-  let fake: ReturnType<typeof installFakeSpeech>
-  beforeEach(() => { fake = installFakeSpeech([{ name: 'Daniel', lang: 'en-GB' }, { name: 'Samantha', lang: 'en-US' }]) })
-  afterEach(() => removeSpeech())
+describe('pickLineIndex', () => {
+  it('returns an index whose filled line matches the text, never repeating', () => {
+    let prev = -1
+    for (let i = 0; i < 40; i++) {
+      const p = pickLineIndex('bigRed', 'double', ctx)!
+      expect(p.index).not.toBe(prev)
+      expect(p.text).toBe(ANNOUNCERS.bigRed.lines.double[p.index]!.replace('{word}', 'giraffe'))
+      prev = p.index
+    }
+  })
+  it('skips {word} lines without a word, and is null for quiet', () => {
+    for (let i = 0; i < 30; i++) {
+      const p = pickLineIndex('bigRed', 'double', { runs: 0, inning: 1 })!
+      expect(ANNOUNCERS.bigRed.lines.double[p.index]).not.toContain('{word}')
+    }
+    expect(pickLineIndex('quiet', 'double', ctx)).toBeNull()
+  })
+})
 
-  it('speaks one of the persona lines with its voice settings', async () => {
+function fullManifest(): Manifest {
+  const clips = {} as Manifest['clips']
+  for (const id of ['bigRed', 'smoothEddie', 'quiet'] as AnnouncerId[]) {
+    clips[id] = {}
+    for (const evt of ANNOUNCE_EVENTS) clips[id][evt] = ANNOUNCERS[id].lines[evt].map((_, i) => `/audio/announcers/${id}/${evt}-${String(i).padStart(2, '0')}.ogg`)
+  }
+  return { version: 1, clips }
+}
+
+describe('sayAs', () => {
+  let played: string[]
+  let finish: Array<() => void>
+  let player: ClipPlayer
+  let fake: ReturnType<typeof installFakeSpeech>
+  beforeEach(() => {
+    played = []
+    finish = []
+    player = {
+      load: vi.fn(async () => {}), preload: vi.fn(async () => {}), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(),
+      play: vi.fn((url: string) => { played.push(url); return new Promise<void>((r) => finish.push(r)) }),
+    }
+    setAnnouncerPlayerForTests(player)
+    setManifestForTests(fullManifest())
+    fake = installFakeSpeech([{ name: 'Daniel', lang: 'en-GB' }])
+  })
+  afterEach(() => { setAnnouncerPlayerForTests(null); setManifestForTests(null); removeSpeech() })
+  const flush = () => new Promise((r) => setTimeout(r, 0))
+
+  it('plays the baked clip matching the picked line', async () => {
+    const states: Array<{ speaking: boolean; line: string | null }> = []
+    const unsub = announcerState.subscribe((s) => states.push(s))
     const p = sayAs('bigRed', 'strikeout', ctx)
-    expect(fake.spoken).toHaveLength(1)
-    const u = fake.spoken[0]!
-    expect(u.rate).toBe(0.95)
-    expect(u.pitch).toBe(0.7)
-    expect((u.voice as { name: string }).name).toBe('Daniel')
-    const templates = ANNOUNCERS.bigRed.lines.strikeout.map((l) => l.replace('{word}', 'giraffe').replace('{runs}', '2').replace('{inning}', '3'))
-    expect(templates).toContain(u.text)
-    u.onend!()
-    await expect(p).resolves.toBeUndefined()
+    await flush()
+    expect(played).toHaveLength(1)
+    const m = /bigRed\/strikeout-(\d\d)\.ogg$/.exec(played[0]!)
+    expect(m).not.toBeNull()
+    const line = ANNOUNCERS.bigRed.lines.strikeout[Number(m![1])]!.replace('{word}', 'giraffe')
+    expect(states.at(-1)).toEqual({ speaking: true, line })
+    finish[0]!()
+    await p
+    expect(states.at(-1)).toEqual({ speaking: false, line: null })
+    expect(fake.synth.speak).not.toHaveBeenCalled()
+    unsub()
+  })
+  it('stays quiet (no TTS) when the clip is missing', async () => {
+    setManifestForTests({ version: 1, clips: { bigRed: {}, smoothEddie: {}, quiet: {} } })
+    const states: unknown[] = []
+    const unsub = announcerState.subscribe((s) => states.push(s))
+    await sayAs('bigRed', 'double', ctx)
+    expect(player.play).not.toHaveBeenCalled()
+    expect(fake.synth.speak).not.toHaveBeenCalled()
+    expect(states).toEqual([])
+    unsub()
   })
   it('says nothing for the quiet booth', async () => {
     await sayAs('quiet', 'double', ctx)
+    expect(player.play).not.toHaveBeenCalled()
     expect(fake.synth.speak).not.toHaveBeenCalled()
   })
-  it('resolves quietly when speech is unavailable', async () => {
-    removeSpeech()
-    await expect(sayAs('bigRed', 'double', ctx)).resolves.toBeUndefined()
+  it('resolves as soon as the player does (muted player resolves immediately)', async () => {
+    player.play = vi.fn(async () => {})
+    await expect(sayAs('smoothEddie', 'single', ctx)).resolves.toBeUndefined()
+    expect(announcerState.get()).toEqual({ speaking: false, line: null })
   })
-  it('publishes speaking state on start and end', async () => {
-    const states: Array<{ speaking: boolean; line: string | null }> = []
-    const unsub = announcerState.subscribe((s) => states.push(s))
-    const p = sayAs('smoothEddie', 'single', ctx)
-    expect(states.at(-1)).toMatchObject({ speaking: true, line: fake.spoken[0]!.text })
-    fake.spoken[0]!.onend!()
-    await p
-    expect(states.at(-1)).toEqual({ speaking: false, line: null })
-    unsub()
-    const n = states.length
-    void sayAs('smoothEddie', 'single', ctx)
-    expect(states.length).toBe(n)
+  it('clears speaking state if play rejects', async () => {
+    player.play = vi.fn(async () => { throw new Error('boom') })
+    await sayAs('bigRed', 'walk', ctx)
+    expect(announcerState.get()).toMatchObject({ speaking: false })
   })
-  it('clears speaking state when the utterance errors', async () => {
-    const states: Array<{ speaking: boolean }> = []
-    const unsub = announcerState.subscribe((s) => states.push(s))
-    const p = sayAs('bigRed', 'walk', ctx)
-    fake.spoken[0]!.onerror!(new Error('boom'))
-    await p
-    expect(states.at(-1)).toMatchObject({ speaking: false })
-    unsub()
-  })
-  it('previewLine speaks a game-start line', async () => {
+  it('previewLine plays a game-start clip', async () => {
     const p = previewLine('smoothEddie')
-    const filled = ANNOUNCERS.smoothEddie.lines.gameStart
-    expect(filled.some((l) => l.replace(/\{(runs|inning|word)\}/g, '') === fake.spoken[0]!.text.replace(/\d+/g, ''))
-      || filled.includes(fake.spoken[0]!.text)).toBe(true)
-    fake.spoken[0]!.onend!()
+    await flush()
+    expect(played[0]).toMatch(/smoothEddie\/gameStart-\d\d\.ogg$/)
+    finish[0]!()
     await p
   })
   it('previewLine is a no-op for the quiet booth', async () => {
     await previewLine('quiet')
-    expect(fake.synth.speak).not.toHaveBeenCalled()
+    expect(player.play).not.toHaveBeenCalled()
   })
 })
 
