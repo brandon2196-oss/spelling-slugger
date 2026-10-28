@@ -32,13 +32,15 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: '/index.html',
         runtimeCaching: [
-          { urlPattern: /^https:\/\/.*\.supabase\.co\//, handler: 'NetworkOnly' },
+          { urlPattern: ({ url }) => url.pathname.startsWith('/api/'), handler: 'NetworkOnly' },
           { urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//, handler: 'StaleWhileRevalidate', options: { cacheName: 'fonts' } },
         ],
       },
       devOptions: { enabled: true, type: 'module' },
     }),
   ],
+  // `VITE_STORE=api npm run dev` against `npm run dev:api` on :3000.
+  server: { proxy: { '/api': 'http://localhost:3000' } },
   build: {
     rolldownOptions: {
       output: {

@@ -1,0 +1,14 @@
+# Replit configuration for Cooper's Spelling Slugger.
+# Workspace "Run" builds everything and serves it on :3000. Publishing uses an Autoscale deployment.
+modules = ["nodejs-22"]
+run = ["sh", "-c", "npm run build:all && npm start"]
+entrypoint = "server/src/index.ts"
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["sh", "-c", "npm ci && npm run build:all"]
+run = ["npm", "start"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80

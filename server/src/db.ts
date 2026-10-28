@@ -45,9 +45,10 @@ export function createPgDb(connectionString: string): Db {
   }
 }
 
-export async function createTestDb(): Promise<Db> {
+/** PGlite: in-memory by default, or persisted under `dataDir` for local full-stack development. */
+export async function createTestDb(dataDir?: string): Promise<Db> {
   const { PGlite } = await import('@electric-sql/pglite')
-  const pg = new PGlite()
+  const pg = new PGlite(dataDir)
   await pg.waitReady
   return {
     async query(sql, params) {
