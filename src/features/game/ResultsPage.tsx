@@ -81,34 +81,44 @@ export function ResultsPage() {
   return (
     <Stadium className="px-4 py-8">
       <div className="mx-auto max-w-3xl">
-        <p className="text-gold font-display text-xl">{newBest ? 'New personal best!' : 'Final score'}</p>
-        <h1 className="font-display leading-none text-7xl sm:text-8xl">{s.runs} <span className="text-4xl text-chalk/70">run{s.runs === 1 ? '' : 's'}</span></h1>
-        {best !== null ? <p className="mt-2 text-chalk/70">Personal best before today: {best}</p> : null}
+        <section aria-label="Postgame show" className="postgame-panel rounded-xl p-5 sm:p-7">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="on-air-tag pixel-text inline-flex items-center gap-2 rounded-sm px-3 py-2 text-[10px] uppercase" aria-hidden="true">
+              <span className="live-dot inline-block h-2 w-2 bg-chalk" />
+              Postgame show
+            </span>
+            <p className="pixel-text text-gold text-xs sm:text-sm uppercase">{newBest ? 'New personal best!' : 'Final score'}</p>
+          </div>
+          <h1 className="pixel-text announce-pixel mt-5 leading-none text-[clamp(3rem,12vw,5.5rem)]">
+            {s.runs}<span className="ml-[0.4em] text-[0.35em] text-chalk [text-shadow:none]">run{s.runs === 1 ? '' : 's'}</span>
+          </h1>
+          {best !== null ? <p className="mt-3 text-chalk/70">Personal best before today: {best}</p> : null}
 
-        <dl className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
-          {rows.map(([k, v]) => (
-            <div key={k} className="rounded-2xl bg-navy/60 border border-chalk/15 p-3">
-              <dt className="text-xs uppercase tracking-wider text-chalk/60">{k}</dt>
-              <dd className="font-display text-3xl text-gold">{v}</dd>
-            </div>
-          ))}
-        </dl>
+          <dl className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {rows.map(([k, v]) => (
+              <div key={k} className="postgame-cell rounded-md p-3">
+                <dt className="pixel-text text-[9px] uppercase text-chalk/60">{k}</dt>
+                <dd className="pixel-text mt-2 text-xl text-gold">{v}</dd>
+              </div>
+            ))}
+          </dl>
 
-        <div className="mt-6 grid sm:grid-cols-2 gap-3">
-          <Breakdown title="This week's words" b={s.current} />
-          {s.review.total > 0 ? <Breakdown title="Review words" b={s.review} /> : null}
-        </div>
+          <div className="mt-6 grid sm:grid-cols-2 gap-3">
+            <Breakdown title="This week's words" b={s.current} />
+            {s.review.total > 0 ? <Breakdown title="Review words" b={s.review} /> : null}
+          </div>
 
-        {s.missedWords.length ? (
-          <section className="mt-6">
-            <h2 className="font-display text-2xl">Words to work on</h2>
-            <ul className="mt-2 flex flex-wrap gap-2">
-              {s.missedWords.map((w) => <li key={w} className="rounded-full bg-red/80 px-3 py-1 font-display text-lg">{w}</li>)}
-            </ul>
-          </section>
-        ) : (
-          <p className="mt-6 text-xl">No words missed. Perfect game!</p>
-        )}
+          {s.missedWords.length ? (
+            <section className="mt-6">
+              <h2 className="pixel-text text-sm sm:text-base uppercase">Words to work on</h2>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {s.missedWords.map((w) => <li key={w} className="rounded-full bg-red/80 px-3 py-1 font-display text-lg">{w}</li>)}
+              </ul>
+            </section>
+          ) : (
+            <p className="mt-6 text-xl">No words missed. Perfect game!</p>
+          )}
+        </section>
 
         {error ? <p className="mt-4 text-gold">{error}</p> : null}
 
@@ -125,8 +135,8 @@ export function ResultsPage() {
 
 function Breakdown({ title, b }: { title: string; b: { total: number; firstTry: number; missed: number } }) {
   return (
-    <div className="rounded-2xl bg-navy/60 border border-chalk/15 p-4">
-      <h3 className="font-display text-xl">{title}</h3>
+    <div className="postgame-cell rounded-md p-4">
+      <h3 className="pixel-text text-xs uppercase text-chalk/80">{title}</h3>
       <p className="text-chalk/80 mt-1">{b.firstTry} of {b.total} on the first try · {b.missed} missed</p>
     </div>
   )

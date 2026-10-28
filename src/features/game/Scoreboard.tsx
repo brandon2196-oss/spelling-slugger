@@ -1,60 +1,80 @@
 import type { GameState } from '../../engine/types'
 
-function Dots({ n, max, label, color, testId }: { n: number; max: number; label: string; color: string; testId: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="w-14 text-chalk/70 text-sm uppercase tracking-wider">{label}</span>
-      <span className="flex gap-1.5" aria-hidden="true">
-        {Array.from({ length: max }, (_, i) => (
-          <span key={i} className={`h-4 w-4 rounded-full ${i < n ? color : 'bg-chalk/15'}`} />
-        ))}
-      </span>
-      <span className="sr-only" data-testid={testId}>{n}</span>
-    </div>
-  )
+export interface BugPlayer {
+  name: string
+  jerseyNumber: number
+  teamName: string
 }
 
-/** The outfield scoreboard: navy board, gold bulbs. */
-export function Scoreboard({ state }: { state: GameState }) {
+/**
+ * The score bug: the glass plate in the corner of the broadcast with the game's numbers.
+ * Same testids as the old outfield board so the game tests and e2e keep reading it.
+ */
+export function Scoreboard({ state, player }: { state: GameState; player?: BugPlayer }) {
   const { tallies, bases } = state
+  const wordNo = Math.min(state.index + 1, state.words.length)
   return (
-    <section aria-label="Scoreboard" className="rounded-3xl bg-navy border-4 border-gold/60 p-4 text-chalk shadow-[0_8px_0_#0a1630]">
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <Stat label="Runs" value={tallies.runs} big testId="runs" />
-        <Stat label="Hits" value={tallies.hits} testId="hits" />
-        <Stat label="Inning" value={state.inning} testId="inning" />
+    <section aria-label="Scoreboard" className="score-bug pixel-text inline-flex flex-col rounded-sm uppercase">
+      <div className="flex items-stretch">
+        {player ? (
+          <div className="bug-plate flex items-center gap-[0.6em] px-[0.8em] py-[0.4em]">
+            <span className="max-w-[9em] truncate">{player.teamName || player.name}</span>
+            <span className="opacity-70">#{player.jerseyNumber}</span>
+          </div>
+        ) : null}
+        <div className="flex items-center gap-[0.6em] px-[0.8em] py-[0.3em]">
+          <span className="bug-runs text-gold" data-testid="runs">{tallies.runs}</span>
+          <span className="bug-runs-label text-chalk/70 text-[0.8em]">Runs</span>
+        </div>
+        <Cell label="Hits" value={tallies.hits} testId="hits" />
+        <Cell label="Inn" value={state.inning} testId="inning" />
+        <div className="bug-cell flex items-center px-[0.7em]">
+          <Diamond bases={bases} />
+        </div>
       </div>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <Dots n={state.strikes} max={2} label="Strikes" color="bg-gold" testId="strikes" />
-          <Dots n={state.outs} max={2} label="Outs" color="bg-red" testId="outs" />
-        </div>
-        <Diamond bases={bases} />
-        <div className="text-right text-sm text-chalk/70" data-testid="progress">
-          Word {Math.min(state.index + 1, state.words.length)} of {state.words.length}
-        </div>
+      <div className="bug-cell flex items-center justify-between gap-[1em] border-t border-chalk/15 px-[0.8em] py-[0.35em] text-[0.85em]">
+        <Dots n={state.strikes} max={2} label="S" color="bg-gold" testId="strikes" />
+        <Dots n={state.outs} max={2} label="O" color="bg-red" testId="outs" />
+        <span className="text-chalk/80" data-testid="progress">
+          Word {wordNo}/{state.words.length}
+        </span>
       </div>
     </section>
   )
 }
 
-function Stat({ label, value, big, testId }: { label: string; value: number; big?: boolean; testId: string }) {
+function Cell({ label, value, testId }: { label: string; value: number; testId: string }) {
   return (
-    <div className="rounded-xl bg-black/30 py-2">
-      <div className="text-xs uppercase tracking-wider text-chalk/60">{label}</div>
-      <div className={`font-display text-gold leading-none ${big ? 'text-5xl' : 'text-3xl'}`} data-testid={testId}>{value}</div>
+    <div className="bug-cell flex flex-col items-center justify-center px-[0.8em] py-[0.3em] leading-none">
+      <span className="text-chalk/60 text-[0.75em]">{label}</span>
+      <span className="mt-[0.35em] text-[1.3em] text-gold" data-testid={testId}>{value}</span>
     </div>
   )
 }
 
-function Diamond({ bases }: { bases: GameState['bases'] }) {
-  const on = (b: boolean) => (b ? 'fill-gold' : 'fill-chalk/20')
+function Dots({ n, max, label, color, testId }: { n: number; max: number; label: string; color: string; testId: string }) {
   return (
-    <svg viewBox="0 0 60 60" className="h-14 w-14" role="img" aria-label={`Runners on: ${[bases.first && 'first', bases.second && 'second', bases.third && 'third'].filter(Boolean).join(', ') || 'none'}`}>
-      <rect x="22" y="2" width="16" height="16" transform="rotate(45 30 10)" className={on(bases.second)} />
-      <rect x="42" y="22" width="16" height="16" transform="rotate(45 50 30)" className={on(bases.first)} />
-      <rect x="2" y="22" width="16" height="16" transform="rotate(45 10 30)" className={on(bases.third)} />
-      <rect x="22" y="42" width="16" height="16" transform="rotate(45 30 50)" className="fill-chalk/50" />
+    <span className="flex items-center gap-[0.5em]">
+      <span className="text-chalk/60">{label}</span>
+      <span className="flex gap-[0.35em]" aria-hidden="true">
+        {Array.from({ length: max }, (_, i) => (
+          <span key={i} className={`bug-dot ${i < n ? color : 'bg-chalk/20'}`} />
+        ))}
+      </span>
+      <span className="sr-only" data-testid={testId}>{n}</span>
+    </span>
+  )
+}
+
+function Diamond({ bases }: { bases: GameState['bases'] }) {
+  const on = (b: boolean) => (b ? 'fill-gold' : 'fill-chalk/25')
+  const who = [bases.first && 'first', bases.second && 'second', bases.third && 'third'].filter(Boolean).join(', ') || 'none'
+  return (
+    <svg viewBox="0 0 12 12" className="h-[2.6em] w-[2.6em]" style={{ shapeRendering: 'crispEdges' }} role="img" aria-label={`Runners on: ${who}`}>
+      <rect x="4" y="0" width="4" height="4" className={on(bases.second)} />
+      <rect x="8" y="4" width="4" height="4" className={on(bases.first)} />
+      <rect x="0" y="4" width="4" height="4" className={on(bases.third)} />
+      <rect x="4" y="8" width="4" height="4" className="fill-chalk/60" />
     </svg>
   )
 }

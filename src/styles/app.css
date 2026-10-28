@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Press+Start+2P&display=swap');
 @import './tokens.css';
 @import 'tailwindcss';
 
@@ -15,6 +15,8 @@
   --color-sky: var(--sky);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
+  --font-pixel: var(--font-pixel);
+  --color-bezel: var(--bezel);
 }
 
 html, body, #root { height: 100%; }
@@ -54,6 +56,142 @@ h1, h2, h3 { font-family: var(--font-display); }
 .announce { animation: announce .6s cubic-bezier(.2,1.4,.4,1) both; }
 @media (prefers-reduced-motion: reduce) { .announce { animation: none; } }
 
+/* ---------- Retro broadcast ---------- */
+
+/* Pixel type is tiny and tight by design; a little air between letters and lines keeps it legible. */
+.pixel-text {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* The TV set: dark frame, a thin gold line where the glass meets the frame, soft vignette on the glass. */
+.broadcast {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(6px, 1.5vw, 12px);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(160deg, #1a1a26 0%, var(--bezel) 40%, #06060a 100%);
+  box-shadow: 0 10px 0 #040408, 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+.broadcast-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  container-type: inline-size;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--navy);
+  outline: 2px solid var(--bezel-line);
+  outline-offset: -2px;
+  isolation: isolate;
+}
+/* The field brings its own big radius; inside the set it follows the glass. */
+.broadcast-screen > div { border-radius: inherit; }
+.broadcast-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, 0.42) 100%);
+  z-index: 1;
+}
+.broadcast-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Score bug: a glass plate with the game's numbers, top-left like a real broadcast. */
+.score-bug {
+  background: var(--bug);
+  border: 2px solid var(--bezel-line);
+  box-shadow: 3px 3px 0 #04070f;
+  color: var(--chalk);
+  font-size: clamp(8px, 1.4vw, 11px);
+}
+.score-bug .bug-plate { background: var(--gold); color: #1b1b1f; }
+.score-bug .bug-runs { font-size: 2.6em; line-height: 1; }
+.score-bug .bug-cell { border-left: 1px solid rgba(255, 250, 240, 0.18); }
+.score-bug .bug-dot { width: 0.8em; height: 0.8em; display: inline-block; }
+
+/* LIVE tag: the little red box in the corner of the glass. */
+.live-tag {
+  background: var(--red);
+  color: var(--chalk);
+  border: 2px solid #ffd6dc;
+  box-shadow: 2px 2px 0 #04070f;
+  font-size: clamp(7px, 1.2vw, 10px);
+}
+.live-tag .live-dot { width: .7em; height: .7em; background: var(--chalk); animation: live-blink 1.2s steps(2, jump-none) infinite; }
+@keyframes live-blink { from { opacity: 1; } to { opacity: .25; } }
+
+/* Announcer window: a pixel portrait over a name plate; the mouth flaps ~8 Hz while a line is read. */
+.announcer-window {
+  background: var(--bug);
+  border: 2px solid var(--bezel-line);
+  box-shadow: 3px 3px 0 #04070f;
+  font-size: clamp(7px, 1.2vw, 10px);
+}
+.announcer-window svg { width: clamp(40px, 7vw, 60px); height: auto; image-rendering: pixelated; shape-rendering: crispEdges; display: block; }
+.announcer-window .mouth-open { opacity: 0; }
+.announcer-window[data-speaking='1'] .mouth-closed { animation: flap-closed 250ms steps(2, jump-none) infinite; }
+.announcer-window[data-speaking='1'] .mouth-open { animation: flap-open 250ms steps(2, jump-none) infinite; }
+@keyframes flap-closed { from { opacity: 1; } to { opacity: 0; } }
+@keyframes flap-open { from { opacity: 0; } to { opacity: 1; } }
+.announcer-window .name-plate { background: var(--gold); color: #1b1b1f; }
+
+/* Caption bar: closed-caption style, bottom of the glass. */
+.caption-bar {
+  background: rgba(4, 7, 15, 0.86);
+  color: var(--chalk);
+  border-top: 2px solid var(--bezel-line);
+  font-size: clamp(8px, 1.5vw, 12px);
+}
+.caption-bar .caption-mark { color: var(--gold); }
+
+/* The pop on the board: gold pixel type with a chunky navy shadow. */
+.announce-pixel {
+  color: var(--gold);
+  text-shadow: 3px 3px 0 #0a1630, 6px 6px 0 #0a1630, -2px -2px 0 #0a1630, 2px -2px 0 #0a1630, -2px 2px 0 #0a1630;
+}
+
+/* Narrow glass (a phone held upright): the bug shrinks and the booth shows the portrait alone so they don't collide. */
+@container (max-width: 560px) {
+  .score-bug { font-size: 7px; }
+  .score-bug .bug-runs-label { display: none; }
+  .announcer-window .name-plate { display: none; }
+  .announcer-window svg { width: 36px; }
+  .caption-bar { font-size: 8px; }
+}
+
+/* Stadium strip on the title screen and the postgame panel. */
+.pixel-strip { image-rendering: pixelated; shape-rendering: crispEdges; display: block; width: 100%; height: auto; }
+.on-air-tag {
+  background: var(--red);
+  color: var(--chalk);
+  border: 2px solid #ffd6dc;
+  box-shadow: 3px 3px 0 #04070f;
+}
+.postgame-panel {
+  background: linear-gradient(180deg, rgba(8, 16, 36, 0.92), rgba(8, 16, 36, 0.78));
+  border: 2px solid var(--bezel-line);
+  box-shadow: 4px 4px 0 #04070f;
+}
+.postgame-cell { background: rgba(4, 7, 15, 0.55); border: 1px solid rgba(255, 250, 240, 0.14); }
+
+@media (prefers-reduced-motion: reduce) {
+  .live-tag .live-dot, .announcer-window[data-speaking='1'] .mouth-closed, .announcer-window[data-speaking='1'] .mouth-open { animation: none; }
+  .announcer-window[data-speaking='1'] .mouth-open { opacity: 1; }
+  .announcer-window[data-speaking='1'] .mouth-closed { opacity: 0; }
+}
+
 /* Phone held sideways: field on the left, controls on the right, nothing below the fold. */
 @media (orientation: landscape) and (max-height: 500px) {
   .game-grid { grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 1fr); align-items: start; margin-top: .25rem; gap: .75rem; }
@@ -62,4 +200,14 @@ h1, h2, h3 { font-family: var(--font-display); }
   .game-hear { grid-template-columns: repeat(4, 1fr); }
   .game-hear button { min-height: 2.5rem; font-size: .95rem; padding: .25rem .5rem; }
   .game-score { order: 1; }
+
+  /* Inside the TV set the glass takes the height and the field fills it. */
+  .broadcast { padding: 4px; border-radius: .75rem; }
+  .broadcast-screen { border-radius: .5rem; }
+  .broadcast-screen > div { height: 100%; max-height: none; aspect-ratio: auto; }
+  /* Compact bug and a portrait-only booth so the batter stays in view; the caption would sit on the batter, so it goes. */
+  .score-bug { font-size: 7px; }
+  .score-bug .bug-runs { font-size: 2em; }
+  .score-bug .bug-runs-label, .announcer-window .name-plate, .caption-bar { display: none; }
+  .announcer-window svg { width: 28px; }
 }

@@ -8,7 +8,7 @@ export function Announcement({ text }: { text: string | null }) {
       aria-live="assertive"
       className="pointer-events-none absolute inset-0 flex items-center justify-center"
     >
-      <span className="announce font-display text-5xl sm:text-7xl text-gold drop-shadow-[0_6px_0_#0a1630] text-center px-4">
+      <span className="announce announce-pixel pixel-text text-center px-4 text-[clamp(1.1rem,4.5vw,3rem)] leading-tight uppercase">
         {text}
       </span>
     </div>
