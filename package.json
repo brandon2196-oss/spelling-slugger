@@ -18,7 +18,8 @@
     "build:all": "npm run build && npm run build:server",
     "start": "node server/dist/index.mjs",
     "dev:api": "npm run build:server && DATABASE_URL=${DATABASE_URL:-pglite://.data/dev} SECURE_COOKIES=0 node server/dist/index.mjs",
-    "reset-password": "npm run -s build:server && node server/dist/cli.mjs reset-password"
+    "reset-password": "npm run -s build:server && node server/dist/cli.mjs reset-password",
+    "bake-audio": "node scripts/bake-audio.mjs"
   },
   "dependencies": {
     "express": "^5.3.0",
