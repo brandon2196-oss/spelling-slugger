@@ -45,10 +45,10 @@ export async function playSequence(
 
   await field?.playPitch()
 
+  // The field animates WHILE the board text shows and the booth talks: a play never waits on a line.
   if (event.kind === 'strike') {
     sfx.whiff()
-    await field?.playStrike(event.strike)
-    await moment(event.strike === 1 ? 'strike1' : 'strike2') // STRIKE ONE! / STRIKE TWO!
+    await Promise.all([field?.playStrike(event.strike), moment(event.strike === 1 ? 'strike1' : 'strike2')]) // STRIKE ONE! / TWO!
     return
   }
 
@@ -56,18 +56,15 @@ export async function playSequence(
     case 'strikeout':
       sfx.strikeBuzz()
       sfx.groan()
-      await field?.playStrike(3)
-      await moment('strikeout') // STRIKE THREE!
+      await Promise.all([field?.playStrike(3), moment('strikeout')]) // STRIKE THREE!
       break
     case 'walk':
       sfx.walkChime()
-      await moment('walk') // TAKE YOUR BASE!
-      await field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored)
+      await Promise.all([field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored), moment('walk')]) // TAKE YOUR BASE!
       break
     default:
       sfx.crack()
-      await moment(event.outcome) // DOUBLE! / BASE HIT!
-      await field?.playHit(event.outcome, event.basesBefore, event.basesAfter, event.runsScored)
+      await Promise.all([field?.playHit(event.outcome, event.basesBefore, event.basesAfter, event.runsScored), moment(event.outcome)]) // DOUBLE! / BASE HIT!
   }
 
   if (event.runsScored > 0) {

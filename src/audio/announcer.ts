@@ -93,7 +93,7 @@ const bigRed: Announcer = {
       'Strike three! Tough break, but storms pass and the sun comes back. Shake it off!',
       "That's a strikeout. {word} is a tricky one, folks! Our slugger will remember it next time!",
       'Strike three! Nothing to hang your head about. The best hitters miss more than they hit!',
-      'Caught looking on strike three. Back to the dugout, but back with a smile!',
+      'Swung right through strike three. Back to the dugout, but back with a smile!',
     ],
     run: [
       'OH MY STARS! A run comes across the plate! The scoreboard lights up!',
@@ -140,7 +140,7 @@ const smoothEddie: Announcer = {
     gameStart: [
       "Hey there, slugger. Easy breezy, nice and easy. Let's go play some ball.",
       "Welcome to the yard, my friend. Sun's out, bats out, no stress about it.",
-      "Alright, alright. Step on in, take a breath, let's have some fun today.",
+      "All right, all right. Step on in, take a breath, let's have some fun today.",
       "What's up, slugger? Keep it loose, keep it smooth, and let the hits come to you.",
       "Good vibes only at the ballpark tonight. Easy breezy, let's play.",
       'Here we go, friend. Relax your shoulders, trust your swing, and enjoy the ride.',
@@ -274,8 +274,13 @@ export function lineFor(id: AnnouncerId, event: AnnounceEvent, ctx: CommentaryCo
 /** The persona's preferred English voice, else any en-US, else any English voice, else null. */
 export function pickAnnouncerVoice<V extends { name: string; lang: string }>(voices: V[], id: AnnouncerId): V | null {
   const en = voices.filter((v) => v.lang.toLowerCase().startsWith('en'))
-  const prefer = ANNOUNCERS[id].voice.prefer
-  return en.find((v) => prefer.test(v.name)) ?? en.find((v) => v.lang.toLowerCase() === 'en-us') ?? en[0] ?? null
+  // Walk the persona's preferences in order (the regex lists best first), not the system's order.
+  for (const alt of ANNOUNCERS[id].voice.prefer.source.split('|')) {
+    const re = new RegExp(alt, 'i')
+    const hit = en.find((v) => re.test(v.name))
+    if (hit) return hit
+  }
+  return en.find((v) => v.lang.toLowerCase() === 'en-us') ?? en[0] ?? null
 }
 
 // ---- speaking state ----------------------------------------------------------------------------

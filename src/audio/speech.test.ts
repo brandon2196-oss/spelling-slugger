@@ -88,6 +88,40 @@ describe('speech wrapper', () => {
     await p
   })
 
+  it('resolves the previous utterance when a new one cancels it (Safari never fires onend)', async () => {
+    const { speak } = await import('./speech')
+    const first = speak('a long announcer line')
+    let settled = false
+    void first.then(() => { settled = true })
+    speak('next')
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(settled).toBe(true)
+  })
+
+  it('caps the no-onend fallback at ten seconds even for a long line', async () => {
+    vi.useFakeTimers()
+    try {
+      const { speak } = await import('./speech')
+      let settled = false
+      void speak('x'.repeat(300)).then(() => { settled = true })
+      await vi.advanceTimersByTimeAsync(9_000)
+      expect(settled).toBe(false)
+      await vi.advanceTimersByTimeAsync(1_100)
+      expect(settled).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('skips the utterance entirely when muted (volume 0) so plays are not slowed', async () => {
+    const { speak, setSpeechVolume } = await import('./speech')
+    setSpeechVolume(0)
+    await expect(speak('quiet')).resolves.toBeUndefined()
+    expect(fake.synth.speak).not.toHaveBeenCalled()
+    setSpeechVolume(1)
+  })
+
   it('rejects, and reports unavailable, when the browser has no speech', async () => {
     removeSpeech()
     const { speechAvailable, speak } = await import('./speech')

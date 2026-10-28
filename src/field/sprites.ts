@@ -1,8 +1,8 @@
 /**
  * Code-drawn 16-bit sprites. A sprite is rows of letters; each letter is a palette role filled from
  * the player's appearance, `.` is transparent. Nothing to license, and every player gets their own
- * colors. Sprites are drawn facing the viewer's LEFT (toward the pitcher for a righty); a lefty is
- * the same texture flipped.
+ * colors. Sprites are drawn facing the viewer's LEFT, which is a LEFTY facing the plate from the
+ * first-base box; a righty is the same texture flipped (see layout.batterPlacement).
  */
 import type Phaser from 'phaser'
 import type { PlayerLook } from './controller'

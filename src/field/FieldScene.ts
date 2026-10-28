@@ -251,6 +251,7 @@ export class FieldScene extends Phaser.Scene implements FieldController {
       }
       fig.startRunning(90)
       for (const p of runnerPath(from, to)) {
+        fig.setFlipX(p.x > fig.x) // the sprite faces left; face the way we're running
         await this.tween({ targets: fig, x: p.x, y: p.y + RUNNER_FOOT, duration: 420, ease: 'Sine.easeInOut' })
       }
       fig.stopRunning()

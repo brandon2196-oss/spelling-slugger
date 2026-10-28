@@ -74,7 +74,7 @@ export function AnnouncerWindow({ name, portrait, speaking }: BroadcastProps['an
       className="announcer-window pixel-text inline-flex flex-col items-stretch rounded-sm overflow-hidden"
     >
       <div className="portrait p-[0.5em]" aria-hidden="true">
-        <Portrait id={portrait} />
+        <BoothPortrait id={portrait} />
       </div>
       <div className="name-plate px-[0.7em] py-[0.45em] text-center uppercase">{quiet ? 'QUIET BOOTH' : name}</div>
     </div>
@@ -190,10 +190,11 @@ function runs(grid: string[], palette: Record<string, string>): [number, number,
   return out
 }
 
-function Portrait({ id }: { id: AnnouncerPortrait }) {
+/** The booth's pixel portrait. Also used by the home-screen picker so the kid picks the face they'll see. */
+export function BoothPortrait({ id, size }: { id: AnnouncerPortrait; size?: number }) {
   const art = PORTRAITS[id]
   return (
-    <svg viewBox="0 0 16 16" role="img" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 16 16" width={size} height={size} shapeRendering="crispEdges" className="booth-portrait" role="img" aria-hidden="true" focusable="false">
       {runs(art.grid, art.palette).map(([x, y, w, fill], i) => (
         <rect key={i} x={x} y={y} width={w} height={1} fill={fill} />
       ))}

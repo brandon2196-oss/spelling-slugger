@@ -33,7 +33,7 @@ describe('playSequence', () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'double', runsScored: 1 }), r.commentary)
     expect(r.calls).toEqual([
-      'playPitch', 'sfx.crack', 'announce(DOUBLE!)', 'say(double)', 'playHit',
+      'playPitch', 'sfx.crack', 'playHit', 'announce(DOUBLE!)', 'say(double)',
       'sfx.cheer', 'sfx.organ(charge)', 'announce(RUN SCORED!)', 'say(run)',
     ])
   })
@@ -78,7 +78,7 @@ describe('playSequence', () => {
   it('a walk trots the forced runners', async () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'walk' }), r.commentary)
-    expect(r.calls).toEqual(['playPitch', 'sfx.walkChime', 'announce(TAKE YOUR BASE!)', 'say(walk)', 'playWalk'])
+    expect(r.calls).toEqual(['playPitch', 'sfx.walkChime', 'playWalk', 'announce(TAKE YOUR BASE!)', 'say(walk)'])
   })
   it('board text and commentary for the same moment run concurrently', async () => {
     const r = recorder()
@@ -88,15 +88,25 @@ describe('playSequence', () => {
     await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
     expect(announce).toHaveBeenCalledWith('DOUBLE!')
     expect(r.commentary).toHaveBeenCalledWith('double', expect.anything())
-    expect(r.calls).not.toContain('playHit')
+    expect(r.calls).toContain('playHit') // the swing doesn't wait for the board text or the line
+    expect(r.calls).not.toContain('sfx.cheer') // but the next moment does wait
     release()
     await p
-    expect(r.calls).toContain('playHit')
   })
   it('ignored events do nothing', async () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, { kind: 'ignored', reason: 'blank' }, r.commentary)
     expect(r.calls).toEqual([])
     expect(r.commentary).not.toHaveBeenCalled()
+  })
+
+  it('runs the hit animation while the booth is still talking', async () => {
+    const r = recorder()
+    const slowCommentary = async (evt: string) => {
+      await new Promise((res) => setTimeout(res, 5))
+      r.calls.push(`say(${evt})`)
+    }
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'double' }), slowCommentary as never)
+    expect(r.calls.indexOf('playHit')).toBeLessThan(r.calls.indexOf('say(double)'))
   })
 })

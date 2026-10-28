@@ -3,92 +3,13 @@
  * his game-start lines so the kid can hear the voice before choosing.
  */
 import { ANNOUNCERS, previewLine, type AnnouncerId } from '../../audio/announcer'
+import { BoothPortrait } from '../game/Broadcast'
 
 const ORDER: AnnouncerId[] = ['bigRed', 'smoothEddie', 'quiet']
 
-const PALETTE: Record<string, string> = {
-  h: '#d6dae2', // grey hair
-  s: '#f1c27d', // skin
-  e: '#1b1b2f', // eyes
-  m: '#b5533c', // mouth
-  r: '#d7263d', // red blazer
-  w: '#fdf8ef', // shirt / mic grille
-  k: '#1b1b2f', // tie, mic body
-  g: '#f2b134', // gold mic / chain
-  a: '#4a2c1a', // brown hair
-  d: '#101014', // sunglasses
-  u: '#2a6fdb', // blue shirt
-  b: '#6b7280', // booth frame
-}
-
-// 16x16 grids; '.' is transparent.
-const PORTRAITS: Record<AnnouncerId, string[]> = {
-  bigRed: [
-    '................',
-    '.....hhhhhh.....',
-    '....hhhhhhhh....',
-    '...hhssssssshh..',
-    '...hsssssssssh..',
-    '...hseesssees...',
-    '....ssssssss..gg',
-    '....sssmmmss..gg',
-    '.....ssssss...k.',
-    '......ssss....k.',
-    '...rrrrwwrrrr.k.',
-    '..rrrrwkkwrrrrk.',
-    '..rrrrwkkwrrrr..',
-    '.rrrrrwkkwrrrrr.',
-    '.rrrrrwwwwrrrrr.',
-    '.rrrrrrrrrrrrrr.',
-  ],
-  smoothEddie: [
-    '................',
-    '.....aaaaaa.....',
-    '....aaaaaaaa....',
-    '...aassssssaa...',
-    '...asssssssss...',
-    '...addddsdddd...',
-    '....ssssssss....',
-    '....ssssmmss....',
-    '.....ssssss.....',
-    '......ssss......',
-    '...uuuussuuuu...',
-    '..uuuusggssuuu..',
-    '..uuuuugguuuuu..',
-    '.uuuuuuuuuuuuuu.',
-    '.uuuuuuuuuuuuuu.',
-    '.uuuuuuuuuuuuuu.',
-  ],
-  quiet: [
-    'bbbbbbbbbbbbbbbb',
-    'b..............b',
-    'b..............b',
-    'b.....kkkk.....b',
-    'b....kwkwkk....b',
-    'b....kkwkwk....b',
-    'b....kwkwkk....b',
-    'b....kkwkwk....b',
-    'b.....kkkk.....b',
-    'b.......k......b',
-    'b.......k......b',
-    'b.....kkkkk....b',
-    'b..............b',
-    'b..............b',
-    'b..............b',
-    'bbbbbbbbbbbbbbbb',
-  ],
-}
-
+/** Same art as the broadcast booth, so the face on the home screen is the face in the game. */
 export function Portrait({ id, size = 64 }: { id: AnnouncerId; size?: number }) {
-  const rows = PORTRAITS[id]
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true" focusable="false">
-      {rows.flatMap((row, y) =>
-        [...row].map((ch, x) => (ch === '.' ? null : <rect key={`${x}-${y}`} x={x} y={y} width={1} height={1} fill={PALETTE[ch]} />)),
-      )}
-      {id === 'quiet' ? <path d="M3 3 L13 13" stroke="#d7263d" strokeWidth={1.5} strokeLinecap="square" /> : null}
-    </svg>
-  )
+  return <BoothPortrait id={ANNOUNCERS[id].portrait} size={size} />
 }
 
 export interface AnnouncerPickerProps {

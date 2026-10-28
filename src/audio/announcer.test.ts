@@ -1,8 +1,5 @@
 import { afterEach, beforeEach } from 'vitest'
-import {
-  ANNOUNCERS, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, previewLine, sayAs,
-  type AnnounceEvent, type AnnouncerId, type CommentaryContext,
-} from './announcer'
+import { ANNOUNCERS, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, previewLine, sayAs, type AnnounceEvent, type AnnouncerId, type CommentaryContext } from './announcer'
 
 type Utter = { text: string; rate: number; pitch: number; volume: number; voice: unknown; onstart: null | (() => void); onend: null | (() => void); onerror: null | ((e: unknown) => void) }
 
@@ -185,3 +182,13 @@ describe('sayAs', () => {
 // Type-level check: AnnounceEvent is the closed list the sequence player relies on.
 const _evt: AnnounceEvent = 'gameStart'
 void _evt
+
+describe('pickAnnouncerVoice preference order', () => {
+  it('walks the persona preferences in order, not the system list order', () => {
+    // Big Red's preference list names daniel before fred; the system lists Fred first.
+    expect(ANNOUNCERS.bigRed.voice.prefer.source.indexOf('daniel')).toBeLessThan(ANNOUNCERS.bigRed.voice.prefer.source.indexOf('fred'))
+    const voices = [{ name: 'Fred', lang: 'en-US' }, { name: 'Daniel', lang: 'en-GB' }]
+    expect(pickAnnouncerVoice(voices, 'bigRed')?.name).toBe('Daniel')
+  })
+})
+

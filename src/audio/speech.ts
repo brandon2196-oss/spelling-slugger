@@ -45,10 +45,18 @@ function pickVoice(s: SpeechSynthesis): SpeechSynthesisVoice | null {
   )
 }
 
+/** Resolves the utterance currently in flight; Safari never fires onend for a cancelled one. */
+let finishCurrent: (() => void) | null = null
+
+/** Longest we wait for the browser to report an utterance finished before moving the game on. */
+export const MAX_UTTERANCE_MS = 10_000
+
 export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
   const s = synth()
   if (!s) return Promise.reject(new Error('SPEECH_UNAVAILABLE'))
+  if ((opts.volume ?? volume) === 0) return Promise.resolve() // muted: nothing to wait for
   return new Promise((resolve) => {
+    finishCurrent?.()
     s.cancel()
     const u = new window.SpeechSynthesisUtterance(text)
     u.rate = opts.rate ?? 0.9
@@ -62,12 +70,15 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
     const finish = () => {
       if (done) return
       done = true
+      if (finishCurrent === finish) finishCurrent = null
       resolve()
     }
+    finishCurrent = finish
     u.onend = finish
     u.onerror = finish
-    // Some browsers never fire onend for cancelled utterances; don't hang the game.
-    setTimeout(finish, Math.max(2500, text.length * 400))
+    // Some browsers never fire onend; estimate from length (~110 ms per character at these rates)
+    // and never wait longer than MAX_UTTERANCE_MS so a play can't lock the input.
+    setTimeout(finish, Math.min(MAX_UTTERANCE_MS, Math.max(2500, text.length * 110)))
     s.speak(u)
   })
 }

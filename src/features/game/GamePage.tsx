@@ -43,10 +43,14 @@ export function GamePage() {
   const [booth, setBooth] = useState(announcerState.get())
   useEffect(() => announcerState.subscribe(setBooth), [])
   const persona = ANNOUNCERS[audio.announcer]
+  /** The booth may run long; a play never waits more than this on a line (the next pitch cuts it off). */
+  const COMMENTARY_CAP_MS = 7000
   const commentary = useCallback(
-    (evt: AnnounceEvent, ctx: CommentaryContext) => sayAs(audio.announcer, evt, ctx),
+    (evt: AnnounceEvent, ctx: CommentaryContext) => Promise.race([sayAs(audio.announcer, evt, ctx), wait(COMMENTARY_CAP_MS)]),
     [audio.announcer],
   )
+  const latest = useRef({ index: -1, busy: false })
+  latest.current = { index: state?.index ?? -1, busy }
 
   const word = state ? currentWord(state) : null
 
@@ -75,7 +79,11 @@ export function GamePage() {
     spokenIndex.current = state.index
     if (!introDone.current && state.index === 0 && state.atBats.every((ab) => ab.attempts.length === 0)) {
       introDone.current = true
-      void sayAs(audio.announcer, 'gameStart', { runs: 0, inning: 1 }).finally(() => hear('word'))
+      const forIndex = state.index
+      void Promise.race([sayAs(audio.announcer, 'gameStart', { runs: 0, inning: 1 }), wait(COMMENTARY_CAP_MS)]).finally(() => {
+        // Only read the word if the child hasn't already swung during the welcome.
+        if (latest.current.index === forIndex && !latest.current.busy) hear('word')
+      })
       return
     }
     introDone.current = true
@@ -182,10 +190,10 @@ export function GamePage() {
             <section aria-label="Your turn" className="game-turn rounded-3xl bg-chalk/10 border border-chalk/15 p-4 space-y-4">
               {canSpeak ? (
                 <div className="game-hear grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
-                  <Button variant="secondary" size="lg" onClick={() => hear('word')}>Hear word</Button>
-                  <Button variant="secondary" onClick={() => hear('slow')}>Hear it slowly</Button>
-                  <Button variant="secondary" onClick={() => hear('word')}>Repeat</Button>
-                  <Button variant="secondary" disabled={!word?.sentence} onClick={() => hear('sentence')}>Hear a sentence</Button>
+                  <Button variant="secondary" size="lg" disabled={busy} onClick={() => hear('word')}>Hear word</Button>
+                  <Button variant="secondary" disabled={busy} onClick={() => hear('slow')}>Hear it slowly</Button>
+                  <Button variant="secondary" disabled={busy} onClick={() => hear('word')}>Repeat</Button>
+                  <Button variant="secondary" disabled={busy || !word?.sentence} onClick={() => hear('sentence')}>Hear a sentence</Button>
                 </div>
               ) : (
                 <div className="rounded-2xl bg-gold/15 border border-gold/40 p-3 text-chalk">

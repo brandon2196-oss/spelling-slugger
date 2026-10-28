@@ -17,6 +17,7 @@ vi.mock('../../audio/speech', () => ({
   umpire: vi.fn(() => Promise.resolve()),
   primeSpeech: vi.fn(),
   setSpeechVolume: vi.fn(),
+  availableVoices: () => [],
 }))
 vi.mock('../../field/Field', () => ({ Field: () => <div data-testid="field" /> }))
 
