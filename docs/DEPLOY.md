@@ -12,7 +12,9 @@ subscription. GitHub holds the code; Replit pulls from it.
 | Database | Replit Postgres (production database, separate from the workspace's dev database) | `DATABASE_URL` is injected. Publishing shows a schema diff for approval; the migration is idempotent either way. |
 | Domain | Your Extra Inning domain | Linked under Publishing → Domains → Add a domain. |
 
-Status 2026-10-27: steps 1–2 below are DONE. Remaining: cap machines at 1, attach the domain.
+Status 2026-10-27: published and verified, machines capped at 1. The game is served at
+https://extrainningszip.replit.app. Custom domain deliberately deferred (step 3 below, when wanted).
+Note: Replit adds its own commit to the Repl on each publish, so pushes from the Mac use `--force`.
 
 ## 1. Import the repo into Replit (one time)
 1. In Replit: **Create App → Import from GitHub** → pick `spelling-slugger`. Replit reads `.replit`
@@ -59,7 +61,7 @@ git remote add replit ssh://8823e214-87fc-4925-b186-306f38fa996b@ssh.worf.replit
 ```
 Then every update is:
 ```bash
-npm test && git push origin main && git push replit main
+npm test && git push origin main && git push --force replit main
 ```
 and in Replit: **Republish**. Installed home-screen copies pick up the new version on their next launch.
 
