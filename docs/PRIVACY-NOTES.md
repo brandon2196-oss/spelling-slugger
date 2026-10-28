@@ -7,8 +7,10 @@ Written for the parent running this app, not as legal advice. Verify before shar
   4-digit parent PIN, stored as a bcrypt hash.
 - **Child:** a first name or nickname, a team name, a jersey number, and avatar colors chosen from a
   fixed palette. No birthday, school, photo, address, or email.
-- **Gameplay:** the word lists a parent types, every spelling attempt a child submits, and the
-  resulting scores. This is the product: it is what the progress reports are made of.
+- **Gameplay:** the word lists a parent types or imports, every spelling attempt a child submits,
+  and the resulting scores. This is the product: it is what the progress reports are made of.
+- **Imported PDFs:** the teacher's PDF is read inside the browser and never uploaded. Only the words
+  the parent confirms are saved; the file itself is discarded.
 - **Device:** audio settings and the current parent-zone unlock live only in the browser
   (localStorage / sessionStorage). No analytics, no advertising identifiers, no third-party scripts
   other than Google Fonts.
