@@ -6,6 +6,9 @@ import { TextField } from '../../components/TextField'
 import { useStore } from '../../data/store'
 import type { NewWord } from '../../data/types'
 import { normalize } from '../../engine/grade'
+import { DIFFICULTIES, type Difficulty } from '../../engine/types'
+import { buildWeekList } from '../../engine/weekList'
+import { findPrecedingList } from '../../data/previous-week'
 import { mondayOf, prettyDate } from './dates'
 import { PdfImport } from './import/PdfImport'
 import { parseWordPaste } from './wordPaste'
@@ -27,6 +30,8 @@ export function ListEditorPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loaded, setLoaded] = useState(!listId)
+  const [review, setReview] = useState<NewWord[] | null>(null)
+  const [buildNotes, setBuildNotes] = useState<string[]>([])
   const [sentenceFor, setSentenceFor] = useState<number | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const saveRef = useRef<HTMLButtonElement>(null)
@@ -38,7 +43,8 @@ export function ListEditorPage() {
       setWeekStart(l.weekStart)
       setTitle(l.title)
       setTitleTouched(true)
-      setWords(l.words.map((w) => ({ text: w.text, sentence: w.sentence })))
+      setWords(l.words.filter((w) => w.source === 'current').map((w) => ({ text: w.text, sentence: w.sentence, difficulty: w.difficulty, source: 'current' })))
+      setReview(l.words.some((w) => w.source === 'review') ? l.words.filter((w) => w.source === 'review').map((w) => ({ text: w.text, sentence: w.sentence, difficulty: w.difficulty, source: 'review' })) : null)
       setLoaded(true)
     })
   }, [store, listId])
@@ -47,6 +53,7 @@ export function ListEditorPage() {
 
   function addWords(texts: string[]) {
     setNotice(null)
+    setReview(null)
     setWords((prev) => {
       const seen = new Set(prev.map((w) => normalize(w.text)))
       const skipped: string[] = []
@@ -58,7 +65,7 @@ export function ListEditorPage() {
           continue
         }
         seen.add(key)
-        next.push({ text: t, sentence: null })
+        next.push({ text: t, sentence: null, difficulty: 'medium', source: 'current' })
       }
       if (skipped.length) setNotice(`Already on the list, skipped: ${skipped.join(', ')}`)
       return next
@@ -91,17 +98,30 @@ export function ListEditorPage() {
     inputRef.current?.focus()
   }
 
+  async function buildWeek(): Promise<NewWord[]> {
+    const lists = await store.listWordLists(playerId)
+    const target = { id: listId ?? '__new__', playerId, title: '', weekStart, isActive: false, createdAt: '', words: [] }
+    const prev = findPrecedingList(lists, target)
+    const built = buildWeekList(words, prev ? prev.words : null, Math.random)
+    const rev = built.words.filter((w) => w.source === 'review')
+    setReview(rev)
+    setBuildNotes(built.warnings)
+    return rev
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     if (words.length === 0) return setError('Add at least one word.')
     if (!/^\d{4}-\d{2}-\d{2}$/.test(weekStart)) return setError('Pick the week start date.')
     try {
-      if (listId) await store.updateWordList(listId, { title: effectiveTitle, weekStart, words })
+      const rev = review ?? (await buildWeek())
+      const all = [...words, ...rev]
+      if (listId) await store.updateWordList(listId, { title: effectiveTitle, weekStart, words: all })
       else {
-        const created = await store.createWordList(playerId, { title: effectiveTitle, weekStart, words })
-        const all = await store.listWordLists(playerId)
-        if (!all.some((l) => l.isActive)) await store.setActiveList(playerId, created.id)
+        const created = await store.createWordList(playerId, { title: effectiveTitle, weekStart, words: all })
+        const lists = await store.listWordLists(playerId)
+        if (!lists.some((l) => l.isActive)) await store.setActiveList(playerId, created.id)
       }
       navigate(`/parent/players/${playerId}/lists`)
     } catch (err) {
@@ -114,7 +134,7 @@ export function ListEditorPage() {
   return (
     <form onSubmit={onSubmit} className="max-w-2xl">
       <h1 className="text-3xl text-navy">{listId ? 'Edit word list' : "This week's words"}</h1>
-      <p className="text-ink/70 mb-6">Drop in the teacher's PDF, or type a word and press Enter. Fifteen is the usual list; any number works.</p>
+      <p className="text-ink/70 mb-6">Type this week's 15 words and tag each Easy, Medium, or Hard. We add 5 review words from last week to make 20.</p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField label="Week starts" type="date" value={weekStart} onChange={(e) => setWeekStart(e.target.value)} required />
@@ -197,6 +217,7 @@ export function ListEditorPage() {
                 autoCapitalize="off"
                 onChange={(e) => setWords((ws) => ws.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))}
               />
+              <DifficultyPicker word={w.text} value={w.difficulty ?? 'medium'} onChange={(d) => setWords((ws) => ws.map((x, j) => (j === i ? { ...x, difficulty: d } : x)))} />
               <Button variant="ghost" className="text-sm text-navy/70" onClick={() => setSentenceFor(sentenceFor === i ? null : i)}>
                 {w.sentence ? 'Sentence ✓' : 'Add sentence'}
               </Button>
@@ -217,6 +238,25 @@ export function ListEditorPage() {
         )}
       </ol>
 
+      <div className="mt-4">
+        <Button variant="secondary" onClick={() => void buildWeek()}>Build week</Button>
+      </div>
+      {buildNotes.map((n) => <div key={n} className="mt-3"><Banner>{n}</Banner></div>)}
+      {review ? (
+        <section className="mt-4">
+          <h2 className="text-xl text-navy">Review words</h2>
+          <ul className="mt-2 divide-y divide-navy/10 rounded-2xl border border-navy/10 bg-white">
+            {review.map((w, i) => (
+              <li key={`r-${i}-${w.text}`} className="p-2 pl-4 flex flex-wrap items-center gap-2">
+                <span className="flex-1 text-lg">{w.text}</span>
+                <span className="rounded-full bg-gold/30 px-2 py-0.5 text-xs font-bold text-navy">from last week</span>
+                <DifficultyPicker word={w.text} value={w.difficulty ?? 'easy'} onChange={(d) => setReview((rs) => rs && rs.map((x, j) => (j === i ? { ...x, difficulty: d } : x)))} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {error ? <div className="mt-4"><Banner kind="error">{error}</Banner></div> : null}
 
       <div className="mt-6 flex gap-3">
@@ -224,5 +264,20 @@ export function ListEditorPage() {
         <Button variant="secondary" size="lg" onClick={() => navigate(`/parent/players/${playerId}/lists`)}>Cancel</Button>
       </div>
     </form>
+  )
+}
+
+function DifficultyPicker({ word, value, onChange }: { word: string; value: Difficulty; onChange: (d: Difficulty) => void }) {
+  const label: Record<Difficulty, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
+  return (
+    <div role="radiogroup" aria-label={`Difficulty for ${word}`} className="flex rounded-full border border-navy/20 overflow-hidden text-sm">
+      {DIFFICULTIES.map((d) => (
+        <button key={d} type="button" role="radio" aria-checked={value === d} aria-label={`${word}: ${label[d]}`}
+          onClick={() => onChange(d)}
+          className={`px-3 py-1 ${value === d ? 'bg-navy text-chalk' : 'text-navy'}`}>
+          {label[d]}
+        </button>
+      ))}
+    </div>
   )
 }
