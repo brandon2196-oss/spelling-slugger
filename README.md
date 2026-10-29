@@ -18,6 +18,8 @@ With no `.env.local`, the app runs in **local mode**: a fake sign-in and data ke
 so you can click through everything without an account. Production builds talk to the app's own API
 (`server/`); see `docs/DEPLOY.md` for running it on Replit.
 
+Set `ALLOW_REGISTRATION=false` (Replit Secrets) once friends have signed up to stop new accounts.
+
 ## Scripts
 
 | Command | What it does |
