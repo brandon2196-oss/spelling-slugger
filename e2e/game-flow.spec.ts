@@ -69,7 +69,7 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   }
   await expect(page.getByTestId('runs')).toHaveText('1')
   await page.waitForURL(/\/results$/)
-  await expect(page.getByText(/run/)).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /runs?$/ })).toBeVisible()
   await expect(page.getByText('Final score').or(page.getByText('New personal best!'))).toBeVisible()
   expect(await noHorizontalScroll(page)).toBe(true)
 })
