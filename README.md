@@ -1,4 +1,4 @@
-# Cooper's Spelling Slugger
+# Grand Slam Spelling
 
 A baseball video game that runs on weekly spelling words. Kids hear a word, type it, and earn
 doubles, singles, walks, or strikeouts depending on how many tries it takes. Parents manage word

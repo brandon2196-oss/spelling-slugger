@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'icons/apple-touch-icon-180.png'],
       manifest: {
-        name: "Cooper's Spelling Slugger",
-        short_name: 'Slugger',
+        name: 'Grand Slam Spelling',
+        short_name: 'Grand Slam',
         description: 'A baseball game that runs on your weekly spelling words.',
         display: 'standalone',
         orientation: 'any',

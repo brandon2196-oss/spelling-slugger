@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ShareButton } from './ShareButton'
+import { SHARE_TEXT, SHARE_TITLE } from './ShareButton'
 
 describe('ShareButton', () => {
   it('copies the app link when the browser has no native share sheet', async () => {
@@ -27,5 +28,13 @@ describe('ShareButton', () => {
     render(<ShareButton url="https://slugger.example.com" />)
     await user.click(screen.getByRole('button', { name: /share/i }))
     expect(share).toHaveBeenCalledWith(expect.objectContaining({ url: 'https://slugger.example.com' }))
+  })
+})
+
+describe('share copy', () => {
+  it('uses the Grand Slam Spelling name and private-share wording', () => {
+    expect(SHARE_TITLE).toBe('Grand Slam Spelling')
+    expect(SHARE_TEXT).toMatch(/Grand Slam Spelling/)
+    expect(SHARE_TEXT).not.toMatch(/Slugger/)
   })
 })

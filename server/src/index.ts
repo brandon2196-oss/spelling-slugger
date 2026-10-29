@@ -21,7 +21,7 @@ async function main() {
   const secureCookies = process.env.SECURE_COOKIES ? process.env.SECURE_COOKIES !== '0' : Boolean(process.env.REPL_ID)
   const app = createApp(db, { secureCookies, staticDir: existsSync(staticDir) ? staticDir : undefined })
   const port = Number(process.env.PORT ?? 3000)
-  app.listen(port, '0.0.0.0', () => console.log(`Spelling Slugger listening on :${port} (secure cookies: ${secureCookies})`))
+  app.listen(port, '0.0.0.0', () => console.log(`Grand Slam Spelling listening on :${port} (secure cookies: ${secureCookies})`))
 }
 
 main().catch((e: unknown) => {

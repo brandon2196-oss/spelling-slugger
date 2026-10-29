@@ -23,8 +23,7 @@ export function WelcomePage() {
           <p className="text-gold font-display text-xl tracking-wide">Now batting</p>
         </div>
         <h1 className="pixel-text announce-pixel mt-5 uppercase leading-[1.5]">
-          <span className="block text-[clamp(1rem,4.5vw,1.5rem)] text-chalk [text-shadow:3px_3px_0_#0a1630]">Cooper&apos;s</span>{' '}
-          <span className="block whitespace-nowrap text-[clamp(1.1rem,5.2vw,1.95rem)]">Spelling Slugger</span>
+          <span className="block whitespace-nowrap text-[clamp(1.1rem,5.2vw,1.95rem)]">Grand Slam Spelling</span>
         </h1>
 
         <div className="mx-auto mt-8 max-w-md rounded-lg border-2 border-[color:var(--bezel-line)] bg-bezel p-1 shadow-[4px_4px_0_#04070f]">
