@@ -29,6 +29,11 @@ so you can click through everything without an account. Production builds talk t
 | `npm run build` | Production build into `dist/` (also generates the PWA service worker) |
 | `npm run preview` | Serve the production build locally |
 | `npm run icons` | Regenerate PNG icons from `public/icon.svg` |
+| `npm run bake-audio` | Re-bake Big Red and Smooth Eddie booth lines into `public/audio/announcers/` and rewrite `public/audio/announcer-manifest.json` (needs network for edge-tts) |
+
+### Audio
+
+Sound effects are royalty-free clip pools in `public/audio/sfx/`; booth commentary plays pre-baked clips from the manifest (no browser TTS for the booth). Spelling words still use browser speech. Run `npm run bake-audio` after editing booth lines and commit the generated files. Sources and licenses: [AUDIO-CREDITS.md](AUDIO-CREDITS.md).
 
 ## How it is built
 - **`src/engine/`** is the whole rulebook, pure TypeScript with no React or DOM: grading
