@@ -56,7 +56,7 @@ export function ChildHomePage() {
           <div className="text-center sm:text-left">
             <p className="text-gold font-display text-xl">Now batting</p>
             <h1 className="font-display text-5xl leading-none">{player.name}</h1>
-            <p className="mt-1 text-chalk/70">{player.teamName || 'Spelling Sluggers'} · #{player.jerseyNumber}</p>
+            <p className="mt-1 text-chalk/70">{player.teamName || 'Grand Slammers'} · #{player.jerseyNumber}</p>
           </div>
         </div>
 
