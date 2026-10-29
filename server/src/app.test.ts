@@ -77,6 +77,20 @@ async function signedUp() {
 }
 
 describe('auth', () => {
+  it('refuses new signups when registration is closed', async () => {
+    const closed = createApp(db, { secureCookies: false, allowRegistration: false })
+    const srv = await new Promise<Server>((ok) => { const s = closed.listen(0, () => ok(s)) })
+    try {
+      const addr = srv.address()
+      const r = await client(`http://127.0.0.1:${typeof addr === 'object' && addr ? addr.port : 0}`)
+        .post('/api/auth/register', { email: `closed-${Date.now()}@example.com`, password: 'longenough1' })
+      expect(r.status).toBe(403)
+      expect(r.body).toEqual({ error: 'REGISTRATION_CLOSED' })
+    } finally {
+      await new Promise<void>((ok) => srv.close(() => ok()))
+    }
+  })
+
   it('registers, sets an httpOnly lax cookie, reports the user, rejects duplicates and short passwords', async () => {
     const c = client(base)
     const e = email()

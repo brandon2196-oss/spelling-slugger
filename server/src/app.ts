@@ -12,6 +12,8 @@ export interface AppOptions {
   secureCookies: boolean
   /** Built frontend to serve with an SPA fallback; omit for API-only. */
   staticDir?: string
+  /** False closes signups (invite-only). Default true. */
+  allowRegistration?: boolean
 }
 
 /** Browsers send this on every mutation; a cross-site form or image tag cannot. */
@@ -193,6 +195,7 @@ export function createApp(db: Db, opts: AppOptions) {
 
   // ---- auth
   api.post('/auth/register', h(async (req, res) => {
+    if (opts.allowRegistration === false) return res.status(403).json({ error: 'REGISTRATION_CLOSED' })
     const { email, password } = parseCredentials(req.body, MIN_PASSWORD_LENGTH)
     const user = await registerUser(db, email, password)
     setSession(res, await createSession(db, user.userId))
