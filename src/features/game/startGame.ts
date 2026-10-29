@@ -1,20 +1,15 @@
-/** Builds and persists new games for each mode, and finds unfinished ones. */
-import { findPrecedingList } from '../../data/previous-week'
-import type { GameRecord, Store } from '../../data/types'
+import type { GameRecord, Store, WordList } from '../../data/types'
 import { normalize } from '../../engine/grade'
-import { practiceWords, selectGameWords, type SourceWord } from '../../engine/selection'
+import { practiceWords, weeklyWords, type SourceWord } from '../../engine/selection'
 import type { GameWord } from '../../engine/types'
 
-const toSource = (list: { words: { id: string; text: string; sentence: string | null }[] }): SourceWord[] =>
-  list.words.map((w) => ({ id: w.id, text: w.text, sentence: w.sentence }))
+const toSource = (list: Pick<WordList, 'words'>): SourceWord[] =>
+  list.words.map((w) => ({ id: w.id, text: w.text, sentence: w.sentence, source: w.source, difficulty: w.difficulty }))
 
 export async function startWeeklyGame(store: Store, playerId: string, listId: string, rng: () => number = Math.random): Promise<GameRecord> {
-  const lists = await store.listWordLists(playerId)
-  const list = lists.find((l) => l.id === listId)
-  if (!list) throw new Error('LIST_NOT_FOUND')
-  const previous = findPrecedingList(lists, list)
-  const { words, warnings } = selectGameWords(toSource(list), previous ? toSource(previous) : null, rng)
-  return store.createGame({ playerId, listId, mode: 'weekly', words, warnings })
+  const list = await store.getWordList(listId)
+  if (!list || list.playerId !== playerId) throw new Error('LIST_NOT_FOUND')
+  return store.createGame({ playerId, listId, mode: 'weekly', words: weeklyWords(toSource(list), rng), warnings: [] })
 }
 
 export async function startPracticeGame(store: Store, playerId: string, listId: string, rng: () => number = Math.random): Promise<GameRecord> {
@@ -45,7 +40,7 @@ export async function startMissedWordsGame(store: Store, playerId: string, rng: 
   const ranked = [...stats.values()].sort((a, b) => b.wrong - a.wrong || (a.lastSeen < b.lastSeen ? 1 : -1)).slice(0, MISSED_WORDS_MAX)
   if (ranked.length === 0) throw new Error('NO_MISSED_WORDS')
   const words = practiceWords(
-    ranked.map((s, i) => ({ id: s.word.sourceWordId ?? `missed-${i}`, text: s.word.text, sentence: s.word.sentence })),
+    ranked.map((s, i) => ({ id: s.word.sourceWordId ?? `missed-${i}`, text: s.word.text, sentence: s.word.sentence, source: 'current' as const, difficulty: s.word.difficulty ?? 'medium' })),
     rng,
   )
   return store.createGame({ playerId, listId: null, mode: 'missed', words, warnings: [] })
