@@ -26,4 +26,10 @@ describe('announcementsFor', () => {
   it('says nothing for ignored input', () => {
     expect(announcementsFor({ kind: 'ignored', reason: 'blank' })).toEqual([])
   })
+  it('calls a home run', () => {
+    const ev = { kind: 'at-bat-complete', outcome: 'homeRun', attempts: [] as never[], runsScored: 1, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
+      outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'rhythm',
+      word: { position: 0, text: 'rhythm', sentence: null, source: 'current', sourceWordId: null, difficulty: 'hard' } } as const
+    expect(announcementsFor(ev)[0]).toBe('HOME RUN!')
+  })
 })

@@ -8,7 +8,7 @@ import { createPicker } from './pool'
 import { availableVoices, speak, speechAvailable } from './speech'
 
 export const ANNOUNCE_EVENTS = [
-  'gameStart', 'double', 'single', 'walk', 'strike1', 'strike2', 'strikeout', 'run', 'runs', 'inningEnd', 'gameOver',
+  'gameStart', 'homeRun', 'double', 'single', 'walk', 'strike1', 'strike2', 'strikeout', 'run', 'runs', 'inningEnd', 'gameOver',
 ] as const
 export type AnnounceEvent = (typeof ANNOUNCE_EVENTS)[number]
 
@@ -47,6 +47,13 @@ const bigRed: Announcer = {
       'Welcome, welcome, welcome! Clear skies, fresh chalk, and a slugger stepping in. I love it!',
       "Hold onto your hats, folks! There's a storm of spelling rolling into the stadium tonight!",
       'Here we go! First pitch is moments away, and I can feel the electricity in the air!',
+    ],
+    homeRun: [
+      "GONE! {word} is OUTTA HERE! A grand-slam-sized home run!",
+      "Touch 'em all, kid! That one's a HOME RUN!",
+      "SAY GOODBYE! {word} just left the ballpark! HOME RUN!",
+      "Holy smokes, that ball is in the parking lot! HOME RUN, folks!",
+      "Somebody call NASA! {word} is a MOONSHOT! HOME RUN!",
     ],
     double: [
       "OH MY STARS! {word} is ROCKETED into the gap! That's a stand-up double!",
@@ -145,6 +152,13 @@ const smoothEddie: Announcer = {
       "Good vibes only at the ballpark tonight. Easy breezy, let's play.",
       'Here we go, friend. Relax your shoulders, trust your swing, and enjoy the ride.',
     ],
+    homeRun: [
+      'Waaaay back… and gone. Home run, smooth as you like.',
+      "That's a souvenir for somebody. Home run.",
+      'Up, up, and over the wall. Home run, nice and easy.',
+      'Just a gentle little trip around the bases. Home run, baby.',
+      'Sail away, little ball. {word} goes deep. Home run.',
+    ],
     double: [
       "Oh yeah, that's a double, baby! Smooth as a wave on a glassy day.",
       '{word}, spelled just right. Ride that line drive all the way to second, friend.',
@@ -234,7 +248,7 @@ const quiet: Announcer = {
   tagline: 'Sounds only. No talking.',
   portrait: 'quiet',
   voice: { rate: 1, pitch: 1, prefer: /$^/ },
-  lines: { gameStart: [], double: [], single: [], walk: [], strike1: [], strike2: [], strikeout: [], run: [], runs: [], inningEnd: [], gameOver: [] },
+  lines: { gameStart: [], homeRun: [], double: [], single: [], walk: [], strike1: [], strike2: [], strikeout: [], run: [], runs: [], inningEnd: [], gameOver: [] },
 }
 
 export const ANNOUNCERS: Record<AnnouncerId, Announcer> = { bigRed, smoothEddie, quiet }

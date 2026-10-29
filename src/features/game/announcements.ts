@@ -6,6 +6,7 @@ export function announcementsFor(event: SubmitEvent): string[] {
   if (event.kind === 'strike') return [event.strike === 1 ? 'STRIKE ONE!' : 'STRIKE TWO!']
   const out: string[] = []
   switch (event.outcome) {
+    case 'homeRun': out.push('HOME RUN!'); break
     case 'double': out.push('DOUBLE!'); break
     case 'single': out.push('BASE HIT!'); break
     case 'walk': out.push('TAKE YOUR BASE!'); break

@@ -273,17 +273,20 @@ export class FieldScene extends Phaser.Scene implements FieldController {
     }
   }
 
-  async playHit(outcome: 'single' | 'double', before: Bases, after: Bases, runs: number): Promise<void> {
+  async playHit(outcome: 'single' | 'double' | 'homeRun', before: Bases, after: Bases, runs: number): Promise<void> {
     const sw = this.swing()
     await this.delay(50)
     const contact = { x: FIELD.home.x, y: FIELD.home.y - 14 }
     this.ball.setPosition(contact.x, contact.y).setVisible(true).setAlpha(1)
     contactFlash(this, contact.x, contact.y)
     // ball flight: doubles go deeper; direction is random (left/center/right)
+    // home runs leave the yard over the wall
+    const deep = outcome !== 'single'
     const dir = Phaser.Math.Between(-1, 1)
-    const tx = FIELD.width / 2 + dir * (outcome === 'double' ? 110 : 70) + Phaser.Math.Between(-12, 12)
-    const ty = outcome === 'double' ? WALL_TOP + 4 : GRASS_TOP + 20
-    const flight = this.tween({ targets: this.ball, x: tx, y: ty, scale: 0.5, duration: outcome === 'double' ? 900 : 700, ease: 'Quad.easeOut' })
+    const tx = FIELD.width / 2 + dir * (deep ? 110 : 70) + Phaser.Math.Between(-12, 12)
+    const ty = outcome === 'homeRun' ? WALL_TOP - 30 : deep ? WALL_TOP + 4 : GRASS_TOP + 20
+    const duration = outcome === 'homeRun' ? 1200 : deep ? 900 : 700
+    const flight = this.tween({ targets: this.ball, x: tx, y: ty, scale: 0.5, duration, ease: 'Quad.easeOut' })
     const run = this.moveRunners(basesDiff(before, after, outcome, runs))
     await Promise.all([sw, flight, run])
     this.ball.setVisible(false)

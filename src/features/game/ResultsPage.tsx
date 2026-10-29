@@ -73,7 +73,7 @@ export function ResultsPage() {
   }
 
   const rows: [string, string | number][] = [
-    ['Hits', s.hits], ['Doubles', s.doubles], ['Singles', s.singles], ['Walks', s.walks], ['Strikeouts', s.strikeouts],
+    ['Hits', s.hits], ['Home runs', s.homeRuns ?? 0], ['Doubles', s.doubles], ['Singles', s.singles], ['Walks', s.walks], ['Strikeouts', s.strikeouts],
     ['Total strikes', s.totalStrikes], ['First try', s.firstTry], ['Second try', s.secondTry], ['Third try', s.thirdTry],
     ['First-try accuracy', `${s.firstTryAccuracy}%`],
   ]

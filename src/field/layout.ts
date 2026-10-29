@@ -56,13 +56,13 @@ export function basesDiff(before: Bases, after: Bases, outcome: Outcome, runsSco
   if (outcome === 'strikeout') return []
   const moves: { from: Base; to: Destination }[] = []
   const occupied: Base[] = (['third', 'second', 'first'] as const).filter((b) => before[b])
-  if (outcome === 'single' || outcome === 'double') {
-    const n = outcome === 'single' ? 1 : 2
+  if (outcome === 'single' || outcome === 'double' || outcome === 'homeRun') {
+    const n = outcome === 'single' ? 1 : outcome === 'double' ? 2 : 4
     for (const b of occupied) {
       const idx = ORDER.indexOf(b) + n
       moves.push({ from: b, to: idx >= 4 ? 'score' : ORDER[idx]! })
     }
-    moves.push({ from: 'home', to: ORDER[n]! })
+    moves.push({ from: 'home', to: n >= 4 ? 'score' : ORDER[n]! })
     return moves
   }
   // walk: forced chain from first

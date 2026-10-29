@@ -4,6 +4,8 @@ import { createLocalStore } from '../../data/local-store'
 import { StoreContext } from '../../data/store'
 import type { NewPlayer } from '../../data/types'
 import { seededRng } from '../../engine/rng'
+import { rebuild } from '../../engine/replay'
+import { summarize } from '../../engine/results'
 import { ResultsPage } from './ResultsPage'
 import { startPracticeGame } from './startGame'
 
@@ -35,5 +37,23 @@ describe('ResultsPage', () => {
     expect(await screen.findByText(/New personal best!|Final score/)).toBeInTheDocument()
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.queryByText('No results for that game yet.')).toBeNull()
+  })
+  it('shows a Home runs row', async () => {
+    localStorage.clear()
+    const store = createLocalStore()
+    const p = await store.createPlayer(cooper)
+    const l = await store.createWordList(p.id, { title: 'L', weekStart: '2026-10-19', words: ['cat', 'dog'].map((text) => ({ text, sentence: null })) })
+    const g = await startPracticeGame(store, p.id, l.id, seededRng(1))
+    for (const w of g.words) await store.recordAttempt(g.id, { position: w.position, attemptNumber: 1, text: w.text, correct: true, outcome: 'double' })
+    const saved = await store.getGame(g.id)
+    await store.completeGame(g.id, { ...summarize(rebuild(saved!.words, saved!.attempts)), homeRuns: 2 })
+    const router = createMemoryRouter([{ path: '/game/:gameId/results', element: <ResultsPage /> }], { initialEntries: [`/game/${g.id}/results`] })
+    render(
+      <StoreContext.Provider value={store}>
+        <RouterProvider router={router} />
+      </StoreContext.Provider>,
+    )
+    const label = await screen.findByText('Home runs')
+    expect(label.nextElementSibling?.textContent).toBe('2')
   })
 })

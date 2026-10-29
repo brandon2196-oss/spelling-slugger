@@ -64,10 +64,10 @@ export async function playSequence(
       break
     default: {
       sfx.crack()
-      // Home-run animation/call lands in a later task; until then it plays as a double.
-      const hit = event.outcome === 'homeRun' ? 'double' : event.outcome
+      if (event.outcome === 'homeRun') sfx.cheer()
+      const hit = event.outcome
       await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
-    } // DOUBLE! / BASE HIT!
+    } // HOME RUN! / DOUBLE! / BASE HIT!
   }
 
   if (event.runsScored > 0) {
