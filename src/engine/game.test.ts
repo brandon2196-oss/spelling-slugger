@@ -1,5 +1,5 @@
 import { EMPTY_BASES } from './bases'
-import { createGame, currentWord, submitAnswer } from './game'
+import { createGame, currentWord, outcomeFor, submitAnswer } from './game'
 import type { GameState, GameWord, SubmitEvent } from './types'
 
 const mk = (texts: string[]): GameWord[] =>
@@ -135,4 +135,21 @@ describe('purity', () => {
       ],
     })
   })
+})
+
+describe('outcomeFor', () => {
+  it.each([
+    [1, 'easy', 'single'], [1, 'medium', 'double'], [1, 'hard', 'homeRun'],
+    [2, 'easy', 'walk'], [2, 'medium', 'single'], [2, 'hard', 'double'],
+    [3, 'easy', 'walk'], [3, 'medium', 'walk'], [3, 'hard', 'walk'],
+  ] as const)('try %i on %s → %s', (n, d, out) => {
+    expect(outcomeFor(n, d)).toBe(out)
+  })
+})
+
+it('a hard word spelled on the first try is a home run and is tallied', () => {
+  const g = createGame([{ position: 0, text: 'rhythm', sentence: null, source: 'current', sourceWordId: null, difficulty: 'hard' }])
+  const { state, event } = submitAnswer(g, 'rhythm')
+  expect(event.kind === 'at-bat-complete' && event.outcome).toBe('homeRun')
+  expect(state.tallies).toMatchObject({ homeRuns: 1, hits: 1, runs: 1, firstTry: 1 })
 })

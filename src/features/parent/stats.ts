@@ -25,7 +25,7 @@ export function wordStats(games: GameRecord[]): WordStat[] {
       const s = map.get(key) ?? { text: w.text, seen: 0, firstTry: 0, missed: 0, strikes: 0, lastSeen: g.startedAt }
       s.seen += 1
       s.strikes += attempts.filter((a) => !a.correct).length
-      if (final.outcome === 'double') s.firstTry += 1
+      if (final.outcome !== 'strikeout' && final.attemptNumber === 1) s.firstTry += 1
       if (final.outcome === 'strikeout') s.missed += 1
       if (g.startedAt > s.lastSeen) s.lastSeen = g.startedAt
       map.set(key, s)
@@ -58,7 +58,7 @@ function firstTryPct(games: GameRecord[]): number {
   for (const g of games) {
     const finals = g.attempts.filter((a) => a.outcome !== null)
     total += finals.length
-    first += finals.filter((a) => a.outcome === 'double').length
+    first += finals.filter((a) => a.outcome !== 'strikeout' && a.attemptNumber === 1).length
   }
   return total === 0 ? 0 : Math.round((first / total) * 100)
 }
@@ -92,7 +92,7 @@ export function reviewRetention(games: GameRecord[]): number | null {
       const final = g.attempts.find((a) => a.position === w.position && a.outcome !== null)
       if (!final) continue
       total += 1
-      if (final.outcome === 'double') first += 1
+      if (final.outcome !== 'strikeout' && final.attemptNumber === 1) first += 1
     }
   }
   return total === 0 ? null : Math.round((first / total) * 100)

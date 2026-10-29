@@ -4,7 +4,7 @@
  */
 import { EMPTY_BASES, advance } from './bases'
 import { isBlank, isCorrect } from './grade'
-import type { Attempt, GameState, GameWord, Outcome, SubmitEvent, Tallies } from './types'
+import type { Attempt, Difficulty, GameState, GameWord, Outcome, SubmitEvent, Tallies } from './types'
 
 export type { SubmitEvent } from './types'
 
@@ -44,16 +44,24 @@ export function currentWord(state: GameState): GameWord | null {
   return state.words[state.index] ?? null
 }
 
-/** Outcome for a correct answer on attempt n (1-based). */
-function outcomeForAttempt(n: number): Outcome {
-  if (n === 1) return 'double'
-  if (n === 2) return 'single'
+const FIRST_TRY: Record<Difficulty, Exclude<Outcome, 'strikeout' | 'walk'>> = { easy: 'single', medium: 'double', hard: 'homeRun' }
+const ONE_DOWN: Record<'homeRun' | 'double' | 'single', 'double' | 'single' | 'walk'> = { homeRun: 'double', double: 'single', single: 'walk' }
+
+/** Outcome for a correct answer on attempt n given the word's difficulty. */
+export function outcomeFor(n: 1 | 2 | 3, difficulty: Difficulty): Exclude<Outcome, 'strikeout'> {
+  const first = FIRST_TRY[difficulty]
+  if (n === 1) return first
+  if (n === 2) return ONE_DOWN[first]
   return 'walk'
 }
 
 function tallyOutcome(t: Tallies, outcome: Outcome, attemptNumber: number, runs: number): Tallies {
   const next = { ...t, runs: t.runs + runs }
   switch (outcome) {
+    case 'homeRun':
+      next.homeRuns += 1
+      next.hits += 1
+      break
     case 'double':
       next.doubles += 1
       next.hits += 1
@@ -110,7 +118,7 @@ export function submitAnswer(state: GameState, text: string): { state: GameState
     }
   }
 
-  const outcome: Outcome = correct ? outcomeForAttempt(attemptNumber) : 'strikeout'
+  const outcome: Outcome = correct ? outcomeFor(attemptNumber, word.difficulty ?? 'medium') : 'strikeout'
   const { bases: basesAfter, runs } = advance(state.bases, outcome)
   let outs = outcome === 'strikeout' ? state.outs + 1 : state.outs
   let inning = state.inning

@@ -50,3 +50,9 @@ describe('helpers', () => {
     expect(runnersOn(b(true, false, true))).toBe(2)
   })
 })
+
+it('home run clears the bases and scores everyone plus the batter', () => {
+  expect(advance({ first: true, second: true, third: true }, 'homeRun')).toEqual({ bases: EMPTY_BASES, runs: 4 })
+  expect(advance(EMPTY_BASES, 'homeRun')).toEqual({ bases: EMPTY_BASES, runs: 1 })
+  expect(advance({ first: false, second: true, third: false }, 'homeRun')).toEqual({ bases: EMPTY_BASES, runs: 2 })
+})

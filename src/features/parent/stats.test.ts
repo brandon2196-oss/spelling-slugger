@@ -76,3 +76,11 @@ describe('totals', () => {
     expect(totals(games)).toEqual({ games: 3, practice: 1, highScore: 3, firstTryRate: 56 })
   })
 })
+
+describe('first-try by attempt number', () => {
+  it('counts a first-attempt single (easy word) as first try', () => {
+    const g = game('g9', 'L9', ['sun'], [0])
+    g.attempts = [{ position: 0, attemptNumber: 1, text: 'sun', correct: true, outcome: 'single' }]
+    expect(wordStats([g]).find((w) => w.text === 'sun')!.firstTry).toBe(1)
+  })
+})
