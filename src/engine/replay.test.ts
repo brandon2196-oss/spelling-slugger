@@ -3,7 +3,7 @@ import { rebuild, type ReplayAttempt } from './replay'
 import type { GameState, GameWord } from './types'
 
 const mk = (texts: string[]): GameWord[] =>
-  texts.map((text, position) => ({ position, text, sentence: null, source: 'current', sourceWordId: null }))
+  texts.map((text, position) => ({ position, text, sentence: null, source: 'current', sourceWordId: null, difficulty: 'medium' as const }))
 
 const twenty = Array.from({ length: 20 }, (_, i) => `w${i}`)
 

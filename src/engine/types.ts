@@ -2,7 +2,10 @@
 
 export type Hand = 'L' | 'R'
 
-export type Outcome = 'double' | 'single' | 'walk' | 'strikeout'
+export type Outcome = 'homeRun' | 'double' | 'single' | 'walk' | 'strikeout'
+
+export type Difficulty = 'easy' | 'medium' | 'hard'
+export const DIFFICULTIES: readonly Difficulty[] = ['easy', 'medium', 'hard']
 
 export type WordSource = 'current' | 'review'
 
@@ -12,6 +15,7 @@ export interface GameWord {
   text: string
   sentence: string | null
   source: WordSource
+  difficulty: Difficulty
   /** Id of the list word this came from, kept for history only (no FK). */
   sourceWordId: string | null
 }
@@ -40,6 +44,7 @@ export interface AtBat {
 export interface Tallies {
   runs: number
   hits: number
+  homeRuns: number
   singles: number
   doubles: number
   walks: number

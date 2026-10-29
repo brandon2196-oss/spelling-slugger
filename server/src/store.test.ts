@@ -12,7 +12,7 @@ const cooper: NewPlayer = {
   },
 }
 const gw = (position: number, text: string, source: GameWord['source'] = 'current'): GameWord => ({
-  position, text, sentence: null, source, sourceWordId: null,
+  position, text, sentence: null, source, sourceWordId: null, difficulty: 'medium',
 })
 
 let db: Db
@@ -40,6 +40,16 @@ describe('players', () => {
 })
 
 describe('word lists', () => {
+  it('stores difficulty and source per word, defaulting to medium/current', async () => {
+    const p = await a.createPlayer(cooper)
+    const list = await a.createWordList(p.id, {
+      title: 't', weekStart: '2026-10-26',
+      words: [{ text: 'cat', sentence: null, difficulty: 'hard' }, { text: 'dog', sentence: null }, { text: 'sun', sentence: null, difficulty: 'easy', source: 'review' }],
+    })
+    expect(list.words.map((w) => [w.text, w.difficulty, w.source])).toEqual([
+      ['cat', 'hard', 'current'], ['dog', 'medium', 'current'], ['sun', 'easy', 'review'],
+    ])
+  })
   it('stores words in order, replaces them renumbered, keeps one active list, sorts newest week first', async () => {
     const p = await a.createPlayer(cooper)
     const l1 = await a.createWordList(p.id, {

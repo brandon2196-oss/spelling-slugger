@@ -3,7 +3,7 @@ import { createGame, currentWord, submitAnswer } from './game'
 import type { GameState, GameWord, SubmitEvent } from './types'
 
 const mk = (texts: string[]): GameWord[] =>
-  texts.map((text, position) => ({ position, text, sentence: null, source: 'current', sourceWordId: null }))
+  texts.map((text, position) => ({ position, text, sentence: null, source: 'current', sourceWordId: null, difficulty: 'medium' as const }))
 
 /** Submit a sequence of answers, returning the final state and the last event. */
 function play(state: GameState, ...answers: string[]): { state: GameState; event: SubmitEvent } {

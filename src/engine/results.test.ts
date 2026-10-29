@@ -9,6 +9,7 @@ const mk = (texts: string[], reviewFrom = Infinity): GameWord[] =>
     sentence: null,
     source: position >= reviewFrom ? 'review' : 'current',
     sourceWordId: null,
+    difficulty: 'medium',
   }))
 
 function play(state: GameState, ...answers: string[]): GameState {

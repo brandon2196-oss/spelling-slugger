@@ -54,6 +54,10 @@ export function advance(bases: Bases, outcome: Outcome): { bases: Bases; runs: n
       return advanceAll(bases, 2)
     case 'walk':
       return walk(bases)
+    case 'homeRun': {
+      const { runs } = advanceAll(bases, 4)
+      return { bases: { first: false, second: false, third: false }, runs }
+    }
     case 'strikeout':
       return { bases: { ...bases }, runs: 0 }
   }

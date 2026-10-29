@@ -43,7 +43,7 @@ const cooper = {
     hatColor: '#000', skinTone: '#fff', hairColor: '#000', hairstyle: 'short',
   },
 }
-const gw = (position: number, text: string) => ({ position, text, sentence: null, source: 'current', sourceWordId: null })
+const gw = (position: number, text: string) => ({ position, text, sentence: null, source: 'current', sourceWordId: null, difficulty: 'medium' as const })
 
 let db: Db
 let server: Server

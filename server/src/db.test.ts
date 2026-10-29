@@ -9,8 +9,8 @@ beforeAll(async () => {
 afterAll(() => db.close())
 
 describe('migrate', () => {
-  it('applies the initial migration once and is idempotent', async () => {
-    expect(await migrate(db)).toEqual(['0001_init.sql'])
+  it('applies all migrations once and is idempotent', async () => {
+    expect(await migrate(db)).toEqual(['0001_init.sql', '0002_difficulty.sql'])
     expect(await migrate(db)).toEqual([])
   })
 

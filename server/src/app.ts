@@ -70,11 +70,16 @@ function parsePlayerPatch(b: unknown) {
   }
 }
 const DATE = /^\d{4}-\d{2}-\d{2}$/
+const DIFF = ['easy', 'medium', 'hard'] as const
 function parseWords(v: unknown) {
   if (!Array.isArray(v) || v.length > 200) throw bad()
   return v.map((w) => {
     if (!isObj(w)) throw bad()
-    return { text: str(w.text, 60), sentence: w.sentence == null ? null : str(w.sentence, 300) }
+    return {
+      text: str(w.text, 60), sentence: w.sentence == null ? null : str(w.sentence, 300),
+      difficulty: w.difficulty == null ? 'medium' as const : oneOf(w.difficulty, DIFF),
+      source: w.source == null ? 'current' as const : oneOf(w.source, ['current', 'review'] as const),
+    }
   })
 }
 function parseGameWords(v: unknown) {
@@ -84,6 +89,7 @@ function parseGameWords(v: unknown) {
     return {
       position: int(w.position, 0, 500), text: str(w.text, 60), sentence: w.sentence == null ? null : str(w.sentence, 300),
       source: oneOf(w.source, ['current', 'review'] as const), sourceWordId: w.sourceWordId == null ? null : str(w.sourceWordId, 64),
+      difficulty: w.difficulty == null ? 'medium' as const : oneOf(w.difficulty, DIFF),
     }
   })
 }
@@ -92,7 +98,7 @@ function parseAttempt(b: unknown) {
   return {
     position: int(b.position, 0, 500), attemptNumber: int(b.attemptNumber, 1, 3) as 1 | 2 | 3, text: str(b.text, 200, 0),
     correct: typeof b.correct === 'boolean' ? b.correct : (() => { throw bad() })(),
-    outcome: b.outcome == null ? null : oneOf(b.outcome, ['double', 'single', 'walk', 'strikeout'] as const),
+    outcome: b.outcome == null ? null : oneOf(b.outcome, ['homeRun', 'double', 'single', 'walk', 'strikeout'] as const),
   }
 }
 /** Registration enforces the minimum length; login only needs a string, so a short wrong password is still a 401. */

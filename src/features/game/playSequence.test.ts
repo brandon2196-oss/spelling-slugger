@@ -4,7 +4,7 @@ import type { SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
 import { playSequence, type SequenceSfx } from './playSequence'
 
-const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null }
+const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null, difficulty: 'medium' as const }
 const done = (over: Partial<Extract<SubmitEvent, { kind: 'at-bat-complete' }>>): SubmitEvent => ({
   kind: 'at-bat-complete', outcome: 'double', attempts: [], runsScored: 0, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
   outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word, ...over,

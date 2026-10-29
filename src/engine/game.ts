@@ -16,6 +16,7 @@ const ZERO_TALLIES: Tallies = {
   hits: 0,
   singles: 0,
   doubles: 0,
+  homeRuns: 0,
   walks: 0,
   strikeouts: 0,
   totalStrikes: 0,

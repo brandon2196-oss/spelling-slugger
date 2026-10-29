@@ -1,12 +1,13 @@
 /** Builds the word set for a game (spec §6 "Weekly Review Words"). */
 import { normalize } from './grade'
 import { shuffle } from './rng'
-import type { GameWord, WordSource } from './types'
+import type { Difficulty, GameWord, WordSource } from './types'
 
 export interface SourceWord {
   id: string
   text: string
   sentence: string | null
+  difficulty?: Difficulty
 }
 
 export interface Selection {
@@ -22,6 +23,7 @@ function toGameWords(items: { word: SourceWord; source: WordSource }[]): GameWor
     text: word.text,
     sentence: word.sentence,
     source,
+    difficulty: word.difficulty ?? 'medium',
     sourceWordId: word.id,
   }))
 }

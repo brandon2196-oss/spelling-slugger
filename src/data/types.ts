@@ -1,6 +1,6 @@
 /** Persistence-layer types and the Store interface every backend implements. */
 import type { GameSummary } from '../engine/results'
-import type { GameWord, Hand, Outcome } from '../engine/types'
+import type { Difficulty, GameWord, Hand, Outcome, WordSource } from '../engine/types'
 
 export type Hairstyle = 'short' | 'curly' | 'long' | 'buzz' | 'ponytail' | 'afro'
 
@@ -32,10 +32,14 @@ export interface Word {
   position: number
   text: string
   sentence: string | null
+  difficulty: Difficulty
+  source: WordSource
 }
 export interface NewWord {
   text: string
   sentence: string | null
+  difficulty?: Difficulty
+  source?: WordSource
 }
 
 export interface WordList {

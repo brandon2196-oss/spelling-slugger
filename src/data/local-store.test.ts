@@ -17,7 +17,7 @@ const cooper: NewPlayer = {
 const sibling: NewPlayer = { ...cooper, name: 'Nora', hand: 'R' }
 
 const gw = (texts: string[]): GameWord[] =>
-  texts.map((text, position) => ({ position, text, sentence: null, source: 'current', sourceWordId: null }))
+  texts.map((text, position) => ({ position, text, sentence: null, source: 'current', sourceWordId: null, difficulty: 'medium' as const }))
 
 let store: Store
 beforeEach(() => {
@@ -46,6 +46,16 @@ describe('players', () => {
 })
 
 describe('word lists', () => {
+  it('stores difficulty and source per word, defaulting to medium/current', async () => {
+    const p = await store.createPlayer(cooper)
+    const list = await store.createWordList(p.id, {
+      title: 't', weekStart: '2026-10-26',
+      words: [{ text: 'cat', sentence: null, difficulty: 'hard' }, { text: 'dog', sentence: null }, { text: 'sun', sentence: null, difficulty: 'easy', source: 'review' }],
+    })
+    expect(list.words.map((w) => [w.text, w.difficulty, w.source])).toEqual([
+      ['cat', 'hard', 'current'], ['dog', 'medium', 'current'], ['sun', 'easy', 'review'],
+    ])
+  })
   it('(23) siblings have independent lists and games', async () => {
     const a = await store.createPlayer(cooper)
     const b = await store.createPlayer(sibling)
