@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach } from 'vitest'
-import { ANNOUNCERS } from '../../audio/announcer'
+import { ANNOUNCERS, setAnnouncerPlayerForTests } from '../../audio/announcer'
+import { setManifestForTests } from '../../audio/manifest'
 import { AnnouncerPicker } from './AnnouncerPicker'
 
 type Utter = { text: string; onend: null | (() => void) }
@@ -54,11 +55,18 @@ describe('AnnouncerPicker', () => {
 
   it('clicking a talker calls onChange and plays a sample line', async () => {
     const onChange = vi.fn()
+    const play = vi.fn(async (_url: string) => {})
+    setAnnouncerPlayerForTests({ load: vi.fn(), preload: vi.fn(), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(), play })
+    const gameStart = ANNOUNCERS.smoothEddie.lines.gameStart.map((_, i) => `/audio/announcers/smoothEddie/gameStart-${String(i).padStart(2, '0')}.ogg`)
+    setManifestForTests({ version: 1, clips: { bigRed: {}, smoothEddie: { gameStart }, quiet: {} } })
     render(<AnnouncerPicker value="bigRed" onChange={onChange} />)
     await userEvent.click(screen.getByRole('button', { name: /smooth eddie/i }))
     expect(onChange).toHaveBeenCalledWith('smoothEddie')
-    expect(fake.synth.speak).toHaveBeenCalledTimes(1)
-    expect(ANNOUNCERS.smoothEddie.lines.gameStart).toContain(fake.spoken[0]!.text)
+    await vi.waitFor(() => expect(play).toHaveBeenCalledTimes(1))
+    expect(play.mock.calls[0]![0]).toMatch(/smoothEddie\/gameStart-\d\d\.ogg$/)
+    expect(fake.synth.speak).not.toHaveBeenCalled()
+    setAnnouncerPlayerForTests(null)
+    setManifestForTests(null)
   })
 
   it('clicking the quiet booth calls onChange without speaking', async () => {

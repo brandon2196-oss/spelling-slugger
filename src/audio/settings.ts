@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ANNOUNCERS, type AnnouncerId } from './announcer'
 import { setSpeechVolume } from './speech'
+import { clips } from './clips'
 import { sfx } from './sfx'
 
 export interface AudioSettings {
@@ -30,6 +31,8 @@ function apply(s: AudioSettings): void {
   const v = s.muted ? 0 : s.volume
   setSpeechVolume(v)
   sfx.setVolume(v)
+  clips.setVolume(v)
+  clips.setMuted(s.muted)
   sfx.enabled = s.sfx && !s.muted
 }
 

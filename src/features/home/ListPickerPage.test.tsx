@@ -85,3 +85,16 @@ describe('ChildHomePage missed words', () => {
     expect(await screen.findByText('No missed words yet. Nice!')).toBeInTheDocument()
   })
 })
+
+describe('ChildHomePage audio preload', () => {
+  it('mounts quietly when the announcer manifest fetch fails', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('offline'))))
+    try {
+      const { store, playerId } = await seed()
+      mount(store, `/play/${playerId}`)
+      expect(await screen.findByRole('button', { name: /missed words/i })).toBeInTheDocument()
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+})
