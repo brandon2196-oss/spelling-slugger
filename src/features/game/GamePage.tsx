@@ -188,20 +188,19 @@ export function GamePage() {
 
           <div className="game-side flex flex-col gap-4">
             <section aria-label="Your turn" className="game-turn rounded-3xl bg-chalk/10 border border-chalk/15 p-4 space-y-4">
-              {canSpeak ? (
-                <div className="game-hear grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
-                  <Button variant="secondary" size="lg" disabled={busy} onClick={() => hear('word')}>Hear word</Button>
-                  <Button variant="secondary" disabled={busy} onClick={() => hear('slow')}>Hear it slowly</Button>
-                  <Button variant="secondary" disabled={busy} onClick={() => hear('word')}>Repeat</Button>
-                  <Button variant="secondary" disabled={busy || !word?.sentence} onClick={() => hear('sentence')}>Hear a sentence</Button>
-                </div>
-              ) : (
+              {!canSpeak ? (
                 <div className="rounded-2xl bg-gold/15 border border-gold/40 p-3 text-chalk">
                   <p>This browser can&apos;t read words aloud. A grown-up can tap &ldquo;Show the word&rdquo; to read it to you.</p>
                   <Button variant="secondary" className="mt-2" onClick={() => setPeek(true)}>Show the word</Button>
                 </div>
-              )}
-              <SpellingInput disabled={busy || !!reveal} onSubmit={onSubmit} focusKey={focusKey} />
+              ) : null}
+              <SpellingInput
+                disabled={busy || !!reveal}
+                onSubmit={onSubmit}
+                focusKey={focusKey}
+                onHear={canSpeak ? hear : undefined}
+                hasSentence={Boolean(word?.sentence)}
+              />
               {saveError ? <p role="alert" className="text-gold">{saveError}</p> : null}
             </section>
 

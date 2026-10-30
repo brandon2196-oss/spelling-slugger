@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router'
+import { CrashScreen } from './components/CrashScreen'
 import { WelcomePage } from './features/welcome/WelcomePage'
 import { LoginPage } from './features/auth/LoginPage'
 import { RegisterPage } from './features/auth/RegisterPage'
@@ -21,13 +22,14 @@ import { GamePage } from './features/game/GamePage'
 import { ResultsPage } from './features/game/ResultsPage'
 
 export const router = createBrowserRouter([
-  { path: '/', element: <WelcomePage /> },
-  { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <RegisterPage /> },
-  { path: '/forgot', element: <ForgotPage /> },
-  { path: '/reset', element: <ResetPage /> },
+  { path: '/', element: <WelcomePage />, errorElement: <CrashScreen /> },
+  { path: '/login', element: <LoginPage />, errorElement: <CrashScreen /> },
+  { path: '/register', element: <RegisterPage />, errorElement: <CrashScreen /> },
+  { path: '/forgot', element: <ForgotPage />, errorElement: <CrashScreen /> },
+  { path: '/reset', element: <ResetPage />, errorElement: <CrashScreen /> },
   {
     element: <RequireAuth />,
+    errorElement: <CrashScreen />,
     children: [
       { path: '/players', element: <PlayersPage /> },
       { path: '/players/new', element: <PlayerEditorPage /> },

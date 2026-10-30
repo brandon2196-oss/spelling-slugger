@@ -33,4 +33,42 @@ describe('SpellingInput', () => {
     await user.click(screen.getByRole('button', { name: /clear/i }))
     expect(screen.getByRole('textbox')).toHaveValue('')
   })
+
+  it('calls onHear for Hear again, Slow, and Use in a sentence', async () => {
+    const user = userEvent.setup()
+    const onHear = vi.fn()
+    render(
+      <SpellingInput disabled={false} onSubmit={() => {}} onHear={onHear} hasSentence />,
+    )
+    await user.click(screen.getByRole('button', { name: /hear again/i }))
+    await user.click(screen.getByRole('button', { name: /^slow$/i }))
+    await user.click(screen.getByRole('button', { name: /use in a sentence/i }))
+    expect(onHear).toHaveBeenCalledWith('word')
+    expect(onHear).toHaveBeenCalledWith('slow')
+    expect(onHear).toHaveBeenCalledWith('sentence')
+  })
+
+  it('hides hear buttons when onHear is omitted', () => {
+    render(<SpellingInput disabled={false} onSubmit={() => {}} />)
+    expect(screen.queryByRole('button', { name: /hear again/i })).not.toBeInTheDocument()
+  })
+
+  it('hides Use in a sentence when hasSentence is false', () => {
+    render(
+      <SpellingInput disabled={false} onSubmit={() => {}} onHear={() => {}} hasSentence={false} />,
+    )
+    expect(screen.queryByRole('button', { name: /use in a sentence/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /hear again/i })).toBeInTheDocument()
+  })
+
+  it('keeps focus on the spelling field after Hear again', async () => {
+    const user = userEvent.setup()
+    render(
+      <SpellingInput disabled={false} onSubmit={() => {}} onHear={() => {}} hasSentence />,
+    )
+    const input = screen.getByRole('textbox')
+    input.focus()
+    await user.click(screen.getByRole('button', { name: /hear again/i }))
+    expect(input).toHaveFocus()
+  })
 })
