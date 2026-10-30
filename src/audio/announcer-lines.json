@@ -9,23 +9,23 @@
       "Here we go! First pitch is moments away, and I can feel the electricity in the air!"
     ],
     "homeRun": [
-      "GONE! {word} is OUTTA HERE! A grand-slam-sized home run!",
+      "GONE! That ball is OUTTA HERE! A grand-slam-sized home run!",
       "Touch 'em all, kid! That one's a HOME RUN!",
-      "SAY GOODBYE! {word} just left the ballpark! HOME RUN!",
+      "SAY GOODBYE! That ball just left the ballpark! HOME RUN!",
       "Holy smokes, that ball is in the parking lot! HOME RUN, folks!",
-      "Somebody call NASA! {word} is a MOONSHOT! HOME RUN!"
+      "Somebody call NASA! That's a MOONSHOT! HOME RUN!"
     ],
     "double": [
-      "OH MY STARS! {word} is ROCKETED into the gap! That's a stand-up double!",
+      "OH MY STARS! That ball is ROCKETED into the gap! That's a stand-up double!",
       "Would you look at that! A line drive to the wall, and the slugger cruises into second!",
       "That ball took off like a bolt of lightning! DOUBLE!",
       "Right down the line! The crowd is on its feet and the slugger is on second base!",
-      "A thunderclap off the bat! {word}, spelled perfectly, two bases, no doubt about it!",
+      "A thunderclap off the bat! Spelled perfectly, two bases, no doubt about it!",
       "Oh, that's a beauty! A frozen rope into the corner, and we've got a double, folks!"
     ],
     "single": [
       "Base hit! Clean as a spring morning, and the slugger is aboard!",
-      "A sharp single through the infield! {word}, spelled and delivered!",
+      "A sharp single through the infield! Spelled and delivered!",
       "That one found the grass! Nice piece of hitting right there!",
       "Base hit, folks! Not flashy, but it counts, and the crowd knows it!",
       "A little rain shower of a hit, drops right in front of the outfielder! Single!",
@@ -58,7 +58,7 @@
       "Strike three. OH MY STARS, that pitcher was tough tonight! Hold your head high, slugger, the next at-bat is a fresh start!",
       "A strikeout, but the crowd gives a warm hand. Every slugger takes a seat sometimes!",
       "Strike three! Tough break, but storms pass and the sun comes back. Shake it off!",
-      "That's a strikeout. {word} is a tricky one, folks! Our slugger will remember it next time!",
+      "That's a strikeout. That word is a tricky one, folks! Our slugger will remember it next time!",
       "Strike three! Nothing to hang your head about. The best hitters miss more than they hit!",
       "Swung right through strike three. Back to the dugout, but back with a smile!"
     ],
@@ -97,99 +97,99 @@
   },
   "smoothEddie": {
     "gameStart": [
-      "Hey there, slugger. Easy breezy, nice and easy. Let's go play some ball.",
-      "Welcome to the yard, my friend. Sun's out, bats out, no stress about it.",
-      "All right, all right. Step on in, take a breath, let's have some fun today.",
-      "What's up, slugger? Keep it loose, keep it smooth, and let the hits come to you.",
-      "Good vibes only at the ballpark tonight. Easy breezy, let's play.",
-      "Here we go, friend. Relax your shoulders, trust your swing, and enjoy the ride."
+      "Good evening, everybody. Jack Dalton here, and it's a fine night for baseball.",
+      "Welcome to the ballpark. Our slugger is stepping in, so let's play ball.",
+      "The field is ready and the crowd is in their seats. Here comes the first pitch.",
+      "Hello again, everyone. Clear skies, a fresh lineup, and a spelling game to play.",
+      "It's game time. Our hitter digs in at the plate, and we are under way.",
+      "Welcome back to the booth. Let's see what our slugger can do tonight."
     ],
     "homeRun": [
-      "Waaaay back… and gone. Home run, smooth as you like.",
-      "That's a souvenir for somebody. Home run.",
-      "Up, up, and over the wall. Home run, nice and easy.",
-      "Just a gentle little trip around the bases. Home run, baby.",
-      "Sail away, little ball. {word} goes deep. Home run."
+      "Long fly ball, deep to left. That ball is gone. Home run.",
+      "He got all of that one. That ball goes over the wall for a home run.",
+      "Way back, way back, and out of here. Home run.",
+      "That one is a no-doubter. Home run, folks.",
+      "High and deep to center field. It's a home run."
     ],
     "double": [
-      "Oh yeah, that's a double, baby! Smooth as a wave on a glassy day.",
-      "{word}, spelled just right. Ride that line drive all the way to second, friend.",
-      "Easy breezy, into the gap you go. Stand-up double.",
-      "Now that's the sound I like. Two bases, all class, no sweat.",
-      "Clean and mean, into the green. Double!",
-      "Look at you go, slugger. Second base, cool as a sea breeze."
+      "Line drive into the gap. Our hitter cruises into second with a double.",
+      "Spelled right, and that's a double down the line.",
+      "Hit hard to the wall. The runner slides into second. Double.",
+      "Into the corner it goes. That's a stand-up double.",
+      "A sharp line drive, and our slugger has a double.",
+      "Off the wall in right field. Two bases on that one."
     ],
     "single": [
-      "Base hit, nice and neat. Easy breezy, friend.",
-      "There it is. Little flick of the wrists and you're on first. Smooth.",
-      "{word}? Yeah, you got it. Single up the middle, let's keep it rolling.",
-      "Nothing fancy, nothing flashy, just a hit that counts. I dig it.",
-      "Through the hole and onto the bag. Nice swing, slugger.",
-      "Base hit, no doubt. Your groove is coming along."
+      "Base hit up the middle. Runner on first.",
+      "A ground ball through the infield. That's a single.",
+      "Spelled right, and that's a clean base hit.",
+      "Line drive into left field. Base hit.",
+      "Dropped in front of the outfielder for a single.",
+      "Good swing. Our hitter is aboard with a single."
     ],
     "walk": [
-      "Ball four, my friend. Jog on down, nice and easy.",
-      "Good eye, good eye. Take your base, no rush.",
-      "That's a walk. Sometimes the best swing is no swing. Smooth.",
-      "Free trip to first, slugger. I'll take it every time.",
-      "Ball four. Patience is a virtue, and you've got plenty.",
-      "On you go, easy breezy, down to first base."
+      "Ball four. Take your base.",
+      "That's a walk. Our hitter heads to first.",
+      "Good eye at the plate. Ball four.",
+      "The pitch is outside. Ball four, and we have a runner.",
+      "A walk puts the runner on first base.",
+      "Ball four. A smart at-bat right there."
     ],
     "strike1": [
-      "Strike one. No worries, friend. Shake it off, we've got time.",
-      "Just a little early on that one. Breathe easy and reset.",
-      "Strike one. That's cool, that's cool. Next pitch is a fresh pitch.",
-      "Missed it, no big deal. Even the ocean misses the beach sometimes.",
-      "That's one. Loosen up those shoulders and have another look.",
-      "Strike one on the board. Keep it easy breezy, slugger."
+      "Strike one.",
+      "Swing and a miss. Strike one.",
+      "Strike one on the count. Plenty of time left.",
+      "A little off on that one. Strike one.",
+      "Strike one. Dig in for the next pitch.",
+      "That's strike one. Eyes on the ball."
     ],
     "strike2": [
-      "Strike two. Still in this, friend. Just you and the ball now.",
-      "Two strikes, but hey, the best stories have a little drama.",
-      "That's two. Slow down, see it clear, let it fly.",
-      "Strike two. Breathe in, breathe out, you know this one.",
-      "Down to the last pitch, and I like your chances, slugger.",
-      "Two strikes, zero stress. One good swing is all it takes."
+      "Strike two. One more chance.",
+      "Two strikes now. Our hitter steps back in.",
+      "Strike two. Time to focus on this next one.",
+      "That's two strikes. Here comes the pitch.",
+      "Strike two. One good swing is all it takes.",
+      "Swing and a miss, strike two."
     ],
     "strikeout": [
-      "Strike three. Hey, that's baseball, friend. Next at-bat is a brand-new wave.",
-      "Struck out swinging. Chin up, slugger. That word will be yours next time.",
-      "That's three. Tough one, {word}. Shake it off and ride the next pitch.",
-      "Strikeout, but you took your swings. I respect that, friend.",
-      "That's a K. Even the smoothest hitters sit down sometimes. Easy breezy, next time.",
-      "Three strikes. No sweat, slugger. The sun comes up tomorrow, and so does the lineup."
+      "Strike three. He'll get it next time.",
+      "That's a strikeout. Tough at-bat, but good effort.",
+      "Strike three. That word will come around again.",
+      "Struck out swinging. Back to the dugout for now.",
+      "Strike three called. On to the next hitter.",
+      "That's the third strike. Keep your head up, slugger."
     ],
     "run": [
-      "And there's a run, slugger. Cross that plate, nice and smooth.",
-      "Run scores! Smooth sailing all the way home.",
-      "That's one on the board. Easy breezy, friend.",
-      "Around third and home. Fist bump, slugger.",
-      "Run comes in! The vibes in this ballpark are off the charts.",
-      "Touch home, take a bow. One run for the good guys."
+      "One run scores.",
+      "The runner crosses home plate. That's a run.",
+      "Safe at home. One run in.",
+      "A run comes in to score.",
+      "Here comes the runner, and he scores.",
+      "That puts a run on the board."
     ],
     "runs": [
-      "{runs} runs cross the plate! That's a party, friend.",
-      "Oh my, {runs} runs. The surf is up at the ballpark.",
-      "{runs} runs score! Smooth as can be.",
-      "Count them up, slugger: {runs} runs. Easy breezy, all day.",
-      "{runs} coming home! Somebody turn up the music.",
-      "That's {runs} runs on one swing. You're in the groove now."
+      "{runs} runs score on the play.",
+      "Here they come. {runs} runs cross the plate.",
+      "That's {runs} runs in. Big hit.",
+      "{runs} runners score, and the dugout is up.",
+      "What a play. {runs} runs come home.",
+      "{runs} runs on that hit. The crowd is on its feet."
     ],
     "inningEnd": [
-      "And that's three outs. Grab some water, we'll roll into inning {inning}.",
-      "Inning's over, friend. Stretch it out, breathe it in.",
-      "Three outs, no stress. On to inning {inning}.",
-      "That wraps that one up. Fresh inning coming, fresh vibes.",
-      "Side retired. Take a sip, take a breath, we're just getting warmed up.",
-      "Inning {inning} is up next. Easy breezy, let's keep it rolling."
+      "That's three outs. We'll head to inning {inning}.",
+      "Three outs, and that will end the inning.",
+      "The side is retired. On to inning {inning}.",
+      "That's the third out. Let's get ready for the next inning.",
+      "Inning over. We'll be right back for inning {inning}.",
+      "Three outs. Time to take the field again."
     ],
     "gameOver": [
-      "And that's the ballgame, friend. You showed up, you swung, you smiled. That's a win in my book.",
-      "Final out. Smooth game, slugger. Catch you next time at the yard.",
-      "That's a wrap. Hats off to you, my friend. Easy breezy, well played.",
-      "Game over. Good swings, good vibes, good times. See you tomorrow.",
-      "The last pitch is in. Walk off tall, slugger, you earned it.",
-      "That's the final. Nice and easy, start to finish. Proud of you, friend."
+      "And that's the ballgame. Nice job out there today.",
+      "That's the final out. What a game, slugger.",
+      "The game is over. Thanks for playing ball with us.",
+      "That's the ballgame. Great swings today.",
+      "Final out, and that will do it. Good game.",
+      "And that wraps it up. Jack Dalton, signing off."
     ]
   }
 }

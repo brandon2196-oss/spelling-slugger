@@ -31,7 +31,7 @@ Set `ALLOW_REGISTRATION=false` (Replit Secrets) once friends have signed up to s
 | `npm run build` | Production build into `dist/` (also generates the PWA service worker) |
 | `npm run preview` | Serve the production build locally |
 | `npm run icons` | Regenerate PNG icons from `public/icon.svg` |
-| `npm run bake-audio` | Re-bake Big Red and Smooth Eddie booth lines into `public/audio/announcers/` and rewrite `public/audio/announcer-manifest.json` (needs network for edge-tts) |
+| `npm run bake-audio` | Re-bake Big Red and Jack Dalton booth lines (`BAKE_ONLY=smoothEddie` to bake one booth) into `public/audio/announcers/` and rewrite `public/audio/announcer-manifest.json` (needs network for edge-tts) |
 
 ### Audio
 

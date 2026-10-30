@@ -10,6 +10,13 @@
         "/audio/announcers/bigRed/gameStart-04.mp3",
         "/audio/announcers/bigRed/gameStart-05.mp3"
       ],
+      "homeRun": [
+        "/audio/announcers/bigRed/homeRun-00.mp3",
+        "/audio/announcers/bigRed/homeRun-01.mp3",
+        "/audio/announcers/bigRed/homeRun-02.mp3",
+        "/audio/announcers/bigRed/homeRun-03.mp3",
+        "/audio/announcers/bigRed/homeRun-04.mp3"
+      ],
       "double": [
         "/audio/announcers/bigRed/double-00.mp3",
         "/audio/announcers/bigRed/double-01.mp3",
@@ -98,6 +105,13 @@
         "/audio/announcers/smoothEddie/gameStart-03.mp3",
         "/audio/announcers/smoothEddie/gameStart-04.mp3",
         "/audio/announcers/smoothEddie/gameStart-05.mp3"
+      ],
+      "homeRun": [
+        "/audio/announcers/smoothEddie/homeRun-00.mp3",
+        "/audio/announcers/smoothEddie/homeRun-01.mp3",
+        "/audio/announcers/smoothEddie/homeRun-02.mp3",
+        "/audio/announcers/smoothEddie/homeRun-03.mp3",
+        "/audio/announcers/smoothEddie/homeRun-04.mp3"
       ],
       "double": [
         "/audio/announcers/smoothEddie/double-00.mp3",
