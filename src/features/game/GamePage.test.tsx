@@ -72,6 +72,26 @@ describe('GamePage', () => {
     expect(screen.getByTestId('outs')).toHaveTextContent('1')
   })
 
+  it('shows the last wrong try letter by letter on strikes 1-2 without revealing the word, and lists tries on strike 3', async () => {
+    const user = userEvent.setup()
+    const { words } = await setup(['pterodactyl', 'xylophone'])
+    const input = await screen.findByRole('textbox')
+    await user.type(input, 'ptx{Enter}')
+    await waitFor(() => expect(input).not.toBeDisabled())
+    const hint = await screen.findByTestId('miss-hint')
+    expect(hint).toHaveTextContent(/Strike one/)
+    expect(within(hint).getByText('p right')).toBeInTheDocument()
+    expect(within(hint).getByText('x wrong')).toBeInTheDocument()
+    expect(within(hint).queryByText(new RegExp(words[0]!, 'i'))).toBeNull()
+    await user.type(input, 'nope{Enter}')
+    await waitFor(() => expect(input).not.toBeDisabled())
+    expect(screen.getByTestId('miss-hint')).toHaveTextContent(/Strike two/)
+    await user.type(input, 'last{Enter}')
+    const tries = await screen.findByTestId('reveal-tries')
+    expect(within(tries).getAllByTestId('letter-hint')).toHaveLength(3)
+    expect(screen.queryByTestId('miss-hint')).toBeNull()
+  })
+
   it('shows a double on the scoreboard after a first-try hit and moves to the results page at the end', async () => {
     const user = userEvent.setup()
     const { words } = await setup(['cat'])
