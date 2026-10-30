@@ -5,6 +5,8 @@ import { MIN_PASSWORD_LENGTH, SESSION_COOKIE, SESSION_DAYS } from './auth'
 import type { Db } from './db'
 import { createServerStore, NotFound } from './store'
 import type { Store } from '../../src/data/types'
+import { CLIP_NAME } from '../../src/audio/word-audio-profile'
+import type { WordBaker } from './word-audio/baker'
 import { authenticate, createSession, deleteSession, findSession, registerUser, setPassword, type SessionUser } from './users'
 
 export interface AppOptions {
@@ -14,6 +16,8 @@ export interface AppOptions {
   staticDir?: string
   /** False closes signups (invite-only). Default true. */
   allowRegistration?: boolean
+  /** Bakes spelling-word clips after list saves and serves them at /audio/words. Omit to disable. */
+  wordAudio?: WordBaker
 }
 
 /** Browsers send this on every mutation; a cross-site form or image tag cannot. */
@@ -196,6 +200,12 @@ export function createApp(db: Db, opts: AppOptions) {
     if (!c) throw new HttpError(401, 'UNAUTHENTICATED')
     return c
   }
+  /** Fire-and-forget: saving a list never waits on (or fails because of) audio baking. */
+  const bakeList = (list: { words: { text: string; sentence: string | null }[] }) => {
+    if (!opts.wordAudio) return
+    opts.wordAudio.enqueueWords(list.words).catch((e: unknown) => console.warn('word audio enqueue failed', e))
+  }
+
   type Handler = (req: Request, res: Response) => Promise<unknown>
   const h = (fn: Handler) => (req: Request, res: Response, next: NextFunction) => fn(req, res).catch(next)
 
@@ -247,6 +257,7 @@ export function createApp(db: Db, opts: AppOptions) {
     const weekStart = str(b.weekStart, 10)
     if (!DATE.test(weekStart)) throw bad()
     const list = await requireUser(req).store.createWordList(param(req, 'pid'), { title: str(b.title, 120), weekStart, words: parseWords(b.words ?? []) })
+    bakeList(list)
     res.status(201).json(list)
   }))
   api.get('/lists/:id', h(async (req, res) => {
@@ -259,7 +270,18 @@ export function createApp(db: Db, opts: AppOptions) {
     const weekStart = optStr(b.weekStart, 10)
     if (weekStart !== undefined && !DATE.test(weekStart)) throw bad()
     const patch = { title: optStr(b.title, 120), weekStart, words: b.words === undefined ? undefined : parseWords(b.words) }
-    res.json(await requireUser(req).store.updateWordList(param(req, 'id'), patch))
+    const list = await requireUser(req).store.updateWordList(param(req, 'id'), patch)
+    if (patch.words !== undefined) bakeList(list)
+    res.json(list)
+  }))
+  api.get('/lists/:id/audio-status', h(async (req, res) => {
+    const list = await requireUser(req).store.getWordList(param(req, 'id'))
+    if (!list) throw new NotFound()
+    if (!opts.wordAudio) return res.json({ enabled: false, total: 0, ready: 0, pending: 0 })
+    const status = await opts.wordAudio.status(list.words)
+    // Re-queue anything missing and idle (restart dropped the queue, or an earlier bake gave up).
+    if (status.ready + status.pending < status.total) bakeList(list)
+    res.json({ enabled: true, ...status })
   }))
   api.delete('/lists/:id', h(async (req, res) => { await requireUser(req).store.deleteWordList(param(req, 'id')); res.status(204).end() }))
   api.put('/players/:pid/active-list', h(async (req, res) => {
@@ -340,6 +362,21 @@ export function createApp(db: Db, opts: AppOptions) {
   })
 
   app.use('/api', api)
+
+  // Baked word clips. Names are content hashes, so a clip never changes: cache it forever.
+  app.get('/audio/words/:file', async (req, res, next) => {
+    try {
+      const m = /^([a-f0-9]{64})\.mp3$/.exec(param(req, 'file'))
+      if (!opts.wordAudio || !m || !CLIP_NAME.test(m[1]!)) return res.status(404).end()
+      const mp3 = await opts.wordAudio.storage.get(m[1]!)
+      if (!mp3) return res.status(404).setHeader('Cache-Control', 'no-store').end()
+      res.setHeader('Content-Type', 'audio/mpeg')
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+      res.send(mp3)
+    } catch (e) {
+      next(e)
+    }
+  })
 
   if (opts.staticDir) {
     const dir = opts.staticDir
