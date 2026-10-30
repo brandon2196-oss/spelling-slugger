@@ -3,7 +3,10 @@ import { useEffect, useRef, useState, type RefObject } from 'react'
 import type { Bases } from '../engine/types'
 import { motionScale } from '../features/game/timing'
 import type { FieldController, PlayerLook } from './controller'
+import { CartoonScene, CARTOON } from './CartoonScene'
+import { readFieldKind } from './fieldChoice'
 import { FieldScene } from './FieldScene'
+import { loadManifest } from './manifest'
 import { FIELD } from './layout'
 
 export type { FieldController, PlayerLook } from './controller'
@@ -18,36 +21,49 @@ export interface FieldProps {
 /** Mounts one Phaser game into a 4:3 box; keeps the batter and bases in sync with props. */
 export function Field({ look, bases, controllerRef }: FieldProps) {
   const host = useRef<HTMLDivElement>(null)
-  const scene = useRef<FieldScene | null>(null)
+  const scene = useRef<FieldScene | CartoonScene | null>(null)
+  const kind = useRef(readFieldKind())
   const game = useRef<Phaser.Game | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
     if (!host.current || game.current) return
-    const s = new FieldScene({ look, bases, motion: motionScale() })
-    scene.current = s
-    game.current = new Phaser.Game({
-      type: Phaser.AUTO,
-      parent: host.current,
-      width: FIELD.width,
-      height: FIELD.height,
-      backgroundColor: '#142850',
-      transparent: false,
-      // True 16-bit: render at 320×240 with nearest-neighbour textures, let FIT scale the canvas up.
-      pixelArt: true,
-      roundPixels: true,
-      render: { antialias: false },
-      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-      scene: s,
-      audio: { noAudio: true },
-      banner: false,
-    })
-    void s.ready.then(() => {
-      if (scene.current !== s) return // StrictMode double-mount: this scene was already torn down
-      if (controllerRef) controllerRef.current = s
-      setReady(true)
-    })
+    const parent = host.current
+    const cartoon = kind.current === 'cartoon'
+    let cancelled = false
+    const start = (s: FieldScene | CartoonScene) => {
+      scene.current = s
+      game.current = new Phaser.Game({
+        type: Phaser.AUTO,
+        parent,
+        width: cartoon ? CARTOON.width : FIELD.width,
+        height: cartoon ? CARTOON.height : FIELD.height,
+        backgroundColor: '#142850',
+        transparent: false,
+        // Pixel: true 16-bit at 320x240 with nearest-neighbour, FIT scales it up. Cartoon: smooth 1280x960.
+        pixelArt: !cartoon,
+        roundPixels: !cartoon,
+        render: { antialias: cartoon },
+        scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+        scene: s,
+        audio: { noAudio: true },
+        banner: false,
+      })
+      void s.ready.then(() => {
+        if (scene.current !== s) return // StrictMode double-mount: this scene was already torn down
+        if (controllerRef) controllerRef.current = s
+        setReady(true)
+      })
+    }
+    if (cartoon) {
+      void loadManifest().then((manifest) => {
+        if (!cancelled) start(new CartoonScene({ look, bases, motion: motionScale(), manifest }))
+      })
+    } else {
+      start(new FieldScene({ look, bases, motion: motionScale() }))
+    }
     return () => {
+      cancelled = true
       game.current?.destroy(true)
       game.current = null
       scene.current = null
@@ -74,7 +90,8 @@ export function Field({ look, bases, controllerRef }: FieldProps) {
     <div
       ref={host}
       data-field-ready={ready ? '1' : undefined}
-      className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-navy [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full [&>canvas]:[image-rendering:pixelated]"
+      data-field-kind={kind.current}
+      className={`aspect-[4/3] w-full overflow-hidden rounded-3xl bg-navy [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full ${kind.current === 'pixel' ? '[&>canvas]:[image-rendering:pixelated]' : ''}`}
       aria-hidden="true"
     />
   )
