@@ -7,6 +7,9 @@ export interface PlayerLook {
   jerseyNumber: number
 }
 
+/** Timing points Ballpark Sound (Phase 2) hooks for SFX. The scene itself never plays sound. */
+export type FieldBeat = 'pitchArrival' | 'contact' | 'wall' | 'leavesYard' | 'runScored'
+
 /**
  * What the game screen may ask the field to show. Every method animates something that the
  * engine has ALREADY decided; the field never changes the score.
@@ -21,4 +24,6 @@ export interface FieldController {
   playInningEnd(nextInning: number): Promise<void>
   playGameOver(runs: number): Promise<void>
   banner(text: string, ms?: number): Promise<void>
+  /** Optional, fire and forget. Set by playSequence in Phase 2. */
+  onBeat?: (beat: FieldBeat) => void
 }
