@@ -16,7 +16,7 @@ import { Broadcast } from './Broadcast'
 import { playSequence } from './playSequence'
 import { LetterHint } from './LetterHint'
 import { SpellingInput } from './SpellingInput'
-import { wait } from './timing'
+import { breathExtraMs, wait } from './timing'
 import { useGameSession } from './useGameSession'
 
 const ANNOUNCE_MS = 1100
@@ -102,6 +102,7 @@ export function GamePage() {
 
   async function onSubmit(text: string) {
     setSaveError(null)
+    const nextIndex = (state?.index ?? -1) + 1
     let event: SubmitEvent
     try {
       event = await submit(text)
@@ -131,17 +132,25 @@ export function GamePage() {
       navigate(`/game/${gameId}/results`, { replace: true })
       return
     }
+    if (event.kind === 'at-bat-complete') await breatheBefore(nextIndex)
     setBusy(false)
     setFocusKey((k) => k + 1)
   }
 
-  function nextAfterReveal() {
+  /** Hard words get a longer breath (1.5x the announcement beat) before input unlocks and the word is read. */
+  async function breatheBefore(index: number) {
+    const extra = breathExtraMs(ANNOUNCE_MS, record?.words.find((w) => w.position === index)?.difficulty)
+    if (extra > 0) await wait(extra)
+  }
+
+  async function nextAfterReveal() {
     const over = reveal?.gameOver
     setReveal(null)
     if (over) {
       navigate(`/game/${gameId}/results`, { replace: true })
       return
     }
+    await breatheBefore(state?.index ?? -1)
     setBusy(false)
     setFocusKey((k) => k + 1)
   }
