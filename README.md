@@ -57,6 +57,22 @@ Sound effects are royalty-free clip pools in `public/audio/sfx/`; booth commenta
 - Sound is synthesized in `src/audio/sfx.ts`; words are read by the browser's own text-to-speech.
   No audio files, no licensed art.
 
+## Baked word audio (Replit App Storage)
+
+Spelling words and sentences are baked to MP3 on the server after a list save (Edge TTS, `en-US-JennyNeural`)
+and served at `/audio/words/{sha256}.mp3`; the game falls back to browser speech until a clip exists.
+
+One-time setup on Replit: open the **App Storage** tool in the Repl and create a bucket. Replit adds the default
+bucket to `.replit`; the deployment then finds it automatically (or set `REPLIT_BUCKET_ID`). No database changes.
+
+| Env | Effect |
+|---|---|
+| `WORD_AUDIO=off` | disable baking and clip serving |
+| `WORD_AUDIO_DIR=<dir>` | store clips on disk instead (local dev, non-Replit hosts) |
+| `WORD_AUDIO_CONCURRENCY` | max simultaneous Edge TTS requests (default 2) |
+
+Off Replit with neither set, clips go to `.data/word-audio`. Progress: `GET /api/lists/:id/audio-status`.
+
 ## Tests
 - `npm test` runs ~150 unit tests covering the spec's listed behaviors except family isolation
   (test 22), which needs a real database: see the next two lines.
