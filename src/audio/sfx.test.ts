@@ -7,7 +7,9 @@ const flush = () => new Promise((r) => setTimeout(r, 0))
 describe('Sfx (ballpark pools)', () => {
   it('each cue plays from its folder on its bus', () => {
     const p = fakeClipPlayer()
-    const s = new Sfx(p)
+    // Every pool filled, so the cue to folder and bus mapping is checked even for shipped stubs.
+    const full = Object.fromEntries(Object.entries(POOL_SPEC).map(([k, v]) => [k, { ...v, n: 2 }])) as PoolSpec
+    const s = new Sfx(p, Math.random, full)
     s.crack(); s.crackHomeRun(); s.whiff(); s.mitt(); s.umpStrike(); s.umpStrike3(); s.umpBall4(); s.ballWall()
     s.cheerSmall(); s.cheerBig(); s.cheerHr(); s.groan(); s.fanfare(); s.organ('charge'); s.organ('inning'); s.organ('walkup')
     expect(p.played.map((x) => [folder(x.url), x.bus])).toEqual([

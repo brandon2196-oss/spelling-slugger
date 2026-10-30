@@ -17,6 +17,8 @@ const EXT = new Set(['.wav', '.flac', '.ogg', '.mp3', '.aif', '.aiff'])
 const TRIM = 'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.02'
 const LOUD = 'loudnorm=I=-16:TP=-1.5:LRA=11'
 const ENCODE = ['-ac', '1', '-ar', '44100', '-c:a', 'libvorbis', '-q:a', '5']
+// ffmpeg 7.1 aborts (best_input assertion) on silenceremove,loudnorm into libvorbis; fixed frame sizes avoid it.
+const FRAME_FIX = 'asetnsamples=n=1024'
 const MAX_SFX_BYTES = 4 * 1024 * 1024
 
 const argv = process.argv.slice(2)
@@ -94,7 +96,7 @@ if (flag('--dry-run')) {
 
 for (const j of jobs) {
   mkdirSync(dirname(j.out), { recursive: true })
-  execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', j.in, '-af', j.filters, ...ENCODE, j.out], { stdio: 'inherit' })
+  execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', j.in, '-af', `${j.filters},${FRAME_FIX}`, ...ENCODE, j.out], { stdio: 'inherit' })
   console.log(`ok  ${j.out}`)
 }
 

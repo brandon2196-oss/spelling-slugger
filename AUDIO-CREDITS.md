@@ -10,25 +10,55 @@ Pools marked "pending, CC0 search failed" are stubs with no files; the game skip
 
 | Folder | File | Source file | Source URL | Author | License | Processing |
 |---|---|---|---|---|---|---|
-
-## Legacy (deleted in Phase 2 Task 8)
-
-| Folder | Files | Source file(s) | Source | Author | License |
-|---|---|---|---|---|---|
-| crack/ | crack-1..4.ogg | impactWood_heavy_000..003.ogg | https://kenney.nl/assets/impact-sounds | Kenney (kenney.nl) | CC0 1.0 |
-| whiff/ | whiff-1..4.ogg | cloth1..4.ogg | https://kenney.nl/assets/rpg-audio | Kenney | CC0 1.0 |
-| walkChime/ | walkChime-1..4.ogg | confirmation_001..004.ogg | https://kenney.nl/assets/interface-sounds | Kenney | CC0 1.0 |
-| strikeBuzz/ | strikeBuzz-1..4.ogg | error_001..004.ogg | https://kenney.nl/assets/interface-sounds | Kenney | CC0 1.0 |
-| fanfare/ | fanfare-1..3.ogg | Sax jingles/jingles_SAX01..03.ogg | https://kenney.nl/assets/music-jingles | Kenney | CC0 1.0 |
-| organ-charge/ | organ-charge-1..3.ogg | Steel jingles/jingles_STEEL00..02.ogg | https://kenney.nl/assets/music-jingles | Kenney | CC0 1.0 |
-| organ-inning/ | organ-inning-1..3.ogg | Pizzicato jingles/jingles_PIZZI01..03.ogg | https://kenney.nl/assets/music-jingles | Kenney | CC0 1.0 |
-| organ-walkup/ | organ-walkup-1..3.ogg | 8-Bit jingles/jingles_NES00, NES03, NES04.ogg | https://kenney.nl/assets/music-jingles | Kenney | CC0 1.0 |
-| cheer/ | cheer-1.ogg | cheers_1.ogg — https://opengameart.org/sites/default/files/cheers_1.ogg | https://opengameart.org/content/cheers-0 | Nocturnal_Vanguard (AuraVoice) | CC0 |
-| cheer/ | cheer-2.ogg | "Well Done CCBY3.ogg" (first 3.1 s) — https://opengameart.org/sites/default/files/Well%20Done%20CCBY3.ogg | https://opengameart.org/content/well-done | qubodup | CC0 (relicensed 2024-10-05) |
-| cheer/ | cheer-3.ogg, cheer-4.ogg | applause-clapping-church-crowd-immersive.wav (2.8 s slices at 2 s and 14 s) — https://opengameart.org/sites/default/files/applause-clapping-church-crowd-immersive.wav | https://opengameart.org/content/applause-in-a-large-hall-or-church | eXpl0it3r | CC0 |
-| groan/ | groan-1..3.ogg | crowd_shouting_0.ogg (1.6 s slices at 3/10/18 s, pitched down 30 %, low-passed, faded) — https://opengameart.org/sites/default/files/crowd_shouting_0.ogg | https://opengameart.org/content/crowd-shoutingspeaking-ambience | StarNinjas | CC0 |
-
-Note: the "organ" folders are organ-ish stand-ins (steel-drum, pizzicato and 8-bit stingers); no CC0 ballpark-organ recordings were found in the packs used.
+| crack/ | crack-1.ogg | Bat Hit 1 FF103.aif (0 to 0.5 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162863/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| crack/ | crack-2.ogg | Bat Hit 3 FF101.aif (0 to 0.5 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162868/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| crack/ | crack-3.ogg | Bat Hit 4 FF100.aif (0 to 0.5 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162867/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| crack/ | crack-4.ogg | Bat Hit 5 FF099.aif (0 to 0.5 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162866/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| crack-hr/ | crack-hr-1.ogg | Bat Hit 18 FF086.aif (0 to 0.7 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162885/ | martinimeniscus | CC0 1.0 | slice, fade out, pitch -2 st, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| crack-hr/ | crack-hr-2.ogg | Bat Hit 12 FF092.aif (0 to 0.7 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162876/ | martinimeniscus | CC0 1.0 | slice, fade out, pitch -2 st, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| crack-hr/ | crack-hr-3.ogg | Bat Hit 13 FF091.aif (0 to 0.7 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/162871/ | martinimeniscus | CC0 1.0 | slice, fade out, pitch -2 st, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| whiff/ | whiff-1.ogg | bat swoosh (whole file) (Freesound HQ preview) | https://freesound.org/people/MrGungus/sounds/766542/ | MrGungus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| whiff/ | whiff-2.ogg | Swing Woosh (whole file) (Freesound HQ preview) | https://freesound.org/people/Jofae/sounds/389590/ | Jofae | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| whiff/ | whiff-3.ogg | snd_swing_whoosh.wav (whole file) (Freesound HQ preview) | https://freesound.org/people/gristi/sounds/562191/ | gristi | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| whiff/ | whiff-4.ogg | Basic Melee Swing / Miss / Whoosh (whole file) (Freesound HQ preview) | https://freesound.org/people/SypherZent/sounds/420668/ | SypherZent | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| mitt/ | mitt-1.ogg | Glove Catch 1 FF014.aif (0 to 0.4 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/164499/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| mitt/ | mitt-2.ogg | Glove Catch 10 FF005.aif (0 to 0.4 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/164525/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| mitt/ | mitt-3.ogg | Glove Catch 11 FF004.aif (0 to 0.4 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/164534/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| mitt/ | mitt-4.ogg | Glove Catch 5 FF010.aif (0 to 0.4 s) (Freesound HQ preview) | https://freesound.org/people/martinimeniscus/sounds/164529/ | martinimeniscus | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| ump-strike3/ | ump-strike3-1.ogg | American Baseball The Umpire.wav (4.8 to 6.95 s) (Freesound HQ preview) | https://freesound.org/people/jcookvoice/sounds/625473/ | jcookvoice | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| ump-strike3/ | ump-strike3-2.ogg | American Baseball The Umpire.wav (1.5 to 3.35 s) (Freesound HQ preview) | https://freesound.org/people/jcookvoice/sounds/625473/ | jcookvoice | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| ball-wall/ | ball-wall-1.ogg | Basketball Hit Wall.wav (0.05 to 0.9 s) (Freesound HQ preview) | https://freesound.org/people/ecfike/sounds/128698/ | ecfike | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| ball-wall/ | ball-wall-2.ogg | kicking a ball against a wall OWI.wav (0.7 to 1.4 s) (Freesound HQ preview) | https://freesound.org/people/1skyland/sounds/543167/ | 1skyland | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-small/ | cheer-small-1.ogg | BerlinGameScene.com Crowd Cheer 1 (whole file) (Freesound HQ preview) | https://freesound.org/people/BerlinGameScene/sounds/267249/ | BerlinGameScene | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-small/ | cheer-small-2.ogg | Voice_Crowd_Small_Expression_Applause_Stereo (whole file) (Freesound HQ preview) | https://freesound.org/people/Nox_Sound/sounds/752710/ | Nox_Sound | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-small/ | cheer-small-3.ogg | Crowd Cheer 5 (0 to 3.5 s) (Freesound HQ preview) | https://freesound.org/people/Krizin/sounds/651646/ | Krizin | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-big/ | cheer-big-1.ogg | Crowd Cheer (1.5 to 5 s) (Freesound HQ preview) | https://freesound.org/people/FoolBoyMedia/sounds/397434/ | FoolBoyMedia | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-big/ | cheer-big-2.ogg | cheering and clapping crowd 1 (1 to 4.5 s) (Freesound HQ preview) | https://freesound.org/people/AlaskaRobotics/sounds/221568/ | AlaskaRobotics | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-big/ | cheer-big-3.ogg | Crowd cheer.wav (0.5 to 4 s) (Freesound HQ preview) | https://freesound.org/people/BeeProductive/sounds/430046/ | BeeProductive | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-hr/ | cheer-hr-1.ogg | applause cheer large ext crowd encore for big concert +Habs chant and surge when band comes back on Parc Jean Drapeau Montreal, Canada.flac (38 to 42.5 s) (Freesound HQ preview) | https://freesound.org/people/kyles/sounds/455660/ | kyles | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-hr/ | cheer-hr-2.ogg | crowd large cheer arena stadium hockey game Montreal Canadiens Habs chant applause whistle.flac (10 to 16 s) (Freesound HQ preview) | https://freesound.org/people/kyles/sounds/629884/ | kyles | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| cheer-hr/ | cheer-hr-3.ogg | S15-02 Big League baseball game walla; 4 takes.wav (6 to 11 s) (Freesound HQ preview) | https://freesound.org/people/craigsmith/sounds/675325/ | craigsmith | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| groan/ | groan-1.ogg | aww.wav (whole file) (Freesound HQ preview) | https://freesound.org/people/phmiller42/sounds/124996/ | phmiller42 | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| groan/ | groan-2.ogg | Group Groan 1 (whole file) (Freesound HQ preview) | https://freesound.org/people/CHallSmith/sounds/870630/ | CHallSmith | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| groan/ | groan-3.ogg | crowd `oh - - disappointed.mp3 (0 to 2.5 s) (Freesound HQ preview) | https://freesound.org/people/mrrap4food/sounds/619007/ | mrrap4food | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| fanfare/ | fanfare-1.ogg | Trumpet Fanfare (0 to 6.5 s) (Freesound HQ preview) | https://freesound.org/people/bevibeldesign/sounds/350428/ | bevibeldesign | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| fanfare/ | fanfare-2.ogg | fanfare.mp3 (whole file) (Freesound HQ preview) | https://freesound.org/people/Wagna/sounds/242207/ | Wagna | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| fanfare/ | fanfare-3.ogg | Triumphant Trumpet and Chimes (whole file) (Freesound HQ preview) | https://freesound.org/people//sounds/578853/ |  | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-charge/ | organ-charge-1.ogg | Baseball calvary sting long sustain.wav (whole file) (Freesound HQ preview) | https://freesound.org/people/vckhaze/sounds/380696/ | vckhaze | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-charge/ | organ-charge-2.ogg | Baseball cavalry sting short sustain.wav (whole file) (Freesound HQ preview) | https://freesound.org/people/vckhaze/sounds/380695/ | vckhaze | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-charge/ | organ-charge-3.ogg | Organ Gallop Riff (0 to 4 s) (Freesound HQ preview) | https://freesound.org/people/trader_one/sounds/649371/ | trader_one | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-inning/ | organ-inning-1.ogg | Organ Sting (0 to 3 s) (Freesound HQ preview) | https://freesound.org/people/nomiqbomi/sounds/578805/ | nomiqbomi | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-inning/ | organ-inning-2.ogg | hammond1.wav (0 to 3 s) (Freesound HQ preview) | https://freesound.org/people/Charliefarley/sounds/34136/ | Charliefarley | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-inning/ | organ-inning-3.ogg | Organ Riffs - Gallop (Loop) (0 to 3 s) (Freesound HQ preview) | https://freesound.org/people/trader_one/sounds/649443/ | trader_one | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-walkup/ | organ-walkup-1.ogg | Construction Kit 1 Hammond B3 (40 to 44.5 s) (Freesound HQ preview) | https://freesound.org/people/itinerantmonk108/sounds/684811/ | itinerantmonk108 | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-walkup/ | organ-walkup-2.ogg | Construction Kit 1 Hammond B3 (61 to 65.5 s) (Freesound HQ preview) | https://freesound.org/people/itinerantmonk108/sounds/684811/ | itinerantmonk108 | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-walkup/ | organ-walkup-3.ogg | Construction Kit 1 Hammond B3 (83 to 87.5 s) (Freesound HQ preview) | https://freesound.org/people/itinerantmonk108/sounds/684811/ | itinerantmonk108 | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| organ-walkup/ | organ-walkup-4.ogg | Construction Kit 1 Hammond B3 (104 to 108.5 s) (Freesound HQ preview) | https://freesound.org/people/itinerantmonk108/sounds/684811/ | itinerantmonk108 | CC0 1.0 | slice, fade out, trim lead silence, loudnorm -16 LUFS, mono, q5 |
+| ambience/ | ambience-low.ogg | G29-37-Large Sports Crowd.wav (12 to 52 s) (Freesound HQ preview) | https://freesound.org/people/craigsmith/sounds/438397/ | craigsmith | CC0 1.0 | seamless 38 s loop (2 s equal-power crossfade of tail into head), loudnorm -16 LUFS, mono, q5 (no trim) |
+| ambience/ | ambience-high.ogg | R07-27-Sporting Event with Steady Cheers.wav (2 to 30 s) (Freesound HQ preview) | https://freesound.org/people/craigsmith/sounds/486214/ | craigsmith | CC0 1.0 | seamless 26 s loop (2 s equal-power crossfade of tail into head), loudnorm -16 LUFS, mono, q5 (no trim) |
+| ir/ | stadium.ogg | IR_Residential Area.5-Storey Residential Buildings 2_EM (whole file) (Freesound HQ preview) | https://freesound.org/people/newlocknew/sounds/816877/ | newlocknew | CC0 1.0 | fade out tail, re-encode only (no trim, no loudnorm) |
+| ump-strike/ | (none) | pending, CC0 search failed | searched: freesound CC0, OpenGameArt CC0 (Sonniss GDC excluded: not CC0) | | | |
+| ump-ball4/ | (none) | pending, CC0 search failed | searched: freesound CC0, OpenGameArt CC0 (Sonniss GDC excluded: not CC0); only one CC0 take exists and it continues "take your base" | | | |
 
 ## Booth announcer clips (`public/audio/announcers/`)
 
