@@ -7,6 +7,7 @@ import { createLocalStore } from './data/local-store'
 import { StoreContext } from './data/store'
 import { router } from './routes'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { enableBakedWordAudio } from './audio/word-audio'
 
 export type Backend = 'local' | 'api'
 
@@ -22,7 +23,10 @@ export function chooseBackend(env: { VITE_STORE?: string; PROD?: boolean } = imp
 
 export default function App() {
   const { auth, store } = useMemo(() => {
-    if (chooseBackend() === 'api') return { auth: createApiAuth(), store: createApiStore() }
+    const backend = chooseBackend()
+    // Baked word clips exist only on the server; local mode keeps browser speech.
+    enableBakedWordAudio(backend === 'api')
+    if (backend === 'api') return { auth: createApiAuth(), store: createApiStore() }
     return { auth: createLocalAuth(), store: createLocalStore() }
   }, [])
   return (
