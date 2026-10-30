@@ -49,8 +49,8 @@ const bigRed: Announcer = {
 
 const smoothEddie: Announcer = {
   id: 'smoothEddie',
-  name: 'Smooth Eddie Breeze',
-  tagline: 'Laid-back, rhymes a little. "Easy breezy."',
+  name: 'Jack Dalton',
+  tagline: 'Calm, classic play-by-play. Straight calls.',
   portrait: 'smoothEddie',
   voice: { rate: 0.85, pitch: 0.8, prefer: /rocko|eddy|reed|google us english|guy|james|aaron/i },
   lines: LINES.smoothEddie,

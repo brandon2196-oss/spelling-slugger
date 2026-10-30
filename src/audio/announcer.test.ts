@@ -51,7 +51,11 @@ describe('ANNOUNCERS', () => {
   it('each talker has his catchphrase somewhere', () => {
     const all = (id: AnnouncerId) => ANNOUNCE_EVENTS.flatMap((e) => ANNOUNCERS[id].lines[e]).join(' ')
     expect(all('bigRed')).toContain('OH MY STARS!')
-    expect(all('smoothEddie').toLowerCase()).toContain('easy breezy')
+    expect(all('smoothEddie').toLowerCase()).not.toContain('easy breezy')
+    expect(ANNOUNCERS.smoothEddie.name).toBe('Jack Dalton')
+  })
+  it('never speaks the live {word} (baked clips cannot know it)', () => {
+    for (const id of talkers) for (const evt of ANNOUNCE_EVENTS) for (const line of ANNOUNCERS[id].lines[evt]) expect(line, line).not.toContain('{word}')
   })
   it('only uses known placeholders', () => {
     for (const id of talkers) for (const evt of ANNOUNCE_EVENTS) for (const line of ANNOUNCERS[id].lines[evt]) {

@@ -12,8 +12,8 @@ test('a family registers, adds words, and plays a game that survives a reload', 
 
   await page.goto(`/play/${playerId}`)
   // the booth: pick the laid-back announcer, then play
-  await page.getByRole('button', { name: /Smooth Eddie/ }).click()
-  await expect(page.getByRole('button', { name: /Smooth Eddie/ })).toHaveAttribute('aria-pressed', 'true')
+  await page.getByRole('button', { name: /Jack Dalton/ }).click()
+  await expect(page.getByRole('button', { name: /Jack Dalton/ })).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: "Play this week's game" }).click()
   await page.waitForURL(/\/game\/[^/]+$/)
   const input = page.getByLabel('Spell the word')
@@ -80,8 +80,8 @@ test('the parent zone needs the PIN and shows the finished game', async ({ page 
   await addWordList(page, playerId, ['cat'])
   await page.goto(`/play/${playerId}`)
   // the booth: pick the laid-back announcer, then play
-  await page.getByRole('button', { name: /Smooth Eddie/ }).click()
-  await expect(page.getByRole('button', { name: /Smooth Eddie/ })).toHaveAttribute('aria-pressed', 'true')
+  await page.getByRole('button', { name: /Jack Dalton/ }).click()
+  await expect(page.getByRole('button', { name: /Jack Dalton/ })).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: "Play this week's game" }).click()
   const input = page.getByLabel('Spell the word')
   await expect(input).toBeEnabled()
