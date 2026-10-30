@@ -1,8 +1,17 @@
 # Audio credits
 
-All sound effects in `public/audio/sfx/` are CC0 / public domain. Files were trimmed of leading silence,
-loudness-normalised (ffmpeg loudnorm, ~-16 LUFS), down-mixed to mono and re-encoded as Ogg Vorbis.
-Kenney packs downloaded 2026-10-28 from the pack pages below (zip download, license file included: CC0 1.0).
+Every file in `public/audio/sfx/` and `public/audio/ir/` is CC0 1.0 or public domain. Masters live in
+`audio-src/`; `npm run process-audio` regenerates the shipped files (trim leading silence, loudnorm to
+-16 LUFS, mono, Ogg Vorbis q5; ambience is not trimmed; the IR is only re-encoded).
+
+Pools marked "pending, CC0 search failed" are stubs with no files; the game skips that layer.
+
+## Ballpark sound (Phase 2)
+
+| Folder | File | Source file | Source URL | Author | License | Processing |
+|---|---|---|---|---|---|---|
+
+## Legacy (deleted in Phase 2 Task 8)
 
 | Folder | Files | Source file(s) | Source | Author | License |
 |---|---|---|---|---|---|
