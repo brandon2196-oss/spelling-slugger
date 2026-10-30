@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { createLocalStore } from '../../data/local-store'
 import { StoreContext } from '../../data/store'
@@ -55,5 +56,29 @@ describe('ResultsPage', () => {
     )
     const label = await screen.findByText('Home runs')
     expect(label.nextElementSibling?.textContent).toBe('2')
+  })
+
+  it('offers a one-tap practice of only this game\'s missed words', async () => {
+    localStorage.clear()
+    const store = createLocalStore()
+    const p = await store.createPlayer(cooper)
+    const l = await store.createWordList(p.id, { title: 'L', weekStart: '2026-10-19', words: ['cat', 'dog'].map((text) => ({ text, sentence: null })) })
+    const g = await startPracticeGame(store, p.id, l.id, seededRng(1))
+    const [a, b] = g.words
+    for (const n of [1, 2, 3] as const) await store.recordAttempt(g.id, { position: a!.position, attemptNumber: n, text: 'q', correct: false, outcome: n === 3 ? 'strikeout' : null })
+    await store.recordAttempt(g.id, { position: b!.position, attemptNumber: 1, text: b!.text, correct: true, outcome: 'double' })
+
+    const router = createMemoryRouter(
+      [{ path: '/game/:gameId/results', element: <ResultsPage /> }, { path: '/game/:gameId', element: <p>game page</p> }],
+      { initialEntries: [`/game/${g.id}/results`] },
+    )
+    render(<StoreContext.Provider value={store}><RouterProvider router={router} /></StoreContext.Provider>)
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Practice these words' }))
+    await screen.findByText('game page')
+    const id = router.state.location.pathname.split('/').pop()!
+    const next = (await store.getGame(id))!
+    expect(next.mode).toBe('missed')
+    expect(next.words.map((w) => w.text)).toEqual([a!.text])
+    expect(screen.queryByText('Practice missed words')).toBeNull()
   })
 })

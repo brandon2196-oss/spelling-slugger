@@ -9,7 +9,7 @@ import type { GameRecord } from '../../data/types'
 import { rebuild } from '../../engine/replay'
 import { summarize } from '../../engine/results'
 import type { GameSummary } from '../../engine/results'
-import { startMissedWordsGame, startPracticeGame, startWeeklyGame } from './startGame'
+import { startMissedWordsGame, startPracticeGame, startThisGameMissesGame, startWeeklyGame } from './startGame'
 
 export function ResultsPage() {
   const { gameId = '' } = useParams()
@@ -72,6 +72,17 @@ export function ResultsPage() {
     }
   }
 
+  async function practiceThese() {
+    primeSpeech()
+    sfx.unlock()
+    try {
+      const g = await startThisGameMissesGame(store, record!)
+      navigate(`/game/${g.id}`)
+    } catch {
+      setError('No missed words to practice. Nice!')
+    }
+  }
+
   const rows: [string, string | number][] = [
     ['Hits', s.hits], ['Home runs', s.homeRuns ?? 0], ['Doubles', s.doubles], ['Singles', s.singles], ['Walks', s.walks], ['Strikeouts', s.strikeouts],
     ['Total strikes', s.totalStrikes], ['First try', s.firstTry], ['Second try', s.secondTry], ['Third try', s.thirdTry],
@@ -122,7 +133,10 @@ export function ResultsPage() {
 
         {error ? <p className="mt-4 text-gold">{error}</p> : null}
 
-        <div className="mt-8 grid grid-cols-2 gap-3">
+        {s.missedWords.length ? (
+          <Button size="lg" className="mt-8 w-full" onClick={() => void practiceThese()}>Practice these words</Button>
+        ) : null}
+        <div className={`${s.missedWords.length ? 'mt-3' : 'mt-8'} grid grid-cols-2 gap-3`}>
           <Button size="lg" onClick={() => void playAgain()}>Play again</Button>
           <Button size="lg" variant="secondary" onClick={() => void practiceMissed()} disabled={s.missedWords.length === 0}>Practice missed words</Button>
           <Link to={`/parent/players/${record.playerId}/stats`} className="btn-secondary">View stats</Link>

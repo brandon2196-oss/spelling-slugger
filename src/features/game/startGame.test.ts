@@ -1,7 +1,7 @@
 import { createLocalStore } from '../../data/local-store'
 import type { NewPlayer, Store } from '../../data/types'
 import { seededRng } from '../../engine/rng'
-import { resumeOrNull, startMissedWordsGame, startPracticeGame, startWeeklyGame } from './startGame'
+import { resumeOrNull, startMissedWordsGame, startPracticeGame, startThisGameMissesGame, startWeeklyGame } from './startGame'
 
 const cooper: NewPlayer = {
   name: 'Cooper', teamName: '', jerseyNumber: 7, hand: 'L',
@@ -77,5 +77,32 @@ describe('resumeOrNull', () => {
     const l = await store.createWordList(playerId, { title: 'L', weekStart: '2026-10-19', words: w('c', 3) })
     const g = await startPracticeGame(store, playerId, l.id, seededRng(1))
     expect((await resumeOrNull(store, playerId))?.id).toBe(g.id)
+  })
+})
+
+describe('startThisGameMissesGame', () => {
+  it('plays only the words struck out in that game, deduped, as a missed-words game', async () => {
+    // an older game miss that must NOT come along
+    const old = await store.createWordList(playerId, { title: 'Old', weekStart: '2026-10-12', words: [{ text: 'zebra', sentence: null }] })
+    const og = await startPracticeGame(store, playerId, old.id, seededRng(1))
+    for (const n of [1, 2, 3] as const) await store.recordAttempt(og.id, { position: 0, attemptNumber: n, text: 'x', correct: false, outcome: n === 3 ? 'strikeout' : null })
+
+    const l = await store.createWordList(playerId, { title: 'L', weekStart: '2026-10-19', words: ['cat', 'dog', 'emu'].map((text) => ({ text, sentence: null })) })
+    const g = await startPracticeGame(store, playerId, l.id, seededRng(1))
+    const [a, b] = g.words
+    for (const n of [1, 2, 3] as const) await store.recordAttempt(g.id, { position: a!.position, attemptNumber: n, text: 'q', correct: false, outcome: n === 3 ? 'strikeout' : null })
+    await store.recordAttempt(g.id, { position: b!.position, attemptNumber: 1, text: 'q', correct: false, outcome: null })
+    await store.recordAttempt(g.id, { position: b!.position, attemptNumber: 2, text: b!.text, correct: true, outcome: 'single' })
+
+    const fresh = (await store.getGame(g.id))!
+    const p = await startThisGameMissesGame(store, fresh, seededRng(2))
+    expect(p.mode).toBe('missed')
+    expect(p.listId).toBeNull()
+    expect(p.words.map((x) => x.text)).toEqual([a!.text])
+  })
+  it('throws when the game had no strikeouts', async () => {
+    const l = await store.createWordList(playerId, { title: 'L', weekStart: '2026-10-19', words: [{ text: 'cat', sentence: null }] })
+    const g = await startPracticeGame(store, playerId, l.id, seededRng(1))
+    await expect(startThisGameMissesGame(store, g)).rejects.toThrow('NO_MISSED_WORDS')
   })
 })
