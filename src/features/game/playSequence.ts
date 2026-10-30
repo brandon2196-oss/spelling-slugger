@@ -19,8 +19,8 @@ export interface SequenceOptions {
   /** Multiplier for fallback offsets; defaults to motionScale(). */
   scale?: number
   /**
-   * Where to hand this play's onBeat. Before Phase 1 lands nothing calls it and every cue uses its
-   * fallback offset. After the rebase (Task 9 Step 4) the default hands it to the field's onBeat slot.
+   * Where to hand this play's onBeat. Defaults to the field's onBeat slot (Phase 1), cleared after
+   * the play. Any beat the field never reports falls back to its motionScale offset.
    */
   onBeatSink?: (onBeat: (beat: FieldBeat) => void) => void
 }
@@ -43,7 +43,8 @@ export async function playSequence(
   /** The contact stack for this play (layering.ts). Field beats fire cues early; offsets are the fallback. */
   const stack = () => {
     driver = driveLayers(layersFor(event, call), sfx, opts.scale ?? motionScale())
-    opts.onBeatSink?.(driver.onBeat)
+    const sink = opts.onBeatSink ?? ((fn: (beat: FieldBeat) => void) => { if (field) field.onBeat = fn })
+    sink(driver.onBeat)
   }
   const texts = announcementsFor(event)
   const next = async () => {
@@ -57,52 +58,57 @@ export async function playSequence(
   /** Board text and the booth line for the same moment, together. */
   const moment = (evt: AnnounceEvent) => Promise.all([next(), commentary(evt, ctx)])
 
-  await field?.playPitch()
+  try {
+    await field?.playPitch()
 
-  // The field animates WHILE the board text shows and the booth talks: a play never waits on a line.
-  if (event.kind === 'strike') {
-    stack()
-    await Promise.all([field?.playStrike(event.strike), moment(event.strike === 1 ? 'strike1' : 'strike2')]) // STRIKE ONE! / TWO!
-    return
-  }
-
-  switch (event.outcome) {
-    case 'strikeout':
+    // The field animates WHILE the board text shows and the booth talks: a play never waits on a line.
+    if (event.kind === 'strike') {
       stack()
-      await Promise.all([field?.playStrike(3), moment('strikeout')]) // STRIKE THREE!
-      break
-    case 'walk':
-      stack()
-      await Promise.all([field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored), moment('walk')]) // TAKE YOUR BASE!
-      break
-    default: {
-      stack() // one cheer per play (layering.ts cheerFor)
-      const hit = event.outcome
-      await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
-    } // HOME RUN! / DOUBLE! / BASE HIT!
-  }
-
-  if (event.runsScored > 0) {
-    if (driver) driver.organCharge()
-    else sfx.organ('charge')
-    await moment(event.runsScored === 1 ? 'run' : 'runs') // RUN SCORED! / N RUNS SCORED!
-  }
-
-  if (event.inningEnded) {
-    if (event.gameOver) {
-      await next() // THREE OUTS! (the booth saves its breath for the game-over call)
-    } else {
-      sfx.organ('inning')
-      await moment('inningEnd') // THREE OUTS!
+      await Promise.all([field?.playStrike(event.strike), moment(event.strike === 1 ? 'strike1' : 'strike2')]) // STRIKE ONE! / TWO!
+      return
     }
-  }
 
-  if (event.gameOver) {
-    if (event.outcome !== 'homeRun') sfx.fanfare()
-    await field?.playGameOver(event.runsScored)
-    await moment('gameOver') // GAME OVER!
-  } else if (event.inningEnded) {
-    await field?.playInningEnd(event.nextInning)
-    await next() // NEW INNING!
+    switch (event.outcome) {
+      case 'strikeout':
+        stack()
+        await Promise.all([field?.playStrike(3), moment('strikeout')]) // STRIKE THREE!
+        break
+      case 'walk':
+        stack()
+        await Promise.all([field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored), moment('walk')]) // TAKE YOUR BASE!
+        break
+      default: {
+        stack() // one cheer per play (layering.ts cheerFor)
+        const hit = event.outcome
+        await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
+      } // HOME RUN! / DOUBLE! / BASE HIT!
+    }
+
+    if (event.runsScored > 0) {
+      if (driver) driver.organCharge()
+      else sfx.organ('charge')
+      await moment(event.runsScored === 1 ? 'run' : 'runs') // RUN SCORED! / N RUNS SCORED!
+    }
+
+    if (event.inningEnded) {
+      if (event.gameOver) {
+        await next() // THREE OUTS! (the booth saves its breath for the game-over call)
+      } else {
+        sfx.organ('inning')
+        await moment('inningEnd') // THREE OUTS!
+      }
+    }
+
+    if (event.gameOver) {
+      if (event.outcome !== 'homeRun') sfx.fanfare()
+      await field?.playGameOver(event.runsScored)
+      await moment('gameOver') // GAME OVER!
+    } else if (event.inningEnded) {
+      await field?.playInningEnd(event.nextInning)
+      await next() // NEW INNING!
+    }
+  } finally {
+    // The field keeps no stale hook between plays.
+    if (field && !opts.onBeatSink) field.onBeat = undefined
   }
 }

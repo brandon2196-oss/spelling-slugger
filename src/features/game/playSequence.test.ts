@@ -152,4 +152,13 @@ describe('playSequence', () => {
     expect(onBeat).not.toBeNull()
     expect(r.calls.filter((c) => c === 'sfx.organ(charge)')).toHaveLength(1)
   })
+  it('hands onBeat to the field by default and clears it after the play', async () => {
+    const r = recorder()
+    let seen: unknown = null
+    r.field.playHit = vi.fn(async () => { seen = r.field.onBeat; r.field.onBeat?.('wall') })
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'double' }), r.commentary, { pitchCall: 'whiff', scale: 1 })
+    expect(typeof seen).toBe('function')
+    expect(r.calls.filter((c) => c === 'sfx.ballWall')).toHaveLength(1)
+    expect(r.field.onBeat).toBeUndefined()
+  })
 })

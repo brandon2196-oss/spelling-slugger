@@ -5,8 +5,9 @@
  */
 import type { Bases, Outcome, SubmitEvent } from '../engine/types'
 
-/** Locked with Grand Slam Spelling, 2026-10-30. The field calls onBeat(beat) when the scene hits it. */
-export type FieldBeat = 'pitchArrival' | 'contact' | 'wall' | 'leavesYard' | 'runScored'
+/** Owned by Phase 1 (src/field/controller.ts); the field calls onBeat(beat) when the scene hits it. */
+import type { FieldBeat } from '../field/controller'
+export type { FieldBeat }
 
 export const CUES = [
   'crack', 'crackHomeRun', 'whiff', 'mitt', 'umpStrike', 'umpStrike3', 'umpBall4', 'ballWall',
