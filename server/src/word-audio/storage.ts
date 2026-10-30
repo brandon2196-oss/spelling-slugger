@@ -54,6 +54,10 @@ const PREFIX = 'word-audio/'
 export async function createReplitClipStorage(bucketId?: string): Promise<ClipStorage> {
   const { Client } = await import('@replit/object-storage')
   const client = new Client(bucketId ? { bucketId } : undefined)
+  // The constructor starts the bucket lookup as a floating promise. Await it here so a missing
+  // bucket throws to the caller instead of becoming an unhandled rejection that kills the server.
+  // getBucket() is runtime-public but typed private; it returns the in-flight init promise.
+  await (client as unknown as { getBucket(): Promise<unknown> }).getBucket()
   return {
     async has(h) {
       const r = await client.exists(PREFIX + check(h) + '.mp3')
