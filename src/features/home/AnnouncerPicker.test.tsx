@@ -4,6 +4,7 @@ import { afterEach, beforeEach } from 'vitest'
 import { ANNOUNCERS, setAnnouncerPlayerForTests } from '../../audio/announcer'
 import { setManifestForTests } from '../../audio/manifest'
 import { AnnouncerPicker } from './AnnouncerPicker'
+import { fakeClipPlayer } from '../../test/fakeClipPlayer'
 
 type Utter = { text: string; onend: null | (() => void) }
 
@@ -56,7 +57,9 @@ describe('AnnouncerPicker', () => {
   it('clicking a talker calls onChange and plays a sample line', async () => {
     const onChange = vi.fn()
     const play = vi.fn(async (_url: string) => {})
-    setAnnouncerPlayerForTests({ load: vi.fn(), preload: vi.fn(), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(), duckStart: vi.fn(), duckEnd: vi.fn(), play })
+    const player = fakeClipPlayer()
+    vi.mocked(player.play).mockImplementation(play)
+    setAnnouncerPlayerForTests(player)
     const gameStart = ANNOUNCERS.smoothEddie.lines.gameStart.map((_, i) => `/audio/announcers/smoothEddie/gameStart-${String(i).padStart(2, '0')}.ogg`)
     setManifestForTests({ version: 1, clips: { bigRed: {}, smoothEddie: { gameStart }, quiet: {} } })
     render(<AnnouncerPicker value="bigRed" onChange={onChange} />)

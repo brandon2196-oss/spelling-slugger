@@ -165,4 +165,51 @@ describe('ClipPlayer', () => {
     await flush(); await flush()
     expect(f.convolvers).toHaveLength(0)
   })
+  it('loop() starts a looping source on its bus with a gain node, and stop() ends it', async () => {
+    const f = fakeCtx()
+    const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
+    const h = await p.loop('/amb.ogg', { bus: 'crowd', gain: 0.5 })
+    expect(h).not.toBeNull()
+    const src = f.sources.at(-1)!
+    expect(src.loop).toBe(true)
+    const g = src.connects[0] as { gain: { value: number }; connects: unknown[] }
+    expect(g.gain.value).toBe(0.5)
+    expect(g.connects).toEqual([f.bus('crowd')])
+    const stop = vi.spyOn(src, 'stop')
+    h!.stop()
+    expect(stop).toHaveBeenCalled()
+  })
+
+  it('loop() still starts while muted (master gain silences it) and is null for a missing clip', async () => {
+    const f = fakeCtx()
+    const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
+    p.setMuted(true)
+    expect(await p.loop('/amb.ogg', { bus: 'crowd' })).not.toBeNull()
+    expect(f.gains[0]!.gain.value).toBe(0)
+    expect(await p.loop('/missing.ogg', { bus: 'crowd' })).toBeNull()
+  })
+
+  it('stopBus stops everything on that bus only', async () => {
+    const f = fakeCtx({ endAfterMs: null })
+    const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
+    await p.load('/w.mp3'); await p.load('/c.ogg')
+    const word = p.play('/w.mp3', { bus: 'voice' })
+    void p.play('/c.ogg', { bus: 'sfx' })
+    await flush()
+    const [voiceSrc, sfxSrc] = f.sources
+    const vStop = vi.spyOn(voiceSrc!, 'stop'); const sStop = vi.spyOn(sfxSrc!, 'stop')
+    p.stopBus('voice')
+    await word
+    expect(vStop).toHaveBeenCalled()
+    expect(sStop).not.toHaveBeenCalled()
+  })
+
+  it('play() applies a per-clip gain when given', async () => {
+    const f = fakeCtx()
+    const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
+    await p.play('/b.ogg', { bus: 'voice', gain: 0.8 })
+    const g = f.sources.at(-1)!.connects[0] as { gain: { value: number }; connects: unknown[] }
+    expect(g.gain.value).toBe(0.8)
+    expect(g.connects).toEqual([f.bus('voice')])
+  })
 })

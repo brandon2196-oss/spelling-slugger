@@ -1,19 +1,11 @@
 import { vi } from 'vitest'
-import type { ClipPlayer } from './clips'
+import { fakeClipPlayer } from '../test/fakeClipPlayer'
 import { SFX_POOLS, Sfx } from './sfx'
 
 function fakePlayer() {
+  const player = fakeClipPlayer()
   const played: string[] = []
-  const player: ClipPlayer & { resume: () => void } = {
-    load: vi.fn(async () => {}),
-    play: vi.fn(async (url: string) => { played.push(url) }),
-    preload: vi.fn(async () => {}),
-    setVolume: vi.fn(),
-    setMuted: vi.fn(),
-    resume: vi.fn(),
-    duckStart: vi.fn(),
-    duckEnd: vi.fn(),
-  }
+  vi.mocked(player.play).mockImplementation(async (url: string) => { played.push(url) })
   return { player, played }
 }
 

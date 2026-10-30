@@ -1,6 +1,7 @@
 import { afterEach, beforeEach } from 'vitest'
 import { setManifestForTests, type Manifest } from './manifest'
 import type { ClipPlayer } from './clips'
+import { fakeClipPlayer } from '../test/fakeClipPlayer'
 import { ANNOUNCERS, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, pickLineIndex, previewLine, sayAs, setAnnouncerPlayerForTests, type AnnounceEvent, type AnnouncerId, type CommentaryContext } from './announcer'
 
 type Utter = { text: string; rate: number; pitch: number; volume: number; voice: unknown; onstart: null | (() => void); onend: null | (() => void); onerror: null | ((e: unknown) => void) }
@@ -160,10 +161,8 @@ describe('sayAs', () => {
   beforeEach(() => {
     played = []
     finish = []
-    player = {
-      load: vi.fn(async () => {}), preload: vi.fn(async () => {}), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(), duckStart: vi.fn(), duckEnd: vi.fn(),
-      play: vi.fn((url: string) => { played.push(url); return new Promise<void>((r) => finish.push(r)) }),
-    }
+    player = fakeClipPlayer()
+    vi.mocked(player.play).mockImplementation((url: string) => { played.push(url); return new Promise<void>((r) => finish.push(r)) })
     setAnnouncerPlayerForTests(player)
     setManifestForTests(fullManifest())
     fake = installFakeSpeech([{ name: 'Daniel', lang: 'en-GB' }])

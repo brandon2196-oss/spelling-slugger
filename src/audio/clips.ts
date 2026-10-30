@@ -10,6 +10,17 @@ export const MAX_WAIT_MS = 7000
 
 export interface PlayOptions {
   bus?: Bus
+  /** Linear gain for this clip only (booth level match). Default 1. */
+  gain?: number
+}
+
+export interface LoopOptions {
+  bus: Bus
+  gain?: number
+}
+
+export interface LoopHandle {
+  stop(): void
 }
 
 export interface ClipPlayer {
@@ -23,6 +34,10 @@ export interface ClipPlayer {
   /** Hold the voice duck (browser speech cannot enter the graph, so it ducks by hand). */
   duckStart(): void
   duckEnd(): void
+  /** Start a seamless loop (ambience). Starts even while muted; master gain silences it. Null if unloadable. */
+  loop(url: string, opts: LoopOptions): Promise<LoopHandle | null>
+  /** Stop every clip and loop currently on the bus. */
+  stopBus(bus: Bus): void
 }
 
 export interface ClipPlayerOptions {
@@ -57,6 +72,20 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
     () => (graph ? DUCKED_BUSES.map((b) => graph!.buses[b].gain) : []),
     () => graph?.ctx.currentTime ?? 0,
   )
+
+  const active: Record<Bus, Set<AudioBufferSourceNode>> = { sfx: new Set(), crowd: new Set(), music: new Set(), voice: new Set() }
+
+  /** Source into the bus, through its own gain node when gain is not 1. */
+  function route(c: Graph, src: AudioBufferSourceNode, bus: Bus, gain = 1): void {
+    if (gain === 1) {
+      src.connect(c.buses[bus])
+      return
+    }
+    const g = c.ctx.createGain()
+    g.gain.value = gain
+    src.connect(g)
+    g.connect(c.buses[bus])
+  }
 
   function context(): Graph | null {
     if (!graph) {
@@ -128,11 +157,13 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
     await new Promise<void>((resolve) => {
       const src = c.ctx.createBufferSource()
       src.buffer = buffer
-      src.connect(c.buses[bus])
+      route(c, src, bus, o.gain)
+      active[bus].add(src)
       let settled = false
       const finish = () => {
         if (settled) return
         settled = true
+        active[bus].delete(src)
         clearTimeout(timer)
         if (bus === 'voice') ducker.end()
         resolve()
@@ -147,9 +178,47 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
     })
   }
 
+  async function loop(url: string, o: LoopOptions): Promise<LoopHandle | null> {
+    let buffer: AudioBuffer
+    try {
+      await load(url)
+      buffer = await buffers.get(url)!
+    } catch {
+      return null
+    }
+    const c = context()
+    if (!c) return null
+    const src = c.ctx.createBufferSource()
+    src.buffer = buffer
+    src.loop = true
+    route(c, src, o.bus, o.gain)
+    active[o.bus].add(src)
+    try {
+      src.start()
+    } catch {
+      active[o.bus].delete(src)
+      return null
+    }
+    return {
+      stop() {
+        active[o.bus].delete(src)
+        try { src.stop() } catch { /* already stopped */ }
+      },
+    }
+  }
+
+  function stopBus(bus: Bus): void {
+    for (const src of [...active[bus]]) {
+      active[bus].delete(src)
+      try { src.stop() } catch { /* already stopped */ }
+    }
+  }
+
   return {
     load,
     play,
+    loop,
+    stopBus,
     async preload(urls) {
       await Promise.allSettled(urls.map(load))
     },
