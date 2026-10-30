@@ -31,3 +31,6 @@ coverage/
 server/dist/
 .data/
 dist-e2e/
+
+# art masters at 2x, never shipped
+art-src/

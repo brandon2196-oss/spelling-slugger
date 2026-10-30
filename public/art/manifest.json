@@ -1,0 +1,1062 @@
+{
+  "_comment": "Phase 0 empty manifest. Every expected file is listed with status missing. Paths are relative to public/. Batter frames follow the pattern art/batter/<clip>/<frame>-<layer>.png where frame is zero padded to 2 digits (00, 01, ...), one PNG per layer per frame, all 256x256 at 2x delivery. Coordinates are game pixels in the 1280x960 frame and are null until the stadium art lands. See docs/art/ART-CONTRACT.md.",
+  "version": 0,
+  "gameSize": {
+    "width": 1280,
+    "height": 960
+  },
+  "deliveryScale": 2,
+  "sizeBudgetBytes": 8000000,
+  "stadium": {
+    "drawOrder": [
+      "sky",
+      "outfield-wall",
+      "stands-far",
+      "grass",
+      "dirt",
+      "chalk",
+      "bases",
+      "dugout-near",
+      "foreground-fence"
+    ],
+    "layers": {
+      "sky": {
+        "path": "art/stadium/sky.png",
+        "status": "missing"
+      },
+      "outfield-wall": {
+        "path": "art/stadium/outfield-wall.png",
+        "status": "missing"
+      },
+      "stands-far": {
+        "path": "art/stadium/stands-far.png",
+        "status": "missing"
+      },
+      "grass": {
+        "path": "art/stadium/grass.png",
+        "status": "missing"
+      },
+      "dirt": {
+        "path": "art/stadium/dirt.png",
+        "status": "missing"
+      },
+      "chalk": {
+        "path": "art/stadium/chalk.png",
+        "status": "missing"
+      },
+      "bases": {
+        "path": "art/stadium/bases.png",
+        "status": "missing"
+      },
+      "dugout-near": {
+        "path": "art/stadium/dugout-near.png",
+        "status": "missing"
+      },
+      "foreground-fence": {
+        "path": "art/stadium/foreground-fence.png",
+        "status": "missing",
+        "optional": true
+      }
+    },
+    "bases": {
+      "home": {
+        "path": "art/stadium/bases-home.png",
+        "status": "missing"
+      },
+      "first": {
+        "path": "art/stadium/bases-first.png",
+        "status": "missing"
+      },
+      "second": {
+        "path": "art/stadium/bases-second.png",
+        "status": "missing"
+      },
+      "third": {
+        "path": "art/stadium/bases-third.png",
+        "status": "missing"
+      }
+    }
+  },
+  "coordinates": {
+    "homePlate": null,
+    "first": null,
+    "second": null,
+    "third": null,
+    "mound": null,
+    "batterBoxLeft": null,
+    "batterBoxRight": null,
+    "catcher": null,
+    "umpire": null,
+    "fielders": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "outfieldWallTop": [],
+    "scoreboardPanel": {
+      "x": null,
+      "y": null,
+      "width": null,
+      "height": null
+    },
+    "ballLeavesYard": null,
+    "_schema": "Points are {\"x\":number,\"y\":number}. fielders is 7 points in order: first base, second base, shortstop, third base, left field, center field, right field. outfieldWallTop is an array of points left to right. scoreboardPanel is a rect."
+  },
+  "batter": {
+    "fps": 12,
+    "frameSize": {
+      "width": 256,
+      "height": 256
+    },
+    "pattern": "art/batter/<clip>/<frame>-<layer>.png",
+    "stance": "right-handed only, game flips for lefties",
+    "layers": [
+      "outline",
+      "skin",
+      "hair-short",
+      "hair-long",
+      "hair-curly",
+      "hair-buzz",
+      "jersey",
+      "trim",
+      "pants",
+      "hat",
+      "hat-brim",
+      "number",
+      "shoes-bat-glove"
+    ],
+    "clips": {
+      "stance-idle": {
+        "frames": 4,
+        "status": "missing",
+        "files": [
+          "art/batter/stance-idle/00-outline.png",
+          "art/batter/stance-idle/00-skin.png",
+          "art/batter/stance-idle/00-hair-short.png",
+          "art/batter/stance-idle/00-hair-long.png",
+          "art/batter/stance-idle/00-hair-curly.png",
+          "art/batter/stance-idle/00-hair-buzz.png",
+          "art/batter/stance-idle/00-jersey.png",
+          "art/batter/stance-idle/00-trim.png",
+          "art/batter/stance-idle/00-pants.png",
+          "art/batter/stance-idle/00-hat.png",
+          "art/batter/stance-idle/00-hat-brim.png",
+          "art/batter/stance-idle/00-number.png",
+          "art/batter/stance-idle/00-shoes-bat-glove.png",
+          "art/batter/stance-idle/01-outline.png",
+          "art/batter/stance-idle/01-skin.png",
+          "art/batter/stance-idle/01-hair-short.png",
+          "art/batter/stance-idle/01-hair-long.png",
+          "art/batter/stance-idle/01-hair-curly.png",
+          "art/batter/stance-idle/01-hair-buzz.png",
+          "art/batter/stance-idle/01-jersey.png",
+          "art/batter/stance-idle/01-trim.png",
+          "art/batter/stance-idle/01-pants.png",
+          "art/batter/stance-idle/01-hat.png",
+          "art/batter/stance-idle/01-hat-brim.png",
+          "art/batter/stance-idle/01-number.png",
+          "art/batter/stance-idle/01-shoes-bat-glove.png",
+          "art/batter/stance-idle/02-outline.png",
+          "art/batter/stance-idle/02-skin.png",
+          "art/batter/stance-idle/02-hair-short.png",
+          "art/batter/stance-idle/02-hair-long.png",
+          "art/batter/stance-idle/02-hair-curly.png",
+          "art/batter/stance-idle/02-hair-buzz.png",
+          "art/batter/stance-idle/02-jersey.png",
+          "art/batter/stance-idle/02-trim.png",
+          "art/batter/stance-idle/02-pants.png",
+          "art/batter/stance-idle/02-hat.png",
+          "art/batter/stance-idle/02-hat-brim.png",
+          "art/batter/stance-idle/02-number.png",
+          "art/batter/stance-idle/02-shoes-bat-glove.png",
+          "art/batter/stance-idle/03-outline.png",
+          "art/batter/stance-idle/03-skin.png",
+          "art/batter/stance-idle/03-hair-short.png",
+          "art/batter/stance-idle/03-hair-long.png",
+          "art/batter/stance-idle/03-hair-curly.png",
+          "art/batter/stance-idle/03-hair-buzz.png",
+          "art/batter/stance-idle/03-jersey.png",
+          "art/batter/stance-idle/03-trim.png",
+          "art/batter/stance-idle/03-pants.png",
+          "art/batter/stance-idle/03-hat.png",
+          "art/batter/stance-idle/03-hat-brim.png",
+          "art/batter/stance-idle/03-number.png",
+          "art/batter/stance-idle/03-shoes-bat-glove.png"
+        ]
+      },
+      "swing-miss": {
+        "frames": 8,
+        "status": "missing",
+        "files": [
+          "art/batter/swing-miss/00-outline.png",
+          "art/batter/swing-miss/00-skin.png",
+          "art/batter/swing-miss/00-hair-short.png",
+          "art/batter/swing-miss/00-hair-long.png",
+          "art/batter/swing-miss/00-hair-curly.png",
+          "art/batter/swing-miss/00-hair-buzz.png",
+          "art/batter/swing-miss/00-jersey.png",
+          "art/batter/swing-miss/00-trim.png",
+          "art/batter/swing-miss/00-pants.png",
+          "art/batter/swing-miss/00-hat.png",
+          "art/batter/swing-miss/00-hat-brim.png",
+          "art/batter/swing-miss/00-number.png",
+          "art/batter/swing-miss/00-shoes-bat-glove.png",
+          "art/batter/swing-miss/01-outline.png",
+          "art/batter/swing-miss/01-skin.png",
+          "art/batter/swing-miss/01-hair-short.png",
+          "art/batter/swing-miss/01-hair-long.png",
+          "art/batter/swing-miss/01-hair-curly.png",
+          "art/batter/swing-miss/01-hair-buzz.png",
+          "art/batter/swing-miss/01-jersey.png",
+          "art/batter/swing-miss/01-trim.png",
+          "art/batter/swing-miss/01-pants.png",
+          "art/batter/swing-miss/01-hat.png",
+          "art/batter/swing-miss/01-hat-brim.png",
+          "art/batter/swing-miss/01-number.png",
+          "art/batter/swing-miss/01-shoes-bat-glove.png",
+          "art/batter/swing-miss/02-outline.png",
+          "art/batter/swing-miss/02-skin.png",
+          "art/batter/swing-miss/02-hair-short.png",
+          "art/batter/swing-miss/02-hair-long.png",
+          "art/batter/swing-miss/02-hair-curly.png",
+          "art/batter/swing-miss/02-hair-buzz.png",
+          "art/batter/swing-miss/02-jersey.png",
+          "art/batter/swing-miss/02-trim.png",
+          "art/batter/swing-miss/02-pants.png",
+          "art/batter/swing-miss/02-hat.png",
+          "art/batter/swing-miss/02-hat-brim.png",
+          "art/batter/swing-miss/02-number.png",
+          "art/batter/swing-miss/02-shoes-bat-glove.png",
+          "art/batter/swing-miss/03-outline.png",
+          "art/batter/swing-miss/03-skin.png",
+          "art/batter/swing-miss/03-hair-short.png",
+          "art/batter/swing-miss/03-hair-long.png",
+          "art/batter/swing-miss/03-hair-curly.png",
+          "art/batter/swing-miss/03-hair-buzz.png",
+          "art/batter/swing-miss/03-jersey.png",
+          "art/batter/swing-miss/03-trim.png",
+          "art/batter/swing-miss/03-pants.png",
+          "art/batter/swing-miss/03-hat.png",
+          "art/batter/swing-miss/03-hat-brim.png",
+          "art/batter/swing-miss/03-number.png",
+          "art/batter/swing-miss/03-shoes-bat-glove.png",
+          "art/batter/swing-miss/04-outline.png",
+          "art/batter/swing-miss/04-skin.png",
+          "art/batter/swing-miss/04-hair-short.png",
+          "art/batter/swing-miss/04-hair-long.png",
+          "art/batter/swing-miss/04-hair-curly.png",
+          "art/batter/swing-miss/04-hair-buzz.png",
+          "art/batter/swing-miss/04-jersey.png",
+          "art/batter/swing-miss/04-trim.png",
+          "art/batter/swing-miss/04-pants.png",
+          "art/batter/swing-miss/04-hat.png",
+          "art/batter/swing-miss/04-hat-brim.png",
+          "art/batter/swing-miss/04-number.png",
+          "art/batter/swing-miss/04-shoes-bat-glove.png",
+          "art/batter/swing-miss/05-outline.png",
+          "art/batter/swing-miss/05-skin.png",
+          "art/batter/swing-miss/05-hair-short.png",
+          "art/batter/swing-miss/05-hair-long.png",
+          "art/batter/swing-miss/05-hair-curly.png",
+          "art/batter/swing-miss/05-hair-buzz.png",
+          "art/batter/swing-miss/05-jersey.png",
+          "art/batter/swing-miss/05-trim.png",
+          "art/batter/swing-miss/05-pants.png",
+          "art/batter/swing-miss/05-hat.png",
+          "art/batter/swing-miss/05-hat-brim.png",
+          "art/batter/swing-miss/05-number.png",
+          "art/batter/swing-miss/05-shoes-bat-glove.png",
+          "art/batter/swing-miss/06-outline.png",
+          "art/batter/swing-miss/06-skin.png",
+          "art/batter/swing-miss/06-hair-short.png",
+          "art/batter/swing-miss/06-hair-long.png",
+          "art/batter/swing-miss/06-hair-curly.png",
+          "art/batter/swing-miss/06-hair-buzz.png",
+          "art/batter/swing-miss/06-jersey.png",
+          "art/batter/swing-miss/06-trim.png",
+          "art/batter/swing-miss/06-pants.png",
+          "art/batter/swing-miss/06-hat.png",
+          "art/batter/swing-miss/06-hat-brim.png",
+          "art/batter/swing-miss/06-number.png",
+          "art/batter/swing-miss/06-shoes-bat-glove.png",
+          "art/batter/swing-miss/07-outline.png",
+          "art/batter/swing-miss/07-skin.png",
+          "art/batter/swing-miss/07-hair-short.png",
+          "art/batter/swing-miss/07-hair-long.png",
+          "art/batter/swing-miss/07-hair-curly.png",
+          "art/batter/swing-miss/07-hair-buzz.png",
+          "art/batter/swing-miss/07-jersey.png",
+          "art/batter/swing-miss/07-trim.png",
+          "art/batter/swing-miss/07-pants.png",
+          "art/batter/swing-miss/07-hat.png",
+          "art/batter/swing-miss/07-hat-brim.png",
+          "art/batter/swing-miss/07-number.png",
+          "art/batter/swing-miss/07-shoes-bat-glove.png"
+        ]
+      },
+      "swing-contact": {
+        "frames": 8,
+        "status": "missing",
+        "files": [
+          "art/batter/swing-contact/00-outline.png",
+          "art/batter/swing-contact/00-skin.png",
+          "art/batter/swing-contact/00-hair-short.png",
+          "art/batter/swing-contact/00-hair-long.png",
+          "art/batter/swing-contact/00-hair-curly.png",
+          "art/batter/swing-contact/00-hair-buzz.png",
+          "art/batter/swing-contact/00-jersey.png",
+          "art/batter/swing-contact/00-trim.png",
+          "art/batter/swing-contact/00-pants.png",
+          "art/batter/swing-contact/00-hat.png",
+          "art/batter/swing-contact/00-hat-brim.png",
+          "art/batter/swing-contact/00-number.png",
+          "art/batter/swing-contact/00-shoes-bat-glove.png",
+          "art/batter/swing-contact/01-outline.png",
+          "art/batter/swing-contact/01-skin.png",
+          "art/batter/swing-contact/01-hair-short.png",
+          "art/batter/swing-contact/01-hair-long.png",
+          "art/batter/swing-contact/01-hair-curly.png",
+          "art/batter/swing-contact/01-hair-buzz.png",
+          "art/batter/swing-contact/01-jersey.png",
+          "art/batter/swing-contact/01-trim.png",
+          "art/batter/swing-contact/01-pants.png",
+          "art/batter/swing-contact/01-hat.png",
+          "art/batter/swing-contact/01-hat-brim.png",
+          "art/batter/swing-contact/01-number.png",
+          "art/batter/swing-contact/01-shoes-bat-glove.png",
+          "art/batter/swing-contact/02-outline.png",
+          "art/batter/swing-contact/02-skin.png",
+          "art/batter/swing-contact/02-hair-short.png",
+          "art/batter/swing-contact/02-hair-long.png",
+          "art/batter/swing-contact/02-hair-curly.png",
+          "art/batter/swing-contact/02-hair-buzz.png",
+          "art/batter/swing-contact/02-jersey.png",
+          "art/batter/swing-contact/02-trim.png",
+          "art/batter/swing-contact/02-pants.png",
+          "art/batter/swing-contact/02-hat.png",
+          "art/batter/swing-contact/02-hat-brim.png",
+          "art/batter/swing-contact/02-number.png",
+          "art/batter/swing-contact/02-shoes-bat-glove.png",
+          "art/batter/swing-contact/03-outline.png",
+          "art/batter/swing-contact/03-skin.png",
+          "art/batter/swing-contact/03-hair-short.png",
+          "art/batter/swing-contact/03-hair-long.png",
+          "art/batter/swing-contact/03-hair-curly.png",
+          "art/batter/swing-contact/03-hair-buzz.png",
+          "art/batter/swing-contact/03-jersey.png",
+          "art/batter/swing-contact/03-trim.png",
+          "art/batter/swing-contact/03-pants.png",
+          "art/batter/swing-contact/03-hat.png",
+          "art/batter/swing-contact/03-hat-brim.png",
+          "art/batter/swing-contact/03-number.png",
+          "art/batter/swing-contact/03-shoes-bat-glove.png",
+          "art/batter/swing-contact/04-outline.png",
+          "art/batter/swing-contact/04-skin.png",
+          "art/batter/swing-contact/04-hair-short.png",
+          "art/batter/swing-contact/04-hair-long.png",
+          "art/batter/swing-contact/04-hair-curly.png",
+          "art/batter/swing-contact/04-hair-buzz.png",
+          "art/batter/swing-contact/04-jersey.png",
+          "art/batter/swing-contact/04-trim.png",
+          "art/batter/swing-contact/04-pants.png",
+          "art/batter/swing-contact/04-hat.png",
+          "art/batter/swing-contact/04-hat-brim.png",
+          "art/batter/swing-contact/04-number.png",
+          "art/batter/swing-contact/04-shoes-bat-glove.png",
+          "art/batter/swing-contact/05-outline.png",
+          "art/batter/swing-contact/05-skin.png",
+          "art/batter/swing-contact/05-hair-short.png",
+          "art/batter/swing-contact/05-hair-long.png",
+          "art/batter/swing-contact/05-hair-curly.png",
+          "art/batter/swing-contact/05-hair-buzz.png",
+          "art/batter/swing-contact/05-jersey.png",
+          "art/batter/swing-contact/05-trim.png",
+          "art/batter/swing-contact/05-pants.png",
+          "art/batter/swing-contact/05-hat.png",
+          "art/batter/swing-contact/05-hat-brim.png",
+          "art/batter/swing-contact/05-number.png",
+          "art/batter/swing-contact/05-shoes-bat-glove.png",
+          "art/batter/swing-contact/06-outline.png",
+          "art/batter/swing-contact/06-skin.png",
+          "art/batter/swing-contact/06-hair-short.png",
+          "art/batter/swing-contact/06-hair-long.png",
+          "art/batter/swing-contact/06-hair-curly.png",
+          "art/batter/swing-contact/06-hair-buzz.png",
+          "art/batter/swing-contact/06-jersey.png",
+          "art/batter/swing-contact/06-trim.png",
+          "art/batter/swing-contact/06-pants.png",
+          "art/batter/swing-contact/06-hat.png",
+          "art/batter/swing-contact/06-hat-brim.png",
+          "art/batter/swing-contact/06-number.png",
+          "art/batter/swing-contact/06-shoes-bat-glove.png",
+          "art/batter/swing-contact/07-outline.png",
+          "art/batter/swing-contact/07-skin.png",
+          "art/batter/swing-contact/07-hair-short.png",
+          "art/batter/swing-contact/07-hair-long.png",
+          "art/batter/swing-contact/07-hair-curly.png",
+          "art/batter/swing-contact/07-hair-buzz.png",
+          "art/batter/swing-contact/07-jersey.png",
+          "art/batter/swing-contact/07-trim.png",
+          "art/batter/swing-contact/07-pants.png",
+          "art/batter/swing-contact/07-hat.png",
+          "art/batter/swing-contact/07-hat-brim.png",
+          "art/batter/swing-contact/07-number.png",
+          "art/batter/swing-contact/07-shoes-bat-glove.png"
+        ]
+      },
+      "take-walk": {
+        "frames": 6,
+        "status": "missing",
+        "files": [
+          "art/batter/take-walk/00-outline.png",
+          "art/batter/take-walk/00-skin.png",
+          "art/batter/take-walk/00-hair-short.png",
+          "art/batter/take-walk/00-hair-long.png",
+          "art/batter/take-walk/00-hair-curly.png",
+          "art/batter/take-walk/00-hair-buzz.png",
+          "art/batter/take-walk/00-jersey.png",
+          "art/batter/take-walk/00-trim.png",
+          "art/batter/take-walk/00-pants.png",
+          "art/batter/take-walk/00-hat.png",
+          "art/batter/take-walk/00-hat-brim.png",
+          "art/batter/take-walk/00-number.png",
+          "art/batter/take-walk/00-shoes-bat-glove.png",
+          "art/batter/take-walk/01-outline.png",
+          "art/batter/take-walk/01-skin.png",
+          "art/batter/take-walk/01-hair-short.png",
+          "art/batter/take-walk/01-hair-long.png",
+          "art/batter/take-walk/01-hair-curly.png",
+          "art/batter/take-walk/01-hair-buzz.png",
+          "art/batter/take-walk/01-jersey.png",
+          "art/batter/take-walk/01-trim.png",
+          "art/batter/take-walk/01-pants.png",
+          "art/batter/take-walk/01-hat.png",
+          "art/batter/take-walk/01-hat-brim.png",
+          "art/batter/take-walk/01-number.png",
+          "art/batter/take-walk/01-shoes-bat-glove.png",
+          "art/batter/take-walk/02-outline.png",
+          "art/batter/take-walk/02-skin.png",
+          "art/batter/take-walk/02-hair-short.png",
+          "art/batter/take-walk/02-hair-long.png",
+          "art/batter/take-walk/02-hair-curly.png",
+          "art/batter/take-walk/02-hair-buzz.png",
+          "art/batter/take-walk/02-jersey.png",
+          "art/batter/take-walk/02-trim.png",
+          "art/batter/take-walk/02-pants.png",
+          "art/batter/take-walk/02-hat.png",
+          "art/batter/take-walk/02-hat-brim.png",
+          "art/batter/take-walk/02-number.png",
+          "art/batter/take-walk/02-shoes-bat-glove.png",
+          "art/batter/take-walk/03-outline.png",
+          "art/batter/take-walk/03-skin.png",
+          "art/batter/take-walk/03-hair-short.png",
+          "art/batter/take-walk/03-hair-long.png",
+          "art/batter/take-walk/03-hair-curly.png",
+          "art/batter/take-walk/03-hair-buzz.png",
+          "art/batter/take-walk/03-jersey.png",
+          "art/batter/take-walk/03-trim.png",
+          "art/batter/take-walk/03-pants.png",
+          "art/batter/take-walk/03-hat.png",
+          "art/batter/take-walk/03-hat-brim.png",
+          "art/batter/take-walk/03-number.png",
+          "art/batter/take-walk/03-shoes-bat-glove.png",
+          "art/batter/take-walk/04-outline.png",
+          "art/batter/take-walk/04-skin.png",
+          "art/batter/take-walk/04-hair-short.png",
+          "art/batter/take-walk/04-hair-long.png",
+          "art/batter/take-walk/04-hair-curly.png",
+          "art/batter/take-walk/04-hair-buzz.png",
+          "art/batter/take-walk/04-jersey.png",
+          "art/batter/take-walk/04-trim.png",
+          "art/batter/take-walk/04-pants.png",
+          "art/batter/take-walk/04-hat.png",
+          "art/batter/take-walk/04-hat-brim.png",
+          "art/batter/take-walk/04-number.png",
+          "art/batter/take-walk/04-shoes-bat-glove.png",
+          "art/batter/take-walk/05-outline.png",
+          "art/batter/take-walk/05-skin.png",
+          "art/batter/take-walk/05-hair-short.png",
+          "art/batter/take-walk/05-hair-long.png",
+          "art/batter/take-walk/05-hair-curly.png",
+          "art/batter/take-walk/05-hair-buzz.png",
+          "art/batter/take-walk/05-jersey.png",
+          "art/batter/take-walk/05-trim.png",
+          "art/batter/take-walk/05-pants.png",
+          "art/batter/take-walk/05-hat.png",
+          "art/batter/take-walk/05-hat-brim.png",
+          "art/batter/take-walk/05-number.png",
+          "art/batter/take-walk/05-shoes-bat-glove.png"
+        ]
+      },
+      "run": {
+        "frames": 6,
+        "status": "missing",
+        "files": [
+          "art/batter/run/00-outline.png",
+          "art/batter/run/00-skin.png",
+          "art/batter/run/00-hair-short.png",
+          "art/batter/run/00-hair-long.png",
+          "art/batter/run/00-hair-curly.png",
+          "art/batter/run/00-hair-buzz.png",
+          "art/batter/run/00-jersey.png",
+          "art/batter/run/00-trim.png",
+          "art/batter/run/00-pants.png",
+          "art/batter/run/00-hat.png",
+          "art/batter/run/00-hat-brim.png",
+          "art/batter/run/00-number.png",
+          "art/batter/run/00-shoes-bat-glove.png",
+          "art/batter/run/01-outline.png",
+          "art/batter/run/01-skin.png",
+          "art/batter/run/01-hair-short.png",
+          "art/batter/run/01-hair-long.png",
+          "art/batter/run/01-hair-curly.png",
+          "art/batter/run/01-hair-buzz.png",
+          "art/batter/run/01-jersey.png",
+          "art/batter/run/01-trim.png",
+          "art/batter/run/01-pants.png",
+          "art/batter/run/01-hat.png",
+          "art/batter/run/01-hat-brim.png",
+          "art/batter/run/01-number.png",
+          "art/batter/run/01-shoes-bat-glove.png",
+          "art/batter/run/02-outline.png",
+          "art/batter/run/02-skin.png",
+          "art/batter/run/02-hair-short.png",
+          "art/batter/run/02-hair-long.png",
+          "art/batter/run/02-hair-curly.png",
+          "art/batter/run/02-hair-buzz.png",
+          "art/batter/run/02-jersey.png",
+          "art/batter/run/02-trim.png",
+          "art/batter/run/02-pants.png",
+          "art/batter/run/02-hat.png",
+          "art/batter/run/02-hat-brim.png",
+          "art/batter/run/02-number.png",
+          "art/batter/run/02-shoes-bat-glove.png",
+          "art/batter/run/03-outline.png",
+          "art/batter/run/03-skin.png",
+          "art/batter/run/03-hair-short.png",
+          "art/batter/run/03-hair-long.png",
+          "art/batter/run/03-hair-curly.png",
+          "art/batter/run/03-hair-buzz.png",
+          "art/batter/run/03-jersey.png",
+          "art/batter/run/03-trim.png",
+          "art/batter/run/03-pants.png",
+          "art/batter/run/03-hat.png",
+          "art/batter/run/03-hat-brim.png",
+          "art/batter/run/03-number.png",
+          "art/batter/run/03-shoes-bat-glove.png",
+          "art/batter/run/04-outline.png",
+          "art/batter/run/04-skin.png",
+          "art/batter/run/04-hair-short.png",
+          "art/batter/run/04-hair-long.png",
+          "art/batter/run/04-hair-curly.png",
+          "art/batter/run/04-hair-buzz.png",
+          "art/batter/run/04-jersey.png",
+          "art/batter/run/04-trim.png",
+          "art/batter/run/04-pants.png",
+          "art/batter/run/04-hat.png",
+          "art/batter/run/04-hat-brim.png",
+          "art/batter/run/04-number.png",
+          "art/batter/run/04-shoes-bat-glove.png",
+          "art/batter/run/05-outline.png",
+          "art/batter/run/05-skin.png",
+          "art/batter/run/05-hair-short.png",
+          "art/batter/run/05-hair-long.png",
+          "art/batter/run/05-hair-curly.png",
+          "art/batter/run/05-hair-buzz.png",
+          "art/batter/run/05-jersey.png",
+          "art/batter/run/05-trim.png",
+          "art/batter/run/05-pants.png",
+          "art/batter/run/05-hat.png",
+          "art/batter/run/05-hat-brim.png",
+          "art/batter/run/05-number.png",
+          "art/batter/run/05-shoes-bat-glove.png"
+        ]
+      },
+      "trot": {
+        "frames": 6,
+        "status": "missing",
+        "files": [
+          "art/batter/trot/00-outline.png",
+          "art/batter/trot/00-skin.png",
+          "art/batter/trot/00-hair-short.png",
+          "art/batter/trot/00-hair-long.png",
+          "art/batter/trot/00-hair-curly.png",
+          "art/batter/trot/00-hair-buzz.png",
+          "art/batter/trot/00-jersey.png",
+          "art/batter/trot/00-trim.png",
+          "art/batter/trot/00-pants.png",
+          "art/batter/trot/00-hat.png",
+          "art/batter/trot/00-hat-brim.png",
+          "art/batter/trot/00-number.png",
+          "art/batter/trot/00-shoes-bat-glove.png",
+          "art/batter/trot/01-outline.png",
+          "art/batter/trot/01-skin.png",
+          "art/batter/trot/01-hair-short.png",
+          "art/batter/trot/01-hair-long.png",
+          "art/batter/trot/01-hair-curly.png",
+          "art/batter/trot/01-hair-buzz.png",
+          "art/batter/trot/01-jersey.png",
+          "art/batter/trot/01-trim.png",
+          "art/batter/trot/01-pants.png",
+          "art/batter/trot/01-hat.png",
+          "art/batter/trot/01-hat-brim.png",
+          "art/batter/trot/01-number.png",
+          "art/batter/trot/01-shoes-bat-glove.png",
+          "art/batter/trot/02-outline.png",
+          "art/batter/trot/02-skin.png",
+          "art/batter/trot/02-hair-short.png",
+          "art/batter/trot/02-hair-long.png",
+          "art/batter/trot/02-hair-curly.png",
+          "art/batter/trot/02-hair-buzz.png",
+          "art/batter/trot/02-jersey.png",
+          "art/batter/trot/02-trim.png",
+          "art/batter/trot/02-pants.png",
+          "art/batter/trot/02-hat.png",
+          "art/batter/trot/02-hat-brim.png",
+          "art/batter/trot/02-number.png",
+          "art/batter/trot/02-shoes-bat-glove.png",
+          "art/batter/trot/03-outline.png",
+          "art/batter/trot/03-skin.png",
+          "art/batter/trot/03-hair-short.png",
+          "art/batter/trot/03-hair-long.png",
+          "art/batter/trot/03-hair-curly.png",
+          "art/batter/trot/03-hair-buzz.png",
+          "art/batter/trot/03-jersey.png",
+          "art/batter/trot/03-trim.png",
+          "art/batter/trot/03-pants.png",
+          "art/batter/trot/03-hat.png",
+          "art/batter/trot/03-hat-brim.png",
+          "art/batter/trot/03-number.png",
+          "art/batter/trot/03-shoes-bat-glove.png",
+          "art/batter/trot/04-outline.png",
+          "art/batter/trot/04-skin.png",
+          "art/batter/trot/04-hair-short.png",
+          "art/batter/trot/04-hair-long.png",
+          "art/batter/trot/04-hair-curly.png",
+          "art/batter/trot/04-hair-buzz.png",
+          "art/batter/trot/04-jersey.png",
+          "art/batter/trot/04-trim.png",
+          "art/batter/trot/04-pants.png",
+          "art/batter/trot/04-hat.png",
+          "art/batter/trot/04-hat-brim.png",
+          "art/batter/trot/04-number.png",
+          "art/batter/trot/04-shoes-bat-glove.png",
+          "art/batter/trot/05-outline.png",
+          "art/batter/trot/05-skin.png",
+          "art/batter/trot/05-hair-short.png",
+          "art/batter/trot/05-hair-long.png",
+          "art/batter/trot/05-hair-curly.png",
+          "art/batter/trot/05-hair-buzz.png",
+          "art/batter/trot/05-jersey.png",
+          "art/batter/trot/05-trim.png",
+          "art/batter/trot/05-pants.png",
+          "art/batter/trot/05-hat.png",
+          "art/batter/trot/05-hat-brim.png",
+          "art/batter/trot/05-number.png",
+          "art/batter/trot/05-shoes-bat-glove.png"
+        ]
+      },
+      "strikeout-slump": {
+        "frames": 4,
+        "status": "missing",
+        "files": [
+          "art/batter/strikeout-slump/00-outline.png",
+          "art/batter/strikeout-slump/00-skin.png",
+          "art/batter/strikeout-slump/00-hair-short.png",
+          "art/batter/strikeout-slump/00-hair-long.png",
+          "art/batter/strikeout-slump/00-hair-curly.png",
+          "art/batter/strikeout-slump/00-hair-buzz.png",
+          "art/batter/strikeout-slump/00-jersey.png",
+          "art/batter/strikeout-slump/00-trim.png",
+          "art/batter/strikeout-slump/00-pants.png",
+          "art/batter/strikeout-slump/00-hat.png",
+          "art/batter/strikeout-slump/00-hat-brim.png",
+          "art/batter/strikeout-slump/00-number.png",
+          "art/batter/strikeout-slump/00-shoes-bat-glove.png",
+          "art/batter/strikeout-slump/01-outline.png",
+          "art/batter/strikeout-slump/01-skin.png",
+          "art/batter/strikeout-slump/01-hair-short.png",
+          "art/batter/strikeout-slump/01-hair-long.png",
+          "art/batter/strikeout-slump/01-hair-curly.png",
+          "art/batter/strikeout-slump/01-hair-buzz.png",
+          "art/batter/strikeout-slump/01-jersey.png",
+          "art/batter/strikeout-slump/01-trim.png",
+          "art/batter/strikeout-slump/01-pants.png",
+          "art/batter/strikeout-slump/01-hat.png",
+          "art/batter/strikeout-slump/01-hat-brim.png",
+          "art/batter/strikeout-slump/01-number.png",
+          "art/batter/strikeout-slump/01-shoes-bat-glove.png",
+          "art/batter/strikeout-slump/02-outline.png",
+          "art/batter/strikeout-slump/02-skin.png",
+          "art/batter/strikeout-slump/02-hair-short.png",
+          "art/batter/strikeout-slump/02-hair-long.png",
+          "art/batter/strikeout-slump/02-hair-curly.png",
+          "art/batter/strikeout-slump/02-hair-buzz.png",
+          "art/batter/strikeout-slump/02-jersey.png",
+          "art/batter/strikeout-slump/02-trim.png",
+          "art/batter/strikeout-slump/02-pants.png",
+          "art/batter/strikeout-slump/02-hat.png",
+          "art/batter/strikeout-slump/02-hat-brim.png",
+          "art/batter/strikeout-slump/02-number.png",
+          "art/batter/strikeout-slump/02-shoes-bat-glove.png",
+          "art/batter/strikeout-slump/03-outline.png",
+          "art/batter/strikeout-slump/03-skin.png",
+          "art/batter/strikeout-slump/03-hair-short.png",
+          "art/batter/strikeout-slump/03-hair-long.png",
+          "art/batter/strikeout-slump/03-hair-curly.png",
+          "art/batter/strikeout-slump/03-hair-buzz.png",
+          "art/batter/strikeout-slump/03-jersey.png",
+          "art/batter/strikeout-slump/03-trim.png",
+          "art/batter/strikeout-slump/03-pants.png",
+          "art/batter/strikeout-slump/03-hat.png",
+          "art/batter/strikeout-slump/03-hat-brim.png",
+          "art/batter/strikeout-slump/03-number.png",
+          "art/batter/strikeout-slump/03-shoes-bat-glove.png"
+        ]
+      },
+      "celebrate": {
+        "frames": 6,
+        "status": "missing",
+        "files": [
+          "art/batter/celebrate/00-outline.png",
+          "art/batter/celebrate/00-skin.png",
+          "art/batter/celebrate/00-hair-short.png",
+          "art/batter/celebrate/00-hair-long.png",
+          "art/batter/celebrate/00-hair-curly.png",
+          "art/batter/celebrate/00-hair-buzz.png",
+          "art/batter/celebrate/00-jersey.png",
+          "art/batter/celebrate/00-trim.png",
+          "art/batter/celebrate/00-pants.png",
+          "art/batter/celebrate/00-hat.png",
+          "art/batter/celebrate/00-hat-brim.png",
+          "art/batter/celebrate/00-number.png",
+          "art/batter/celebrate/00-shoes-bat-glove.png",
+          "art/batter/celebrate/01-outline.png",
+          "art/batter/celebrate/01-skin.png",
+          "art/batter/celebrate/01-hair-short.png",
+          "art/batter/celebrate/01-hair-long.png",
+          "art/batter/celebrate/01-hair-curly.png",
+          "art/batter/celebrate/01-hair-buzz.png",
+          "art/batter/celebrate/01-jersey.png",
+          "art/batter/celebrate/01-trim.png",
+          "art/batter/celebrate/01-pants.png",
+          "art/batter/celebrate/01-hat.png",
+          "art/batter/celebrate/01-hat-brim.png",
+          "art/batter/celebrate/01-number.png",
+          "art/batter/celebrate/01-shoes-bat-glove.png",
+          "art/batter/celebrate/02-outline.png",
+          "art/batter/celebrate/02-skin.png",
+          "art/batter/celebrate/02-hair-short.png",
+          "art/batter/celebrate/02-hair-long.png",
+          "art/batter/celebrate/02-hair-curly.png",
+          "art/batter/celebrate/02-hair-buzz.png",
+          "art/batter/celebrate/02-jersey.png",
+          "art/batter/celebrate/02-trim.png",
+          "art/batter/celebrate/02-pants.png",
+          "art/batter/celebrate/02-hat.png",
+          "art/batter/celebrate/02-hat-brim.png",
+          "art/batter/celebrate/02-number.png",
+          "art/batter/celebrate/02-shoes-bat-glove.png",
+          "art/batter/celebrate/03-outline.png",
+          "art/batter/celebrate/03-skin.png",
+          "art/batter/celebrate/03-hair-short.png",
+          "art/batter/celebrate/03-hair-long.png",
+          "art/batter/celebrate/03-hair-curly.png",
+          "art/batter/celebrate/03-hair-buzz.png",
+          "art/batter/celebrate/03-jersey.png",
+          "art/batter/celebrate/03-trim.png",
+          "art/batter/celebrate/03-pants.png",
+          "art/batter/celebrate/03-hat.png",
+          "art/batter/celebrate/03-hat-brim.png",
+          "art/batter/celebrate/03-number.png",
+          "art/batter/celebrate/03-shoes-bat-glove.png",
+          "art/batter/celebrate/04-outline.png",
+          "art/batter/celebrate/04-skin.png",
+          "art/batter/celebrate/04-hair-short.png",
+          "art/batter/celebrate/04-hair-long.png",
+          "art/batter/celebrate/04-hair-curly.png",
+          "art/batter/celebrate/04-hair-buzz.png",
+          "art/batter/celebrate/04-jersey.png",
+          "art/batter/celebrate/04-trim.png",
+          "art/batter/celebrate/04-pants.png",
+          "art/batter/celebrate/04-hat.png",
+          "art/batter/celebrate/04-hat-brim.png",
+          "art/batter/celebrate/04-number.png",
+          "art/batter/celebrate/04-shoes-bat-glove.png",
+          "art/batter/celebrate/05-outline.png",
+          "art/batter/celebrate/05-skin.png",
+          "art/batter/celebrate/05-hair-short.png",
+          "art/batter/celebrate/05-hair-long.png",
+          "art/batter/celebrate/05-hair-curly.png",
+          "art/batter/celebrate/05-hair-buzz.png",
+          "art/batter/celebrate/05-jersey.png",
+          "art/batter/celebrate/05-trim.png",
+          "art/batter/celebrate/05-pants.png",
+          "art/batter/celebrate/05-hat.png",
+          "art/batter/celebrate/05-hat-brim.png",
+          "art/batter/celebrate/05-number.png",
+          "art/batter/celebrate/05-shoes-bat-glove.png"
+        ]
+      }
+    },
+    "contactFrame": {
+      "swing-contact": 4,
+      "ballLeavesFrame": 5
+    }
+  },
+  "pitcher": {
+    "image": {
+      "path": "art/pitcher.png",
+      "status": "missing"
+    },
+    "data": {
+      "path": "art/pitcher.json",
+      "status": "missing"
+    },
+    "fps": 12,
+    "clips": {
+      "pitcher-idle": {
+        "frames": 4
+      },
+      "pitcher-windup-throw": {
+        "frames": 10
+      },
+      "pitcher-react-hit": {
+        "frames": 4
+      }
+    },
+    "pitcherWindupReleaseFrame": 7
+  },
+  "fielders": {
+    "image": {
+      "path": "art/fielders.png",
+      "status": "missing"
+    },
+    "data": {
+      "path": "art/fielders.json",
+      "status": "missing"
+    },
+    "fps": 12,
+    "clips": {
+      "fielder-idle": {
+        "frames": 4
+      },
+      "fielder-chase": {
+        "frames": 6
+      },
+      "fielder-catch": {
+        "frames": 6
+      },
+      "fielder-watch-hr": {
+        "frames": 4
+      }
+    }
+  },
+  "catcherUmp": {
+    "image": {
+      "path": "art/catcher-ump.png",
+      "status": "missing"
+    },
+    "data": {
+      "path": "art/catcher-ump.json",
+      "status": "missing"
+    },
+    "fps": 12,
+    "clips": {
+      "catcher-idle": {
+        "frames": 2
+      },
+      "catcher-receive": {
+        "frames": 4
+      },
+      "ump-idle": {
+        "frames": 2
+      },
+      "ump-strike": {
+        "frames": 4
+      },
+      "ump-punchout": {
+        "frames": 6
+      }
+    }
+  },
+  "ball": {
+    "ball": {
+      "path": "art/ball/ball.png",
+      "status": "missing"
+    },
+    "ball-spin": {
+      "frames": 3,
+      "files": [
+        {
+          "path": "art/ball/ball-spin-00.png",
+          "status": "missing"
+        },
+        {
+          "path": "art/ball/ball-spin-01.png",
+          "status": "missing"
+        },
+        {
+          "path": "art/ball/ball-spin-02.png",
+          "status": "missing"
+        }
+      ]
+    },
+    "ball-shadow": {
+      "path": "art/ball/ball-shadow.png",
+      "status": "missing"
+    }
+  },
+  "crowd": {
+    "image": {
+      "path": "art/crowd.png",
+      "status": "missing"
+    },
+    "data": {
+      "path": "art/crowd.json",
+      "status": "missing"
+    },
+    "fps": 12,
+    "clips": {
+      "crowd-idle": {
+        "frames": 2
+      },
+      "crowd-cheer": {
+        "frames": 4
+      }
+    },
+    "rows": 3,
+    "tileWidth": 512
+  },
+  "mascot": {
+    "image": {
+      "path": "art/mascot.png",
+      "status": "missing"
+    },
+    "data": {
+      "path": "art/mascot.json",
+      "status": "missing"
+    },
+    "fps": 12,
+    "clips": {
+      "mascot-idle": {
+        "frames": 4
+      },
+      "mascot-happy": {
+        "frames": 4
+      },
+      "mascot-sad": {
+        "frames": 4
+      }
+    },
+    "optional": true
+  },
+  "booth": {
+    "bigRed-mouth-closed": {
+      "path": "art/booth/bigRed-mouth-closed.png",
+      "status": "missing",
+      "size": 512
+    },
+    "bigRed-mouth-open": {
+      "path": "art/booth/bigRed-mouth-open.png",
+      "status": "missing",
+      "size": 512
+    },
+    "jackDalton-mouth-closed": {
+      "path": "art/booth/jackDalton-mouth-closed.png",
+      "status": "missing",
+      "size": 512
+    },
+    "jackDalton-mouth-open": {
+      "path": "art/booth/jackDalton-mouth-open.png",
+      "status": "missing",
+      "size": 512
+    }
+  },
+  "chrome": {
+    "score-bug": {
+      "path": "art/chrome/score-bug.svg",
+      "status": "missing"
+    },
+    "caption-bar": {
+      "path": "art/chrome/caption-bar.svg",
+      "status": "missing"
+    },
+    "frame-corners": {
+      "path": "art/chrome/frame-corners.svg",
+      "status": "missing"
+    },
+    "on-air-tag": {
+      "path": "art/chrome/on-air-tag.svg",
+      "status": "missing"
+    },
+    "banner-strike-one": {
+      "path": "art/chrome/banner-strike-one.svg",
+      "status": "missing"
+    },
+    "banner-strike-two": {
+      "path": "art/chrome/banner-strike-two.svg",
+      "status": "missing"
+    },
+    "banner-strike-three": {
+      "path": "art/chrome/banner-strike-three.svg",
+      "status": "missing"
+    },
+    "banner-ball-four": {
+      "path": "art/chrome/banner-ball-four.svg",
+      "status": "missing"
+    },
+    "banner-base-hit": {
+      "path": "art/chrome/banner-base-hit.svg",
+      "status": "missing"
+    },
+    "banner-double": {
+      "path": "art/chrome/banner-double.svg",
+      "status": "missing"
+    },
+    "banner-home-run": {
+      "path": "art/chrome/banner-home-run.svg",
+      "status": "missing"
+    },
+    "banner-run-scored": {
+      "path": "art/chrome/banner-run-scored.svg",
+      "status": "missing"
+    },
+    "banner-runs-scored": {
+      "path": "art/chrome/banner-runs-scored.svg",
+      "status": "missing"
+    },
+    "banner-three-outs": {
+      "path": "art/chrome/banner-three-outs.svg",
+      "status": "missing"
+    },
+    "banner-new-inning": {
+      "path": "art/chrome/banner-new-inning.svg",
+      "status": "missing"
+    },
+    "banner-game-over": {
+      "path": "art/chrome/banner-game-over.svg",
+      "status": "missing"
+    },
+    "banner-walk-off": {
+      "path": "art/chrome/banner-walk-off.svg",
+      "status": "missing"
+    },
+    "banner-you-win": {
+      "path": "art/chrome/banner-you-win.svg",
+      "status": "missing"
+    },
+    "banner-tough-loss": {
+      "path": "art/chrome/banner-tough-loss.svg",
+      "status": "missing"
+    },
+    "banner-highlight": {
+      "path": "art/chrome/banner-highlight.svg",
+      "status": "missing"
+    }
+  }
+}
