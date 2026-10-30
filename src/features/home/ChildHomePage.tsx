@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { toggleFieldKind } from '../../field/fieldChoice'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
@@ -93,11 +94,31 @@ export function ChildHomePage() {
         </div>
 
         <section aria-label="Announcer" className="mt-8">
-          <h2 className="pixel-text text-gold text-sm mb-3">In the booth tonight</h2>
+          <BoothHeading />
           <AnnouncerPicker value={audio.announcer} onChange={(id) => { primeSpeech(); sfx.unlock(); audio.set({ announcer: id }) }} />
         </section>
       </div>
       {modal}
     </Stadium>
+  )
+}
+
+/** Hidden tester toggle: five taps on the heading flips the stadium between cartoon and pixel. */
+function BoothHeading() {
+  const taps = useRef(0)
+  const [flash, setFlash] = useState<string | null>(null)
+  return (
+    <h2
+      className="pixel-text text-gold text-sm mb-3"
+      onClick={() => {
+        taps.current += 1
+        if (taps.current < 5) return
+        taps.current = 0
+        setFlash(`Stadium: ${toggleFieldKind()}`)
+        setTimeout(() => setFlash(null), 1500)
+      }}
+    >
+      {flash ?? 'In the booth tonight'}
+    </h2>
   )
 }
