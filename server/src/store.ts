@@ -5,7 +5,7 @@
 import type { GameSummary } from '../../src/engine/results'
 import { summarize } from '../../src/engine/results'
 import { rebuild } from '../../src/engine/replay'
-import type { GameWord, Hand, Outcome } from '../../src/engine/types'
+import type { Difficulty, GameWord, Hand, Outcome, WordSource } from '../../src/engine/types'
 import type {
   Appearance, GameFilter, GameMode, GameRecord, NewGame, NewPlayer, NewWord, Player, Store, StoredAttempt, Word, WordList,
 } from '../../src/data/types'
@@ -27,19 +27,19 @@ interface PlayerRow {
   id: string; name: string; team_name: string; jersey_number: number; batting_hand: Hand; appearance: Appearance; created_at: unknown
 }
 interface ListRow { id: string; player_id: string; title: string; week_start: string; is_active: boolean; created_at: unknown }
-interface WordRow { id: string; list_id: string; position: number; text: string; sentence: string | null }
+interface WordRow { id: string; list_id: string; position: number; text: string; sentence: string | null; difficulty: Difficulty; source: WordSource }
 interface GameRow {
   id: string; player_id: string; list_id: string | null; mode: GameMode; status: GameRecord['status']
   warnings: string[] | null; summary: GameSummary | null; started_at: unknown; completed_at: unknown
 }
-interface GameWordRow { game_id: string; position: number; text: string; sentence: string | null; source: GameWord['source']; source_word_id: string | null; outcome: Outcome | null }
+interface GameWordRow { game_id: string; position: number; text: string; sentence: string | null; source: GameWord['source']; source_word_id: string | null; difficulty: Difficulty; outcome: Outcome | null }
 interface AttemptRow { game_id: string; position: number; attempt_number: number; text: string; correct: boolean }
 
 const toPlayer = (r: PlayerRow): Player => ({
   id: r.id, name: r.name, teamName: r.team_name, jerseyNumber: r.jersey_number, hand: r.batting_hand,
   appearance: r.appearance, createdAt: iso(r.created_at),
 })
-const toWord = (w: WordRow): Word => ({ id: w.id, position: w.position, text: w.text, sentence: w.sentence })
+const toWord = (w: WordRow): Word => ({ id: w.id, position: w.position, text: w.text, sentence: w.sentence, difficulty: w.difficulty, source: w.source })
 const toList = (r: ListRow, words: WordRow[]): WordList => ({
   id: r.id, playerId: r.player_id, title: r.title, weekStart: r.week_start, isActive: r.is_active, createdAt: iso(r.created_at),
   words: words.filter((w) => w.list_id === r.id).sort((a, b) => a.position - b.position).map(toWord),
@@ -56,7 +56,7 @@ function toGame(r: GameRow, gws: GameWordRow[], atts: AttemptRow[]): GameRecord 
     }))
   return {
     id: r.id, playerId: r.player_id, listId: r.list_id, mode: r.mode, status: r.status,
-    words: mine.map((w) => ({ position: w.position, text: w.text, sentence: w.sentence, source: w.source, sourceWordId: w.source_word_id })),
+    words: mine.map((w) => ({ position: w.position, text: w.text, sentence: w.sentence, source: w.source, difficulty: w.difficulty, sourceWordId: w.source_word_id })),
     attempts, warnings: r.warnings ?? [], summary: r.summary, startedAt: iso(r.started_at), completedAt: isoOrNull(r.completed_at),
   }
 }
@@ -96,7 +96,10 @@ export function createServerStore(db: Db, familyId: string): Store {
 
   async function insertWords(q: Queryable, listId: string, words: NewWord[]): Promise<void> {
     for (const [i, w] of words.entries())
-      await q.query('insert into words (list_id, position, text, sentence) values ($1, $2, $3, $4)', [listId, i + 1, w.text, w.sentence])
+      await q.query(
+        'insert into words (list_id, position, text, sentence, difficulty, source) values ($1, $2, $3, $4, $5, $6)',
+        [listId, i + 1, w.text, w.sentence, w.difficulty ?? 'medium', w.source ?? 'current'],
+      )
   }
   async function loadLists(where: string, params: unknown[]): Promise<WordList[]> {
     const lists = (await db.query<ListRow>(
@@ -207,8 +210,8 @@ export function createServerStore(db: Db, familyId: string): Store {
         )
         for (const w of input.words)
           await q.query(
-            'insert into game_words (game_id, position, text, sentence, source, source_word_id) values ($1, $2, $3, $4, $5, $6)',
-            [rows[0]!.id, w.position, w.text, w.sentence, w.source, w.sourceWordId],
+            'insert into game_words (game_id, position, text, sentence, source, source_word_id, difficulty) values ($1, $2, $3, $4, $5, $6, $7)',
+            [rows[0]!.id, w.position, w.text, w.sentence, w.source, w.sourceWordId, w.difficulty],
           )
         return rows[0]!.id
       })

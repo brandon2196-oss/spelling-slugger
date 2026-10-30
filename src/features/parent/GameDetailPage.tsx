@@ -4,7 +4,7 @@ import { Paper } from '../../components/Page'
 import { useStore } from '../../data/store'
 import type { GameRecord } from '../../data/types'
 
-const outcomeLabel = { double: 'Double', single: 'Single', walk: 'Walk', strikeout: 'Strikeout' } as const
+const outcomeLabel = { homeRun: 'Home Run', double: 'Double', single: 'Single', walk: 'Walk', strikeout: 'Strikeout' } as const
 
 export function GameDetailPage() {
   const { gameId = '' } = useParams()

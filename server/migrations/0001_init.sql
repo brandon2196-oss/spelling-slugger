@@ -59,6 +59,8 @@ create table if not exists words (
   position int not null,
   text text not null,
   sentence text null,
+  difficulty text not null default 'medium' check (difficulty in ('easy','medium','hard')),
+  source text not null default 'current' check (source in ('current','review')),
   unique (list_id, position)
 );
 create index if not exists words_list_idx on words(list_id);
@@ -86,7 +88,8 @@ create table if not exists game_words (
   sentence text null,
   source text not null check (source in ('current','review')),
   source_word_id uuid null,
-  outcome text null check (outcome in ('double','single','walk','strikeout')),
+  difficulty text not null default 'medium' check (difficulty in ('easy','medium','hard')),
+  outcome text null check (outcome in ('homeRun','double','single','walk','strikeout')),
   unique (game_id, position)
 );
 create index if not exists game_words_game_idx on game_words(game_id);

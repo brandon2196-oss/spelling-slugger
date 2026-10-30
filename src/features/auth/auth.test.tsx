@@ -7,13 +7,14 @@ import { createLocalStore } from '../../data/local-store'
 import { createLocalAuth } from '../../data/auth'
 import { RegisterPage } from './RegisterPage'
 import { LoginPage } from './LoginPage'
+import { ApiError } from '../../data/api-client'
 
 function WhoAmI() {
   const { user } = useAuth()
   return <div data-testid="whoami">{user ? user.email : 'nobody'}</div>
 }
 
-function renderAt(path: string) {
+function renderAt(path: string, backend = createLocalAuth()) {
   const router = createMemoryRouter(
     [
       { path: '/register', element: <RegisterPage /> },
@@ -23,7 +24,7 @@ function renderAt(path: string) {
     { initialEntries: [path] },
   )
   return render(
-    <AuthProvider backend={createLocalAuth()}>
+    <AuthProvider backend={backend}>
       <StoreContext.Provider value={createLocalStore()}>
         <RouterProvider router={router} />
       </StoreContext.Provider>
@@ -53,5 +54,16 @@ describe('registration and sign-in (local backend)', () => {
     await user.type(screen.getByLabelText(/^password/i), 'wrong-pass')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
     expect(await screen.findByText("That email or password doesn't match.")).toBeInTheDocument()
+  })
+
+  it('explains invite-only when registration is closed', async () => {
+    const user = userEvent.setup()
+    const backend = createLocalAuth()
+    backend.signUp = () => Promise.reject(new ApiError(403, 'REGISTRATION_CLOSED'))
+    renderAt('/register', backend)
+    await user.type(screen.getByLabelText(/email/i), 'new@example.com')
+    await user.type(screen.getByLabelText(/^password/i), 'secret-pass-1')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+    expect(await screen.findByText(/invite-only/i)).toBeInTheDocument()
   })
 })

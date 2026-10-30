@@ -21,7 +21,7 @@ function breakdown(state: GameState, source: WordSource): SourceBreakdown {
   const atBats = state.atBats.filter((ab) => positions.has(ab.position) && ab.outcome !== null)
   return {
     total: words.length,
-    firstTry: atBats.filter((ab) => ab.outcome === 'double').length,
+    firstTry: atBats.filter((ab) => ab.outcome !== 'strikeout' && ab.attempts.length === 1).length,
     missed: atBats.filter((ab) => ab.outcome === 'strikeout').length,
   }
 }

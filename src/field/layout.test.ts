@@ -76,3 +76,11 @@ describe('grassStripes', () => {
     expect(last.y + last.h).toBe(FIELD.height)
   })
 })
+
+describe('basesDiff homeRun', () => {
+  it('sends every runner and the batter home', () => {
+    expect(basesDiff({ first: true, second: false, third: true }, { first: false, second: false, third: false }, 'homeRun', 3)).toEqual([
+      { from: 'third', to: 'score' }, { from: 'first', to: 'score' }, { from: 'home', to: 'score' },
+    ])
+  })
+})

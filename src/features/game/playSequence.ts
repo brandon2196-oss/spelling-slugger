@@ -62,9 +62,12 @@ export async function playSequence(
       sfx.walkChime()
       await Promise.all([field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored), moment('walk')]) // TAKE YOUR BASE!
       break
-    default:
+    default: {
       sfx.crack()
-      await Promise.all([field?.playHit(event.outcome, event.basesBefore, event.basesAfter, event.runsScored), moment(event.outcome)]) // DOUBLE! / BASE HIT!
+      if (event.outcome === 'homeRun') sfx.cheer()
+      const hit = event.outcome
+      await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
+    } // HOME RUN! / DOUBLE! / BASE HIT!
   }
 
   if (event.runsScored > 0) {

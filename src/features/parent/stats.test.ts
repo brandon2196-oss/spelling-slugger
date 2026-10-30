@@ -3,7 +3,7 @@ import type { GameWord } from '../../engine/types'
 import { frequentlyMissed, mastered, reviewRetention, totals, weeklyTrend, wordStats } from './stats'
 
 const gw = (texts: string[], review: string[] = []): GameWord[] =>
-  texts.map((text, position) => ({ position, text, sentence: null, source: review.includes(text) ? 'review' : 'current', sourceWordId: null }))
+  texts.map((text, position) => ({ position, text, sentence: null, source: review.includes(text) ? 'review' : 'current', sourceWordId: null, difficulty: 'medium' as const }))
 
 /** answers: per word, number of wrong tries before right (3 = strikeout). */
 function game(id: string, listId: string | null, words: string[], wrong: number[], opts: { review?: string[]; mode?: GameRecord['mode']; runs?: number; startedAt?: string } = {}): GameRecord {
@@ -16,7 +16,7 @@ function game(id: string, listId: string | null, words: string[], wrong: number[
   const firstTry = wrong.filter((n) => n === 0).length
   return {
     id, playerId: 'p', listId, mode: opts.mode ?? 'weekly', status: 'complete', words: gw(words, opts.review), attempts, warnings: [],
-    summary: { runs: opts.runs ?? 0, hits: 0, singles: 0, doubles: 0, walks: 0, strikeouts: 0, totalStrikes: 0, firstTry, secondTry: 0, thirdTry: 0, missed: 0,
+    summary: { runs: opts.runs ?? 0, hits: 0, homeRuns: 0, singles: 0, doubles: 0, walks: 0, strikeouts: 0, totalStrikes: 0, firstTry, secondTry: 0, thirdTry: 0, missed: 0,
       firstTryAccuracy: Math.round((firstTry / words.length) * 100), current: { total: 0, firstTry: 0, missed: 0 }, review: { total: 0, firstTry: 0, missed: 0 }, missedWords: [] },
     startedAt: opts.startedAt ?? '2026-10-20T00:00:00Z', completedAt: '2026-10-20T00:10:00Z',
   }
@@ -74,5 +74,13 @@ describe('reviewRetention', () => {
 describe('totals', () => {
   it('counts games, practice sessions, high score and first-try rate', () => {
     expect(totals(games)).toEqual({ games: 3, practice: 1, highScore: 3, firstTryRate: 56 })
+  })
+})
+
+describe('first-try by attempt number', () => {
+  it('counts a first-attempt single (easy word) as first try', () => {
+    const g = game('g9', 'L9', ['sun'], [0])
+    g.attempts = [{ position: 0, attemptNumber: 1, text: 'sun', correct: true, outcome: 'single' }]
+    expect(wordStats([g]).find((w) => w.text === 'sun')!.firstTry).toBe(1)
   })
 })

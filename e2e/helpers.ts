@@ -93,3 +93,13 @@ export async function cleanupFamily(page: Page): Promise<void> {
     /* local mode or already gone */
   }
 }
+
+export async function addWordListWithDifficulty(page: Page, playerId: string, words: [string, 'Easy' | 'Medium' | 'Hard'][]): Promise<void> {
+  await openNewList(page, playerId)
+  const input = page.getByLabel('Type a word and press Enter')
+  for (const [w] of words) { await input.fill(w); await input.press('Enter') }
+  for (const [w, d] of words) await page.getByRole('radio', { name: `${w}: ${d}` }).click()
+  await page.getByRole('button', { name: 'Save list' }).click()
+  await page.waitForURL(new RegExp(`/parent/players/${playerId}/lists$`))
+  await page.getByText('Active', { exact: true }).waitFor()
+}

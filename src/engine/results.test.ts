@@ -9,6 +9,7 @@ const mk = (texts: string[], reviewFrom = Infinity): GameWord[] =>
     sentence: null,
     source: position >= reviewFrom ? 'review' : 'current',
     sourceWordId: null,
+    difficulty: 'medium',
   }))
 
 function play(state: GameState, ...answers: string[]): GameState {
@@ -37,4 +38,14 @@ describe('summarize', () => {
   it('reports 0% accuracy for an empty game rather than NaN', () => {
     expect(summarize(createGame([])).firstTryAccuracy).toBe(0)
   })
+})
+
+it('counts first-try by attempt, not by outcome', () => {
+  const words = (['easy', 'hard'] as const).map((difficulty, position) => ({ position, text: `w${position}`, sentence: null, source: 'current' as const, sourceWordId: null, difficulty }))
+  let s = createGame(words)
+  s = submitAnswer(s, 'w0').state
+  s = submitAnswer(s, 'w1').state
+  const sum = summarize(s)
+  expect(sum.current.firstTry).toBe(2)
+  expect(sum.firstTryAccuracy).toBe(100)
 })

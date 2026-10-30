@@ -1,4 +1,4 @@
-# Cooper's Spelling Slugger
+# Grand Slam Spelling
 
 A baseball video game that runs on weekly spelling words. Kids hear a word, type it, and earn
 doubles, singles, walks, or strikeouts depending on how many tries it takes. Parents manage word
@@ -17,6 +17,8 @@ npm run dev
 With no `.env.local`, the app runs in **local mode**: a fake sign-in and data kept in the browser,
 so you can click through everything without an account. Production builds talk to the app's own API
 (`server/`); see `docs/DEPLOY.md` for running it on Replit.
+
+Set `ALLOW_REGISTRATION=false` (Replit Secrets) once friends have signed up to stop new accounts.
 
 ## Scripts
 

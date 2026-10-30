@@ -46,6 +46,25 @@ async function setup(): Promise<{ store: Store; playerId: string }> {
 }
 
 describe('ListEditorPage', () => {
+  it('tags difficulty, then builds the week with 5 easy review words from last week', async () => {
+    const user = userEvent.setup()
+    const { store, playerId } = await setup()
+    await store.createWordList(playerId, { title: 'last', weekStart: '2026-10-19', words: Array.from({ length: 10 }, (_, i) => ({ text: `old${i}`, sentence: null })) })
+    await user.clear(await screen.findByLabelText('Week starts'))
+    await user.type(screen.getByLabelText('Week starts'), '2026-10-26')
+    for (const t of ['cat', 'dog']) await user.type(screen.getByLabelText('Type a word and press Enter'), `${t}{Enter}`)
+    await user.click(screen.getByRole('radio', { name: 'cat: Hard' }))
+    expect(screen.getByRole('radio', { name: 'dog: Medium' })).toBeChecked()
+    await user.click(screen.getByRole('button', { name: 'Build week' }))
+    expect(await screen.findAllByText('from last week')).toHaveLength(5)
+    await user.click(screen.getByRole('button', { name: 'Save list' }))
+    await screen.findByText('lists index')
+    const saved = (await store.listWordLists(playerId)).find((l) => l.weekStart === '2026-10-26')!
+    expect(saved.words).toHaveLength(7)
+    expect(saved.words.find((w) => w.text === 'cat')!.difficulty).toBe('hard')
+    expect(saved.words.filter((w) => w.source === 'review').every((w) => w.difficulty === 'easy')).toBe(true)
+  })
+
   it('adds a word on Enter, clears and refocuses the input, numbers the rows', async () => {
     const user = userEvent.setup()
     await setup()

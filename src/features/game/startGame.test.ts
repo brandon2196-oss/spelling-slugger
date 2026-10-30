@@ -21,31 +21,19 @@ beforeEach(async () => {
 })
 
 describe('startWeeklyGame', () => {
-  it('uses the active list plus five review words from the preceding week', async () => {
+  it('plays exactly the saved list, shuffled, with no extra review words', async () => {
     await store.createWordList(playerId, { title: 'Oct 12', weekStart: '2026-10-12', words: w('p', 15) })
-    const active = await store.createWordList(playerId, { title: 'Oct 19', weekStart: '2026-10-19', words: w('c', 15) })
+    const words = [...w('c', 15), ...w('p', 5).map((x) => ({ ...x, source: 'review' as const, difficulty: 'easy' as const }))]
+    const active = await store.createWordList(playerId, { title: 'Oct 19', weekStart: '2026-10-19', words })
     const g = await startWeeklyGame(store, playerId, active.id, seededRng(1))
     expect(g.words).toHaveLength(20)
     expect(g.words.filter((x) => x.source === 'review')).toHaveLength(5)
-    expect(g.listId).toBe(active.id)
-    expect(g.mode).toBe('weekly')
+    expect(g.words.find((x) => x.text === 'p0')!.difficulty).toBe('easy')
     expect(g.warnings).toEqual([])
-    expect(g.words.filter((x) => x.source === 'review').every((x) => x.text.startsWith('p'))).toBe(true)
   })
-  it('does not reach back to a list from six weeks ago', async () => {
-    await store.createWordList(playerId, { title: 'Sep 1', weekStart: '2026-09-01', words: w('p', 15) })
+  it('a 15-word list plays 15', async () => {
     const active = await store.createWordList(playerId, { title: 'Oct 19', weekStart: '2026-10-19', words: w('c', 15) })
-    const g = await startWeeklyGame(store, playerId, active.id, seededRng(1))
-    expect(g.words).toHaveLength(15)
-    expect(g.warnings[0]).toMatch(/No previous week/)
-  })
-  it('picks different review words on different starts', async () => {
-    await store.createWordList(playerId, { title: 'Oct 12', weekStart: '2026-10-12', words: w('p', 15) })
-    const active = await store.createWordList(playerId, { title: 'Oct 19', weekStart: '2026-10-19', words: w('c', 15) })
-    const a = await startWeeklyGame(store, playerId, active.id, seededRng(1))
-    const b = await startWeeklyGame(store, playerId, active.id, seededRng(2))
-    const ids = (g: typeof a) => g.words.filter((x) => x.source === 'review').map((x) => x.sourceWordId).sort().join()
-    expect(ids(a)).not.toBe(ids(b))
+    expect((await startWeeklyGame(store, playerId, active.id, seededRng(1))).words).toHaveLength(15)
   })
 })
 

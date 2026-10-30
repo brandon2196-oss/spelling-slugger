@@ -8,6 +8,13 @@
       "Hold onto your hats, folks! There's a storm of spelling rolling into the stadium tonight!",
       "Here we go! First pitch is moments away, and I can feel the electricity in the air!"
     ],
+    "homeRun": [
+      "GONE! {word} is OUTTA HERE! A grand-slam-sized home run!",
+      "Touch 'em all, kid! That one's a HOME RUN!",
+      "SAY GOODBYE! {word} just left the ballpark! HOME RUN!",
+      "Holy smokes, that ball is in the parking lot! HOME RUN, folks!",
+      "Somebody call NASA! {word} is a MOONSHOT! HOME RUN!"
+    ],
     "double": [
       "OH MY STARS! {word} is ROCKETED into the gap! That's a stand-up double!",
       "Would you look at that! A line drive to the wall, and the slugger cruises into second!",
@@ -96,6 +103,13 @@
       "What's up, slugger? Keep it loose, keep it smooth, and let the hits come to you.",
       "Good vibes only at the ballpark tonight. Easy breezy, let's play.",
       "Here we go, friend. Relax your shoulders, trust your swing, and enjoy the ride."
+    ],
+    "homeRun": [
+      "Waaaay back… and gone. Home run, smooth as you like.",
+      "That's a souvenir for somebody. Home run.",
+      "Up, up, and over the wall. Home run, nice and easy.",
+      "Just a gentle little trip around the bases. Home run, baby.",
+      "Sail away, little ball. {word} goes deep. Home run."
     ],
     "double": [
       "Oh yeah, that's a double, baby! Smooth as a wave on a glassy day.",

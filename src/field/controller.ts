@@ -16,7 +16,7 @@ export interface FieldController {
   setBases(b: Bases): void
   playPitch(): Promise<void>
   playStrike(n: 1 | 2 | 3): Promise<void>
-  playHit(outcome: 'single' | 'double', before: Bases, after: Bases, runs: number): Promise<void>
+  playHit(outcome: 'single' | 'double' | 'homeRun', before: Bases, after: Bases, runs: number): Promise<void>
   playWalk(before: Bases, after: Bases, runs: number): Promise<void>
   playInningEnd(nextInning: number): Promise<void>
   playGameOver(runs: number): Promise<void>

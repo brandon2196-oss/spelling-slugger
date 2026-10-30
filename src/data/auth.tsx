@@ -141,6 +141,7 @@ export function authErrorMessage(e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e)
   if (msg === 'INVALID_CREDENTIALS') return "That email or password doesn't match."
   if (msg === 'EMAIL_TAKEN') return 'An account with that email already exists. Try signing in.'
+  if (msg === 'REGISTRATION_CLOSED') return 'Grand Slam Spelling is invite-only right now. Ask the friend who sent you the link.'
   if (msg === 'UNAUTHENTICATED') return 'You are signed out. Please sign in again.'
   if (msg === 'TOO_MANY_ATTEMPTS') return 'Too many tries. Wait a few minutes and try again.'
   if (msg === 'OFFLINE') return "Can't reach the server. Check the connection and try again."

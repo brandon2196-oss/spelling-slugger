@@ -2,7 +2,7 @@ import { EMPTY_BASES } from '../../engine/bases'
 import type { SubmitEvent } from '../../engine/types'
 import { announcementsFor } from './announcements'
 
-const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null }
+const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null, difficulty: 'medium' as const }
 const done = (over: Partial<Extract<SubmitEvent, { kind: 'at-bat-complete' }>>): SubmitEvent => ({
   kind: 'at-bat-complete', outcome: 'double', attempts: [], runsScored: 0, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
   outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word, ...over,
@@ -25,5 +25,11 @@ describe('announcementsFor', () => {
   })
   it('says nothing for ignored input', () => {
     expect(announcementsFor({ kind: 'ignored', reason: 'blank' })).toEqual([])
+  })
+  it('calls a home run', () => {
+    const ev = { kind: 'at-bat-complete', outcome: 'homeRun', attempts: [] as never[], runsScored: 1, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
+      outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'rhythm',
+      word: { position: 0, text: 'rhythm', sentence: null, source: 'current', sourceWordId: null, difficulty: 'hard' } } as const
+    expect(announcementsFor(ev)[0]).toBe('HOME RUN!')
   })
 })

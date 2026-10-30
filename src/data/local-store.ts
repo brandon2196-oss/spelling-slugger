@@ -21,7 +21,14 @@ const empty = (): Blob => ({ players: [], lists: [], games: [], pinHash: null })
 function load(): Blob {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? { ...empty(), ...(JSON.parse(raw) as Partial<Blob>) } : empty()
+    if (!raw) return empty()
+    const b: Blob = { ...empty(), ...(JSON.parse(raw) as Partial<Blob>) }
+    // Normalize words saved before difficulty/source existed.
+    b.lists = b.lists.map((l) => ({
+      ...l, words: l.words.map((w) => ({ ...w, difficulty: w.difficulty ?? 'medium', source: w.source ?? 'current' })),
+    }))
+    b.games = b.games.map((g) => ({ ...g, words: g.words.map((w) => ({ ...w, difficulty: w.difficulty ?? 'medium' })) }))
+    return b
   } catch {
     return empty()
   }
@@ -51,7 +58,10 @@ async function hashPin(pin: string): Promise<string> {
 }
 
 function numberWords(words: NewWord[]): Word[] {
-  return words.map((w, i) => ({ id: uid(), position: i + 1, text: w.text, sentence: w.sentence }))
+  return words.map((w, i) => ({
+    id: uid(), position: i + 1, text: w.text, sentence: w.sentence,
+    difficulty: w.difficulty ?? 'medium', source: w.source ?? 'current',
+  }))
 }
 
 const byWeekDesc = (a: WordList, b: WordList): number => (a.weekStart < b.weekStart ? 1 : a.weekStart > b.weekStart ? -1 : 0)

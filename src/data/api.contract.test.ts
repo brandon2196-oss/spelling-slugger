@@ -69,7 +69,7 @@ describe('ApiAuth + ApiStore against the server', () => {
 
     const g = await store.createGame({
       playerId: p.id, listId: list.id, mode: 'weekly',
-      words: [{ position: 0, text: 'cat', sentence: null, source: 'current', sourceWordId: list.words[0]!.id }], warnings: [],
+      words: [{ position: 0, text: 'cat', sentence: null, source: 'current', sourceWordId: list.words[0]!.id, difficulty: 'medium' as const }], warnings: [],
     })
     expect((await store.findInProgressGame(p.id))?.id).toBe(g.id)
     await store.recordAttempt(g.id, { position: 0, attemptNumber: 1, text: 'cat', correct: true, outcome: 'double' })

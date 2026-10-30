@@ -27,7 +27,8 @@ function advanceAll(bases: Bases, n: number): { bases: Bases; runs: number } {
     else after[dest] = true
   })
   // Batter: starts at "home" (index -1) and ends at n - 1.
-  after[n - 1] = true
+  if (n <= 3) after[n - 1] = true
+  else runs += 1
   return { bases: fromArray(after), runs }
 }
 
@@ -54,6 +55,8 @@ export function advance(bases: Bases, outcome: Outcome): { bases: Bases; runs: n
       return advanceAll(bases, 2)
     case 'walk':
       return walk(bases)
+    case 'homeRun':
+      return advanceAll(bases, 4)
     case 'strikeout':
       return { bases: { ...bases }, runs: 0 }
   }
