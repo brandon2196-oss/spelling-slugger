@@ -64,14 +64,14 @@ export async function playSequence(
       break
     default: {
       sfx.crack()
-      if (event.outcome === 'homeRun') sfx.cheer()
+      // One crowd cheer per play, only for the big moments: a home run or 2+ runs.
+      if (event.outcome === 'homeRun' || event.runsScored >= 2) sfx.cheer()
       const hit = event.outcome
       await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
     } // HOME RUN! / DOUBLE! / BASE HIT!
   }
 
   if (event.runsScored > 0) {
-    sfx.cheer()
     sfx.organ('charge')
     await moment(event.runsScored === 1 ? 'run' : 'runs') // RUN SCORED! / N RUNS SCORED!
   }

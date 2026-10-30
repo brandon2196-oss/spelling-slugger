@@ -29,13 +29,25 @@ function recorder() {
 }
 
 describe('playSequence', () => {
-  it('a double with a run: pitch, hit, cheer with the organ charge, no inning end', async () => {
+  it('a double with one run: pitch, hit, organ charge, no cheer, no inning end', async () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'double', runsScored: 1 }), r.commentary)
     expect(r.calls).toEqual([
       'playPitch', 'sfx.crack', 'playHit', 'announce(DOUBLE!)', 'say(double)',
-      'sfx.cheer', 'sfx.organ(charge)', 'announce(RUN SCORED!)', 'say(run)',
+      'sfx.organ(charge)', 'announce(RUN SCORED!)', 'say(run)',
     ])
+  })
+  it('crowd cheers once on 2+ runs', async () => {
+    const r = recorder()
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'single', runsScored: 2 }), r.commentary)
+    expect(r.calls.filter((c) => c === 'sfx.cheer')).toHaveLength(1)
+  })
+  it('crowd cheers once on a home run, even when runs score', async () => {
+    for (const runsScored of [1, 4]) {
+      const r = recorder()
+      await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'homeRun', runsScored }), r.commentary)
+      expect(r.calls.filter((c) => c === 'sfx.cheer')).toHaveLength(1)
+    }
   })
   it('more than one run uses the plural commentary and passes the count', async () => {
     const r = recorder()
