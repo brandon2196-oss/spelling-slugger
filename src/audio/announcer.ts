@@ -156,6 +156,9 @@ export function setAnnouncerPlayerForTests(p: ClipPlayer | null): void {
   player = p ?? defaultClips
 }
 
+/** Per-booth trim so Big Red and Smooth Eddie sit within 1 dB of each other (measured in Task 7). */
+export const ANNOUNCER_GAIN_DB: Record<Exclude<AnnouncerId, 'quiet'>, number> = { bigRed: 0, smoothEddie: 0 }
+
 /**
  * Play one baked line for the event as the given announcer. Resolves when done. Quiet booth, missing
  * clip, or muted player all resolve without sound (and without falling back to browser TTS).
@@ -169,7 +172,7 @@ export async function sayAs(id: AnnouncerId, event: AnnounceEvent, ctx: Commenta
   if (!url) return
   emit({ speaking: true, line: pick.text })
   try {
-    await player.play(url)
+    await player.play(url, { bus: 'voice', gain: 10 ** (ANNOUNCER_GAIN_DB[id as Exclude<AnnouncerId, 'quiet'>] / 20) })
   } catch {
     /* play never throws, but never leave the booth stuck "speaking" */
   } finally {

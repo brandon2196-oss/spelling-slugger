@@ -18,6 +18,9 @@ vi.mock('../../audio/speech', () => ({
   primeSpeech: vi.fn(),
   setSpeechVolume: vi.fn(),
   availableVoices: () => [],
+  setSpeechDucker: vi.fn(),
+  getSpeechVolume: () => 1,
+  stopSpeech: vi.fn(),
 }))
 vi.mock('../../field/Field', () => ({ Field: () => <div data-testid="field" /> }))
 
