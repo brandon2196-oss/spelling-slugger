@@ -27,7 +27,8 @@ export function readAudioSettings(): AudioSettings {
   }
 }
 
-function apply(s: AudioSettings): void {
+/** Speaker mute silences everything (ambience too). Quiet Booth (announcer 'quiet') removes only voices. */
+export function applyAudioSettings(s: AudioSettings): void {
   const v = s.muted ? 0 : s.volume
   setSpeechVolume(v)
   sfx.setVolume(v)
@@ -38,7 +39,7 @@ function apply(s: AudioSettings): void {
 
 export function useAudioSettings() {
   const [settings, setSettings] = useState<AudioSettings>(readAudioSettings)
-  useEffect(() => apply(settings), [settings])
+  useEffect(() => applyAudioSettings(settings), [settings])
   const set = useCallback((patch: Partial<AudioSettings>) => {
     setSettings((prev) => {
       const next = { ...prev, ...patch }

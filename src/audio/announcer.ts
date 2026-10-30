@@ -157,7 +157,7 @@ export function setAnnouncerPlayerForTests(p: ClipPlayer | null): void {
 }
 
 /** Per-booth trim so Big Red and Smooth Eddie sit within 1 dB of each other (measured in Task 7). */
-export const ANNOUNCER_GAIN_DB: Record<Exclude<AnnouncerId, 'quiet'>, number> = { bigRed: 0, smoothEddie: 0 }
+export const ANNOUNCER_GAIN_DB: Record<Exclude<AnnouncerId, 'quiet'>, number> = { bigRed: 0, smoothEddie: 1.5 }
 
 /**
  * Play one baked line for the event as the given announcer. Resolves when done. Quiet booth, missing

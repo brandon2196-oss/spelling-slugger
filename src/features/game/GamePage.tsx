@@ -18,6 +18,8 @@ import { LetterHint } from './LetterHint'
 import { SpellingInput } from './SpellingInput'
 import { breathExtraMs, wait } from './timing'
 import { useGameSession } from './useGameSession'
+import { ambienceFor } from '../../audio/layering'
+import { EMPTY_BASES } from '../../engine/bases'
 
 const ANNOUNCE_MS = 1100
 const Field = lazy(() => import('../../field/Field').then((m) => ({ default: m.Field })))
@@ -62,6 +64,11 @@ export function GamePage() {
   useEffect(() => {
     if (state && fieldBases === null) setFieldBases(state.bases)
   }, [state, fieldBases])
+  // Crowd bed: low with the bases empty, high with anyone on, off when leaving the game screen.
+  useEffect(() => {
+    sfx.ambience(ambienceFor(fieldBases ?? EMPTY_BASES))
+  }, [fieldBases])
+  useEffect(() => () => sfx.ambience('off'), [])
 
   const hear = useCallback(
     (how: 'word' | 'slow' | 'sentence') => {

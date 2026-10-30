@@ -1,4 +1,5 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { sfx } from '../../audio/sfx'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { createLocalStore } from '../../data/local-store'
@@ -101,5 +102,14 @@ describe('GamePage', () => {
     const input = await screen.findByRole('textbox')
     await user.type(input, `${words[0]}{Enter}`)
     await screen.findByText('results page')
+  })
+  it('starts the crowd bed low on mount and stops it on unmount', async () => {
+    const amb = vi.spyOn(sfx, 'ambience')
+    await setup(['pterodactyl', 'xylophone'])
+    await screen.findByRole('textbox')
+    expect(amb).toHaveBeenCalledWith('low')
+    cleanup()
+    expect(amb).toHaveBeenLastCalledWith('off')
+    amb.mockRestore()
   })
 })
