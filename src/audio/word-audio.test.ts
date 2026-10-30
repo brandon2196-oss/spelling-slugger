@@ -1,30 +1,12 @@
+import { fakeClipPlayer } from '../test/fakeClipPlayer'
 import { clipHash } from './word-audio-profile'
 import * as speech from './speech'
 
 vi.mock('./speech', async (orig) => {
   const real = await orig<typeof import('./speech')>()
-  return { ...real, speakWord: vi.fn(async () => {}), speakSlowly: vi.fn(async () => {}), speakSentence: vi.fn(async () => {}), stopSpeech: vi.fn() }
+  return { ...real, speakWord: vi.fn(async () => {}), speakSlowly: vi.fn(async () => {}), speakSentence: vi.fn(async () => {}), stopSpeech: vi.fn(), setSpeechDucker: vi.fn() }
 })
-import { enableBakedWordAudio, sayWord, type ClipPlayer } from './word-audio'
-
-function fakePlayers(behave: (url: string) => 'ok' | 'fail') {
-  const urls: string[] = []
-  const make = (url: string): ClipPlayer => {
-    urls.push(url)
-    const handlers: Record<string, () => void> = {}
-    return {
-      volume: 1,
-      pause: vi.fn(),
-      addEventListener: (t, fn) => { handlers[t] = fn },
-      play: () => {
-        if (behave(url) === 'fail') return Promise.reject(new Error('404'))
-        setTimeout(() => handlers.ended?.(), 0)
-        return Promise.resolve()
-      },
-    }
-  }
-  return { urls, make }
-}
+import { enableBakedWordAudio, sayWord } from './word-audio'
 
 describe('sayWord', () => {
   beforeEach(() => {
@@ -32,41 +14,52 @@ describe('sayWord', () => {
     speech.setSpeechVolume(1)
   })
 
-  it('plays the baked clip and skips browser speech', async () => {
-    const say = vi.mocked(speech.speakWord)
-    const p = fakePlayers(() => 'ok')
-    enableBakedWordAudio(true, p.make)
+  it('plays the baked clip on the voice bus and skips browser speech', async () => {
+    const p = fakeClipPlayer()
+    enableBakedWordAudio(true, p)
     await sayWord('word', 'rhythm')
-    expect(p.urls).toEqual([`/audio/words/${await clipHash('word', 'rhythm')}.mp3`])
-    expect(say).not.toHaveBeenCalled()
+    expect(p.played).toEqual([{ url: `/audio/words/${await clipHash('word', 'rhythm')}.mp3`, bus: 'voice', gain: 1 }])
+    expect(p.stopBus).toHaveBeenCalledWith('voice')
+    expect(speech.speakWord).not.toHaveBeenCalled()
   })
 
   it('falls back to browser speech when the clip is missing, and does not refetch right away', async () => {
-    const slow = vi.mocked(speech.speakSlowly)
-    const p = fakePlayers(() => 'fail')
-    enableBakedWordAudio(true, p.make)
+    const p = fakeClipPlayer({ missing: () => true })
+    enableBakedWordAudio(true, p)
     await sayWord('slow', 'yacht')
     await sayWord('slow', 'yacht')
-    expect(slow).toHaveBeenCalledTimes(2)
-    expect(p.urls).toHaveLength(1)
+    expect(speech.speakSlowly).toHaveBeenCalledTimes(2)
+    expect(p.load).toHaveBeenCalledTimes(1)
   })
 
   it('uses browser speech only in local mode', async () => {
-    const sent = vi.mocked(speech.speakSentence)
-    const p = fakePlayers(() => 'ok')
-    enableBakedWordAudio(false, p.make)
+    const p = fakeClipPlayer()
+    enableBakedWordAudio(false, p)
     await sayWord('sentence', 'The cat sat.')
-    expect(p.urls).toHaveLength(0)
-    expect(sent).toHaveBeenCalledWith('The cat sat.')
+    expect(p.played).toHaveLength(0)
+    expect(speech.speakSentence).toHaveBeenCalledWith('The cat sat.')
   })
 
-  it('stays silent-path when muted (browser speech handles mute)', async () => {
+  it('stays on the silent path when muted (browser speech handles mute)', async () => {
     speech.setSpeechVolume(0)
-    const say = vi.mocked(speech.speakWord)
-    const p = fakePlayers(() => 'ok')
-    enableBakedWordAudio(true, p.make)
+    const p = fakeClipPlayer()
+    enableBakedWordAudio(true, p)
     await sayWord('word', 'cat')
-    expect(p.urls).toHaveLength(0)
-    expect(say).toHaveBeenCalled()
+    expect(p.played).toHaveLength(0)
+    expect(speech.speakWord).toHaveBeenCalled()
+  })
+
+  it('a clip that never ends cannot lock input', async () => {
+    vi.useFakeTimers()
+    const p = fakeClipPlayer({ hold: true })
+    enableBakedWordAudio(true, p)
+    let done = false
+    const run = sayWord('word', 'cat').then(() => { done = true })
+    // clipHash uses crypto.subtle, which resolves off the fake clock; wait for play before advancing.
+    await vi.waitUntil(() => vi.mocked(p.play).mock.calls.length > 0)
+    await vi.advanceTimersByTimeAsync(10_001)
+    await run
+    expect(done).toBe(true)
+    vi.useRealTimers()
   })
 })

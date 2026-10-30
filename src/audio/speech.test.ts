@@ -128,4 +128,26 @@ describe('speech wrapper', () => {
     expect(speechAvailable()).toBe(false)
     await expect(speak('x')).rejects.toThrow()
   })
+  it('ducks the mixer while an utterance is actually speaking', async () => {
+    const { speak, setSpeechDucker } = await import('./speech')
+    const d = { duckStart: vi.fn(), duckEnd: vi.fn() }
+    setSpeechDucker(d)
+    const p = speak('baseball')
+    expect(d.duckStart).not.toHaveBeenCalled()
+    fake.spoken[0]!.onstart!()
+    expect(d.duckStart).toHaveBeenCalledTimes(1)
+    fake.spoken[0]!.onend!()
+    await p
+    expect(d.duckEnd).toHaveBeenCalledTimes(1)
+  })
+
+  it('never ends a duck it did not start (no onstart before error)', async () => {
+    const { speak, setSpeechDucker } = await import('./speech')
+    const d = { duckStart: vi.fn(), duckEnd: vi.fn() }
+    setSpeechDucker(d)
+    const p = speak('baseball')
+    fake.spoken[0]!.onerror!({})
+    await p
+    expect(d.duckEnd).not.toHaveBeenCalled()
+  })
 })

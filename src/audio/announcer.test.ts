@@ -1,7 +1,8 @@
 import { afterEach, beforeEach } from 'vitest'
 import { setManifestForTests, type Manifest } from './manifest'
 import type { ClipPlayer } from './clips'
-import { ANNOUNCERS, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, pickLineIndex, previewLine, sayAs, setAnnouncerPlayerForTests, type AnnounceEvent, type AnnouncerId, type CommentaryContext } from './announcer'
+import { fakeClipPlayer } from '../test/fakeClipPlayer'
+import { ANNOUNCERS, ANNOUNCER_GAIN_DB, ANNOUNCE_EVENTS, announcerState, lineFor, pickAnnouncerVoice, pickLineIndex, previewLine, sayAs, setAnnouncerPlayerForTests, type AnnounceEvent, type AnnouncerId, type CommentaryContext } from './announcer'
 
 type Utter = { text: string; rate: number; pitch: number; volume: number; voice: unknown; onstart: null | (() => void); onend: null | (() => void); onerror: null | ((e: unknown) => void) }
 
@@ -160,10 +161,8 @@ describe('sayAs', () => {
   beforeEach(() => {
     played = []
     finish = []
-    player = {
-      load: vi.fn(async () => {}), preload: vi.fn(async () => {}), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(),
-      play: vi.fn((url: string) => { played.push(url); return new Promise<void>((r) => finish.push(r)) }),
-    }
+    player = fakeClipPlayer()
+    vi.mocked(player.play).mockImplementation((url: string) => { played.push(url); return new Promise<void>((r) => finish.push(r)) })
     setAnnouncerPlayerForTests(player)
     setManifestForTests(fullManifest())
     fake = installFakeSpeech([{ name: 'Daniel', lang: 'en-GB' }])
@@ -222,6 +221,13 @@ describe('sayAs', () => {
   it('previewLine is a no-op for the quiet booth', async () => {
     await previewLine('quiet')
     expect(player.play).not.toHaveBeenCalled()
+  })
+  it('plays booth lines on the voice bus at the announcer level-match gain', async () => {
+    const p = sayAs('smoothEddie', 'double', ctx)
+    await flush()
+    expect(player.play).toHaveBeenCalledWith(expect.stringMatching(/smoothEddie\//), { bus: 'voice', gain: 10 ** (ANNOUNCER_GAIN_DB.smoothEddie / 20) })
+    finish[0]!()
+    await p
   })
 })
 

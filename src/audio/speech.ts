@@ -3,6 +3,16 @@
  * resolves when the utterance ends. `primeSpeech()` must be called from a user gesture once on iOS.
  */
 
+/** Browser speech cannot enter the WebAudio graph; it only holds the mixer duck while it talks. */
+export interface SpeechDucker {
+  duckStart(): void
+  duckEnd(): void
+}
+let ducker: SpeechDucker | null = null
+export function setSpeechDucker(d: SpeechDucker | null): void {
+  ducker = d
+}
+
 export interface SpeakOptions {
   rate?: number
   pitch?: number
@@ -72,11 +82,19 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
     u.lang = 'en-US'
     const voice = opts.voice ?? pickVoice(s)
     if (voice) u.voice = voice
-    if (opts.onStart) u.onstart = () => opts.onStart?.()
+    let ducked = false
+    u.onstart = () => {
+      if (!ducked) {
+        ducked = true
+        ducker?.duckStart()
+      }
+      opts.onStart?.()
+    }
     let done = false
     const finish = () => {
       if (done) return
       done = true
+      if (ducked) ducker?.duckEnd()
       if (finishCurrent === finish) finishCurrent = null
       resolve()
     }

@@ -41,7 +41,8 @@ describe('Sfx', () => {
     s.enabled = true
     expect(() => {
       s.unlock(); s.setVolume(0.5)
-      s.crack(); s.whiff(); s.cheer(); s.walkChime(); s.strikeBuzz(); s.fanfare(); s.groan()
+      s.crack(); s.crackHomeRun(); s.whiff(); s.mitt(); s.umpStrike(); s.umpStrike3(); s.umpBall4(); s.ballWall()
+      s.cheerSmall(); s.cheerBig(); s.cheerHr(); s.fanfare(); s.groan(); s.ambience('low'); s.ambience('off')
       s.organ('charge'); s.organ('inning'); s.organ('walkup')
     }).not.toThrow()
   })
