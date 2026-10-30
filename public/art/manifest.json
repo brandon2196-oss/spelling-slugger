@@ -1,6 +1,6 @@
 {
-  "_comment": "Phase 0 empty manifest. Every expected file is listed with status missing. Paths are relative to public/. Batter frames follow the pattern art/batter/<clip>/<frame>-<layer>.png where frame is zero padded to 2 digits (00, 01, ...), one PNG per layer per frame, all 256x256 at 2x delivery. Coordinates are game pixels in the 1280x960 frame and are null until the stadium art lands. See docs/art/ART-CONTRACT.md.",
-  "version": 0,
+  "_comment": "Written by npm run pack-art from art-src/ (see scripts/pack-art). Paths are relative to public/. Assets marked missing were never generated; the game draws placeholders for them. Do not hand-edit statuses; rerun pack-art.",
+  "version": 1,
   "gameSize": {
     "width": 1280,
     "height": 960
@@ -22,89 +22,322 @@
     "layers": {
       "sky": {
         "path": "art/stadium/sky.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "outfield-wall": {
         "path": "art/stadium/outfield-wall.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "stands-far": {
         "path": "art/stadium/stands-far.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "grass": {
         "path": "art/stadium/grass.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "dirt": {
         "path": "art/stadium/dirt.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "chalk": {
         "path": "art/stadium/chalk.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "bases": {
         "path": "art/stadium/bases.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "dugout-near": {
         "path": "art/stadium/dugout-near.png",
-        "status": "missing"
+        "status": "ready",
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       },
       "foreground-fence": {
         "path": "art/stadium/foreground-fence.png",
         "status": "missing",
-        "optional": true
+        "optional": true,
+        "size": {
+          "width": 1024,
+          "height": 768
+        }
       }
     },
     "bases": {
       "home": {
         "path": "art/stadium/bases-home.png",
-        "status": "missing"
+        "status": "ready",
+        "at": {
+          "x": 640,
+          "y": 840
+        }
       },
       "first": {
         "path": "art/stadium/bases-first.png",
-        "status": "missing"
+        "status": "ready",
+        "at": {
+          "x": 972,
+          "y": 672
+        }
       },
       "second": {
         "path": "art/stadium/bases-second.png",
-        "status": "missing"
+        "status": "ready",
+        "at": {
+          "x": 640,
+          "y": 575
+        }
       },
       "third": {
         "path": "art/stadium/bases-third.png",
-        "status": "missing"
+        "status": "ready",
+        "at": {
+          "x": 308,
+          "y": 672
+        }
       }
     }
   },
   "coordinates": {
-    "homePlate": null,
-    "first": null,
-    "second": null,
-    "third": null,
-    "mound": null,
-    "batterBoxLeft": null,
-    "batterBoxRight": null,
-    "catcher": null,
-    "umpire": null,
-    "fielders": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "outfieldWallTop": [],
-    "scoreboardPanel": {
-      "x": null,
-      "y": null,
-      "width": null,
-      "height": null
+    "homePlate": {
+      "x": 640,
+      "y": 840
     },
-    "ballLeavesYard": null,
-    "_schema": "Points are {\"x\":number,\"y\":number}. fielders is 7 points in order: first base, second base, shortstop, third base, left field, center field, right field. outfieldWallTop is an array of points left to right. scoreboardPanel is a rect."
+    "first": {
+      "x": 972,
+      "y": 672
+    },
+    "second": {
+      "x": 640,
+      "y": 575
+    },
+    "third": {
+      "x": 308,
+      "y": 672
+    },
+    "mound": {
+      "x": 640,
+      "y": 682
+    },
+    "batterBoxLeft": {
+      "x": 594,
+      "y": 844
+    },
+    "batterBoxRight": {
+      "x": 686,
+      "y": 844
+    },
+    "catcher": {
+      "x": 640,
+      "y": 880
+    },
+    "umpire": {
+      "x": 690,
+      "y": 913
+    },
+    "fielders": [
+      {
+        "x": 932,
+        "y": 627
+      },
+      {
+        "x": 789,
+        "y": 584
+      },
+      {
+        "x": 491,
+        "y": 584
+      },
+      {
+        "x": 348,
+        "y": 627
+      },
+      {
+        "x": 278,
+        "y": 536
+      },
+      {
+        "x": 640,
+        "y": 506
+      },
+      {
+        "x": 1002,
+        "y": 536
+      }
+    ],
+    "outfieldWallTop": [
+      {
+        "x": 0,
+        "y": 469
+      },
+      {
+        "x": 40,
+        "y": 460
+      },
+      {
+        "x": 80,
+        "y": 454
+      },
+      {
+        "x": 120,
+        "y": 447
+      },
+      {
+        "x": 160,
+        "y": 441
+      },
+      {
+        "x": 200,
+        "y": 436
+      },
+      {
+        "x": 240,
+        "y": 431
+      },
+      {
+        "x": 280,
+        "y": 426
+      },
+      {
+        "x": 320,
+        "y": 422
+      },
+      {
+        "x": 360,
+        "y": 419
+      },
+      {
+        "x": 400,
+        "y": 416
+      },
+      {
+        "x": 440,
+        "y": 414
+      },
+      {
+        "x": 480,
+        "y": 411
+      },
+      {
+        "x": 520,
+        "y": 410
+      },
+      {
+        "x": 560,
+        "y": 407
+      },
+      {
+        "x": 600,
+        "y": 407
+      },
+      {
+        "x": 640,
+        "y": 406
+      },
+      {
+        "x": 680,
+        "y": 407
+      },
+      {
+        "x": 720,
+        "y": 407
+      },
+      {
+        "x": 760,
+        "y": 409
+      },
+      {
+        "x": 800,
+        "y": 411
+      },
+      {
+        "x": 840,
+        "y": 412
+      },
+      {
+        "x": 880,
+        "y": 416
+      },
+      {
+        "x": 920,
+        "y": 419
+      },
+      {
+        "x": 960,
+        "y": 422
+      },
+      {
+        "x": 1000,
+        "y": 426
+      },
+      {
+        "x": 1040,
+        "y": 431
+      },
+      {
+        "x": 1080,
+        "y": 436
+      },
+      {
+        "x": 1120,
+        "y": 441
+      },
+      {
+        "x": 1160,
+        "y": 447
+      },
+      {
+        "x": 1200,
+        "y": 454
+      },
+      {
+        "x": 1240,
+        "y": 460
+      }
+    ],
+    "scoreboardPanel": {
+      "x": 520,
+      "y": 195,
+      "width": 280,
+      "height": 95
+    },
+    "ballLeavesYard": {
+      "x": 640,
+      "y": 366
+    },
+    "_schema": "Points are {\"x\":number,\"y\":number}. fielders is 7 points in order: first base, second base, shortstop, third base, left field, center field, right field. outfieldWallTop is an array of points left to right. scoreboardPanel is a rect.",
+    "_derived": "Bases are measured from stadium/bases.png. Mound, boxes, catcher, umpire and fielders are placed on that diamond by pack-art; wall top and scoreboard come from outfield-wall.png. Tune here if anything looks off."
   },
   "batter": {
     "fps": 12,
@@ -300,113 +533,96 @@
       },
       "swing-contact": {
         "frames": 8,
-        "status": "missing",
+        "status": "ready",
         "files": [
+          "art/batter/swing-contact/00-shoes-bat-glove.png",
           "art/batter/swing-contact/00-outline.png",
+          "art/batter/swing-contact/00-hat-brim.png",
+          "art/batter/swing-contact/00-hat.png",
           "art/batter/swing-contact/00-skin.png",
-          "art/batter/swing-contact/00-hair-short.png",
-          "art/batter/swing-contact/00-hair-long.png",
-          "art/batter/swing-contact/00-hair-curly.png",
-          "art/batter/swing-contact/00-hair-buzz.png",
           "art/batter/swing-contact/00-jersey.png",
+          "art/batter/swing-contact/00-hair-short.png",
           "art/batter/swing-contact/00-trim.png",
           "art/batter/swing-contact/00-pants.png",
-          "art/batter/swing-contact/00-hat.png",
-          "art/batter/swing-contact/00-hat-brim.png",
-          "art/batter/swing-contact/00-number.png",
-          "art/batter/swing-contact/00-shoes-bat-glove.png",
+          "art/batter/swing-contact/01-shoes-bat-glove.png",
+          "art/batter/swing-contact/01-hat.png",
           "art/batter/swing-contact/01-outline.png",
+          "art/batter/swing-contact/01-hat-brim.png",
           "art/batter/swing-contact/01-skin.png",
-          "art/batter/swing-contact/01-hair-short.png",
-          "art/batter/swing-contact/01-hair-long.png",
-          "art/batter/swing-contact/01-hair-curly.png",
-          "art/batter/swing-contact/01-hair-buzz.png",
           "art/batter/swing-contact/01-jersey.png",
+          "art/batter/swing-contact/01-hair-short.png",
           "art/batter/swing-contact/01-trim.png",
           "art/batter/swing-contact/01-pants.png",
-          "art/batter/swing-contact/01-hat.png",
-          "art/batter/swing-contact/01-hat-brim.png",
-          "art/batter/swing-contact/01-number.png",
-          "art/batter/swing-contact/01-shoes-bat-glove.png",
+          "art/batter/swing-contact/02-shoes-bat-glove.png",
           "art/batter/swing-contact/02-outline.png",
-          "art/batter/swing-contact/02-skin.png",
-          "art/batter/swing-contact/02-hair-short.png",
-          "art/batter/swing-contact/02-hair-long.png",
-          "art/batter/swing-contact/02-hair-curly.png",
-          "art/batter/swing-contact/02-hair-buzz.png",
-          "art/batter/swing-contact/02-jersey.png",
-          "art/batter/swing-contact/02-trim.png",
-          "art/batter/swing-contact/02-pants.png",
           "art/batter/swing-contact/02-hat.png",
           "art/batter/swing-contact/02-hat-brim.png",
-          "art/batter/swing-contact/02-number.png",
-          "art/batter/swing-contact/02-shoes-bat-glove.png",
+          "art/batter/swing-contact/02-skin.png",
+          "art/batter/swing-contact/02-jersey.png",
+          "art/batter/swing-contact/02-hair-short.png",
+          "art/batter/swing-contact/02-trim.png",
+          "art/batter/swing-contact/02-pants.png",
+          "art/batter/swing-contact/03-shoes-bat-glove.png",
           "art/batter/swing-contact/03-outline.png",
-          "art/batter/swing-contact/03-skin.png",
-          "art/batter/swing-contact/03-hair-short.png",
-          "art/batter/swing-contact/03-hair-long.png",
-          "art/batter/swing-contact/03-hair-curly.png",
-          "art/batter/swing-contact/03-hair-buzz.png",
-          "art/batter/swing-contact/03-jersey.png",
-          "art/batter/swing-contact/03-trim.png",
-          "art/batter/swing-contact/03-pants.png",
           "art/batter/swing-contact/03-hat.png",
           "art/batter/swing-contact/03-hat-brim.png",
-          "art/batter/swing-contact/03-number.png",
-          "art/batter/swing-contact/03-shoes-bat-glove.png",
+          "art/batter/swing-contact/03-skin.png",
+          "art/batter/swing-contact/03-jersey.png",
+          "art/batter/swing-contact/03-hair-short.png",
+          "art/batter/swing-contact/03-trim.png",
+          "art/batter/swing-contact/03-pants.png",
+          "art/batter/swing-contact/04-shoes-bat-glove.png",
           "art/batter/swing-contact/04-outline.png",
+          "art/batter/swing-contact/04-hat.png",
+          "art/batter/swing-contact/04-hat-brim.png",
           "art/batter/swing-contact/04-skin.png",
           "art/batter/swing-contact/04-hair-short.png",
-          "art/batter/swing-contact/04-hair-long.png",
-          "art/batter/swing-contact/04-hair-curly.png",
-          "art/batter/swing-contact/04-hair-buzz.png",
           "art/batter/swing-contact/04-jersey.png",
           "art/batter/swing-contact/04-trim.png",
           "art/batter/swing-contact/04-pants.png",
-          "art/batter/swing-contact/04-hat.png",
-          "art/batter/swing-contact/04-hat-brim.png",
-          "art/batter/swing-contact/04-number.png",
-          "art/batter/swing-contact/04-shoes-bat-glove.png",
+          "art/batter/swing-contact/05-shoes-bat-glove.png",
+          "art/batter/swing-contact/05-hat.png",
           "art/batter/swing-contact/05-outline.png",
+          "art/batter/swing-contact/05-hat-brim.png",
           "art/batter/swing-contact/05-skin.png",
-          "art/batter/swing-contact/05-hair-short.png",
-          "art/batter/swing-contact/05-hair-long.png",
-          "art/batter/swing-contact/05-hair-curly.png",
-          "art/batter/swing-contact/05-hair-buzz.png",
           "art/batter/swing-contact/05-jersey.png",
+          "art/batter/swing-contact/05-hair-short.png",
           "art/batter/swing-contact/05-trim.png",
           "art/batter/swing-contact/05-pants.png",
-          "art/batter/swing-contact/05-hat.png",
-          "art/batter/swing-contact/05-hat-brim.png",
-          "art/batter/swing-contact/05-number.png",
-          "art/batter/swing-contact/05-shoes-bat-glove.png",
+          "art/batter/swing-contact/06-shoes-bat-glove.png",
           "art/batter/swing-contact/06-outline.png",
-          "art/batter/swing-contact/06-skin.png",
-          "art/batter/swing-contact/06-hair-short.png",
-          "art/batter/swing-contact/06-hair-long.png",
-          "art/batter/swing-contact/06-hair-curly.png",
-          "art/batter/swing-contact/06-hair-buzz.png",
-          "art/batter/swing-contact/06-jersey.png",
-          "art/batter/swing-contact/06-trim.png",
-          "art/batter/swing-contact/06-pants.png",
           "art/batter/swing-contact/06-hat.png",
           "art/batter/swing-contact/06-hat-brim.png",
-          "art/batter/swing-contact/06-number.png",
-          "art/batter/swing-contact/06-shoes-bat-glove.png",
-          "art/batter/swing-contact/07-outline.png",
-          "art/batter/swing-contact/07-skin.png",
-          "art/batter/swing-contact/07-hair-short.png",
-          "art/batter/swing-contact/07-hair-long.png",
-          "art/batter/swing-contact/07-hair-curly.png",
-          "art/batter/swing-contact/07-hair-buzz.png",
-          "art/batter/swing-contact/07-jersey.png",
-          "art/batter/swing-contact/07-trim.png",
-          "art/batter/swing-contact/07-pants.png",
+          "art/batter/swing-contact/06-jersey.png",
+          "art/batter/swing-contact/06-skin.png",
+          "art/batter/swing-contact/06-hair-short.png",
+          "art/batter/swing-contact/06-trim.png",
+          "art/batter/swing-contact/06-pants.png",
+          "art/batter/swing-contact/07-shoes-bat-glove.png",
           "art/batter/swing-contact/07-hat.png",
+          "art/batter/swing-contact/07-outline.png",
           "art/batter/swing-contact/07-hat-brim.png",
-          "art/batter/swing-contact/07-number.png",
-          "art/batter/swing-contact/07-shoes-bat-glove.png"
-        ]
+          "art/batter/swing-contact/07-skin.png",
+          "art/batter/swing-contact/07-jersey.png",
+          "art/batter/swing-contact/07-hair-short.png",
+          "art/batter/swing-contact/07-trim.png",
+          "art/batter/swing-contact/07-pants.png"
+        ],
+        "delivered": {
+          "frames": 8,
+          "frameSize": {
+            "width": 177,
+            "height": 120
+          },
+          "contactFrame": 4
+        },
+        "missingLayers": [
+          "hair-long",
+          "hair-curly",
+          "hair-buzz",
+          "number"
+        ],
+        "_note": "Packed from one flat Gemini drawing split by hue (brief 3.3.1). The drawn hair is the only hairstyle and ships as hair-short. Layers listed in missingLayers have no pixels; the game skips them."
       },
       "take-walk": {
         "frames": 6,
@@ -811,114 +1027,178 @@
   "pitcher": {
     "image": {
       "path": "art/pitcher.png",
-      "status": "missing"
+      "status": "ready"
     },
     "data": {
       "path": "art/pitcher.json",
-      "status": "missing"
+      "status": "ready"
     },
     "fps": 12,
     "clips": {
       "pitcher-idle": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       },
       "pitcher-windup-throw": {
-        "frames": 10
+        "frames": 10,
+        "delivered": {
+          "frames": 10
+        }
       },
       "pitcher-react-hit": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       }
     },
-    "pitcherWindupReleaseFrame": 7
+    "pitcherWindupReleaseFrame": 7,
+    "frameSize": {
+      "width": 159,
+      "height": 186
+    }
   },
   "fielders": {
     "image": {
       "path": "art/fielders.png",
-      "status": "missing"
+      "status": "ready"
     },
     "data": {
       "path": "art/fielders.json",
-      "status": "missing"
+      "status": "ready"
     },
     "fps": 12,
     "clips": {
       "fielder-idle": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4,
+          "bodyTypes": [
+            "a",
+            "b"
+          ]
+        }
       },
       "fielder-chase": {
-        "frames": 6
+        "frames": 6,
+        "delivered": {
+          "frames": 6,
+          "bodyTypes": [
+            "a",
+            "b"
+          ]
+        }
       },
       "fielder-catch": {
-        "frames": 6
+        "frames": 6,
+        "delivered": {
+          "frames": 6,
+          "bodyTypes": [
+            "a",
+            "b"
+          ]
+        }
       },
       "fielder-watch-hr": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4,
+          "bodyTypes": [
+            "a",
+            "b"
+          ]
+        }
       }
+    },
+    "frameSize": {
+      "width": 192,
+      "height": 267
     }
   },
   "catcherUmp": {
     "image": {
       "path": "art/catcher-ump.png",
-      "status": "missing"
+      "status": "ready"
     },
     "data": {
       "path": "art/catcher-ump.json",
-      "status": "missing"
+      "status": "ready"
     },
     "fps": 12,
     "clips": {
       "catcher-idle": {
-        "frames": 2
+        "frames": 2,
+        "delivered": {
+          "frames": 2
+        }
       },
       "catcher-receive": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       },
       "ump-idle": {
-        "frames": 2
+        "frames": 2,
+        "delivered": {
+          "frames": 2
+        }
       },
       "ump-strike": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       },
       "ump-punchout": {
-        "frames": 6
+        "frames": 6,
+        "delivered": {
+          "frames": 6
+        }
       }
+    },
+    "frameSize": {
+      "width": 381,
+      "height": 485
     }
   },
   "ball": {
     "ball": {
       "path": "art/ball/ball.png",
-      "status": "missing"
+      "status": "ready"
     },
     "ball-spin": {
       "frames": 3,
       "files": [
         {
           "path": "art/ball/ball-spin-00.png",
-          "status": "missing"
+          "status": "ready"
         },
         {
           "path": "art/ball/ball-spin-01.png",
-          "status": "missing"
+          "status": "ready"
         },
         {
           "path": "art/ball/ball-spin-02.png",
-          "status": "missing"
+          "status": "ready"
         }
       ]
     },
     "ball-shadow": {
       "path": "art/ball/ball-shadow.png",
-      "status": "missing"
+      "status": "ready"
     }
   },
   "crowd": {
     "image": {
       "path": "art/crowd.png",
-      "status": "missing"
+      "status": "ready"
     },
     "data": {
       "path": "art/crowd.json",
-      "status": "missing"
+      "status": "ready"
     },
     "fps": 12,
     "clips": {
@@ -930,50 +1210,67 @@
       }
     },
     "rows": 3,
-    "tileWidth": 512
+    "tileWidth": 512,
+    "frameSize": {
+      "width": 512,
+      "height": 104
+    }
   },
   "mascot": {
     "image": {
       "path": "art/mascot.png",
-      "status": "missing"
+      "status": "ready"
     },
     "data": {
       "path": "art/mascot.json",
-      "status": "missing"
+      "status": "ready"
     },
     "fps": 12,
     "clips": {
       "mascot-idle": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       },
       "mascot-happy": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       },
       "mascot-sad": {
-        "frames": 4
+        "frames": 4,
+        "delivered": {
+          "frames": 4
+        }
       }
     },
-    "optional": true
+    "optional": true,
+    "frameSize": {
+      "width": 193,
+      "height": 235
+    }
   },
   "booth": {
     "bigRed-mouth-closed": {
       "path": "art/booth/bigRed-mouth-closed.png",
-      "status": "missing",
+      "status": "ready",
       "size": 512
     },
     "bigRed-mouth-open": {
       "path": "art/booth/bigRed-mouth-open.png",
-      "status": "missing",
+      "status": "ready",
       "size": 512
     },
     "jackDalton-mouth-closed": {
       "path": "art/booth/jackDalton-mouth-closed.png",
-      "status": "missing",
+      "status": "ready",
       "size": 512
     },
     "jackDalton-mouth-open": {
       "path": "art/booth/jackDalton-mouth-open.png",
-      "status": "missing",
+      "status": "ready",
       "size": 512
     }
   },

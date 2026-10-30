@@ -26,6 +26,36 @@ export interface FieldManifest {
   coords: Coordinates
   /** Paths of every required asset still missing. */
   missing: string[]
+  /** Paths (relative to public/) of every asset marked ready. */
+  ready: Set<string>
+  /** Packed batter swing (the only batter clip delivered so far), or null for the placeholder. */
+  batterSwing: BatterClip | null
+}
+
+export interface BatterClip {
+  frames: number
+  contactFrame: number
+  /** Layer names that have pixels, e.g. outline, skin, jersey. */
+  layers: string[]
+  /** Path for one frame and layer. */
+  file: (frame: number, layer: string) => string
+}
+
+function parseSwing(batter: unknown): BatterClip | null {
+  const clip = (batter as { clips?: Record<string, unknown> } | undefined)?.clips?.['swing-contact'] as
+    | { status?: string; files?: string[]; delivered?: { frames?: number; contactFrame?: number } }
+    | undefined
+  if (clip?.status !== 'ready' || !Array.isArray(clip.files) || !clip.files.length) return null
+  const frames = clip.delivered?.frames ?? 0
+  if (frames < 1) return null
+  const prefix = 'art/batter/swing-contact/'
+  const layers = [...new Set(clip.files.filter((f) => f.startsWith(prefix + '00-')).map((f) => f.slice(prefix.length + 3, -4)))]
+  return {
+    frames,
+    contactFrame: clip.delivered?.contactFrame ?? Math.min(3, frames - 1),
+    layers,
+    file: (frame, layer) => `${prefix}${String(frame).padStart(2, '0')}-${layer}.png`,
+  }
 }
 
 /** Cartoon game pixels are the pixel layout times this. */
@@ -65,6 +95,8 @@ export function parseManifest(raw: RawManifest | null | undefined): FieldManifes
   const panelOk = sp && ['x', 'y', 'width', 'height'].every((k) => typeof sp[k] === 'number')
   const assets: Asset[] = []
   walkAssets({ stadium: r.stadium, batter: r.batter, chrome: r.chrome, crowd: r.crowd, fielders: r.fielders }, assets)
+  const all: Asset[] = []
+  walkAssets(r, all)
   return {
     width: r.gameSize?.width ?? 1280,
     height: r.gameSize?.height ?? 960,
@@ -79,6 +111,8 @@ export function parseManifest(raw: RawManifest | null | undefined): FieldManifes
       scoreboardPanel: panelOk ? (sp as unknown as Coordinates['scoreboardPanel']) : DEFAULT_COORDS.scoreboardPanel,
     },
     missing: assets.filter((a) => a.status !== 'ready' && !a.optional).map((a) => a.path),
+    ready: new Set(all.filter((a) => a.status === 'ready').map((a) => a.path)),
+    batterSwing: parseSwing(r.batter),
   }
 }
 
