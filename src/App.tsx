@@ -6,6 +6,7 @@ import { AuthProvider, createLocalAuth } from './data/auth'
 import { createLocalStore } from './data/local-store'
 import { StoreContext } from './data/store'
 import { router } from './routes'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 export type Backend = 'local' | 'api'
 
@@ -27,7 +28,9 @@ export default function App() {
   return (
     <AuthProvider backend={auth}>
       <StoreContext.Provider value={store}>
-        <RouterProvider router={router} />
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+        </ErrorBoundary>
       </StoreContext.Provider>
     </AuthProvider>
   )
