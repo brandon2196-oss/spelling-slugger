@@ -14,6 +14,7 @@ import type { FieldController } from '../../field/controller'
 import { usePlayer } from '../players/usePlayers'
 import { Broadcast } from './Broadcast'
 import { playSequence } from './playSequence'
+import { LetterHint } from './LetterHint'
 import { SpellingInput } from './SpellingInput'
 import { wait } from './timing'
 import { useGameSession } from './useGameSession'
@@ -30,7 +31,9 @@ export function GamePage() {
   const audio = useAudioSettings()
 
   const [announcement, setAnnouncement] = useState<string | null>(null)
-  const [reveal, setReveal] = useState<{ word: string; gameOver: boolean } | null>(null)
+  const [reveal, setReveal] = useState<{ word: string; gameOver: boolean; tries: string[] } | null>(null)
+  /** The last wrong try on strikes 1–2, shown letter by letter under the input. */
+  const [lastMiss, setLastMiss] = useState<{ typed: string; strike: 1 | 2 } | null>(null)
   const [peek, setPeek] = useState(false)
   const [focusKey, setFocusKey] = useState(0)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -108,6 +111,8 @@ export function GamePage() {
       return
     }
     if (event.kind === 'ignored') return
+    if (event.kind === 'strike') setLastMiss({ typed: event.attemptsSoFar[event.attemptsSoFar.length - 1]?.text ?? text, strike: event.strike })
+    else setLastMiss(null)
     sfx.unlock()
     try {
       await playSequence(fieldRef.current, sfx, announce, event, commentary)
@@ -119,7 +124,7 @@ export function GamePage() {
       if (event.kind === 'at-bat-complete') setFieldBases(event.basesAfter)
     }
     if (event.kind === 'at-bat-complete' && event.outcome === 'strikeout') {
-      setReveal({ word: event.correctSpelling, gameOver: event.gameOver })
+      setReveal({ word: event.correctSpelling, gameOver: event.gameOver, tries: event.attempts.filter((a) => !a.correct).map((a) => a.text) })
       return // stays busy until the child taps Next
     }
     if (event.kind === 'at-bat-complete' && event.gameOver) {
@@ -202,6 +207,13 @@ export function GamePage() {
                 onHear={canSpeak ? hear : undefined}
                 hasSentence={Boolean(word?.sentence)}
               />
+              {lastMiss && word ? (
+                <div data-testid="miss-hint" aria-live="polite" className="rounded-2xl bg-chalk/10 p-3">
+                  <p className="text-sm text-chalk/80">Strike {lastMiss.strike === 1 ? 'one' : 'two'}! You typed:</p>
+                  <LetterHint typed={lastMiss.typed} correct={word.text} label={`You typed ${lastMiss.typed}`} />
+                  <p className="text-xs text-chalk/60 mt-1">Underlined letters are right. Crossed-out letters need fixing.</p>
+                </div>
+              ) : null}
               {saveError ? <p role="alert" className="text-gold">{saveError}</p> : null}
             </section>
 
@@ -216,6 +228,14 @@ export function GamePage() {
         <div data-testid="reveal">
           <p className="text-ink/70">The word was</p>
           <p className="font-display text-4xl text-navy tracking-wide my-2">{reveal?.word}</p>
+          {reveal && reveal.tries.length ? (
+            <div data-testid="reveal-tries" className="mt-3">
+              <p className="text-ink/70 text-sm">Your tries</p>
+              <ul className="mt-1 space-y-1">
+                {reveal.tries.map((t, i) => <li key={i}><LetterHint typed={t} correct={reveal.word} label={`Try ${i + 1}: ${t}`} /></li>)}
+              </ul>
+            </div>
+          ) : null}
           <div className="mt-5 flex flex-wrap gap-3 justify-end">
             {canSpeak ? <Button variant="secondary" onClick={() => reveal && void sayWord('word', reveal.word)}>Hear it again</Button> : null}
             <Button onClick={nextAfterReveal} autoFocus>{reveal?.gameOver ? 'See results' : 'Next word'}</Button>

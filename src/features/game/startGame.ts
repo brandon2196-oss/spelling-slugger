@@ -46,6 +46,24 @@ export async function startMissedWordsGame(store: Store, playerId: string, rng: 
   return store.createGame({ playerId, listId: null, mode: 'missed', words, warnings: [] })
 }
 
+/** Only the words struck out in one finished game, for the one-tap postgame drill. */
+export async function startThisGameMissesGame(store: Store, game: GameRecord, rng: () => number = Math.random): Promise<GameRecord> {
+  const struck = new Set(game.attempts.filter((a) => a.outcome === 'strikeout').map((a) => a.position))
+  const seen = new Set<string>()
+  const missed: GameWord[] = []
+  for (const w of game.words) {
+    if (!struck.has(w.position) || seen.has(normalize(w.text))) continue
+    seen.add(normalize(w.text))
+    missed.push(w)
+  }
+  if (missed.length === 0) throw new Error('NO_MISSED_WORDS')
+  const words = practiceWords(
+    missed.map((w, i) => ({ id: w.sourceWordId ?? `missed-${i}`, text: w.text, sentence: w.sentence, source: 'current' as const, difficulty: w.difficulty ?? 'medium' })),
+    rng,
+  )
+  return store.createGame({ playerId: game.playerId, listId: null, mode: 'missed', words, warnings: [] })
+}
+
 export function resumeOrNull(store: Store, playerId: string): Promise<GameRecord | null> {
   return store.findInProgressGame(playerId)
 }
