@@ -5,25 +5,24 @@
  * Board text and commentary for the same moment run concurrently; the next moment waits for both.
  */
 import type { AnnounceEvent, CommentaryContext } from '../../audio/announcer'
+import { driveLayers, layersFor, pickPitchCall, type FieldBeat, type PitchCall, type SequenceSfx } from '../../audio/layering'
 import type { SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
 import { announcementsFor } from './announcements'
+import { motionScale } from './timing'
 
-export interface SequenceSfx {
-  crack(): void
-  crackHomeRun(): void
-  whiff(): void
-  mitt(): void
-  umpStrike(): void
-  umpStrike3(): void
-  umpBall4(): void
-  ballWall(): void
-  cheerSmall(): void
-  cheerBig(): void
-  cheerHr(): void
-  fanfare(): void
-  groan(): void
-  organ(riff: 'charge' | 'inning' | 'walkup'): void
+export type { FieldBeat, PitchCall, SequenceSfx } from '../../audio/layering'
+
+export interface SequenceOptions {
+  /** Mitt or whiff on a strike. Decided here, never by the scene. */
+  pitchCall?: PitchCall
+  /** Multiplier for fallback offsets; defaults to motionScale(). */
+  scale?: number
+  /**
+   * Where to hand this play's onBeat. Before Phase 1 lands nothing calls it and every cue uses its
+   * fallback offset. After the rebase (Task 9 Step 4) the default hands it to the field's onBeat slot.
+   */
+  onBeatSink?: (onBeat: (beat: FieldBeat) => void) => void
 }
 
 export type Announce = (text: string) => Promise<void>
@@ -35,8 +34,17 @@ export async function playSequence(
   announce: Announce,
   event: SubmitEvent,
   commentary: Commentary,
+  opts: SequenceOptions = {},
 ): Promise<void> {
   if (event.kind === 'ignored') return
+  const call = opts.pitchCall ?? pickPitchCall()
+  // Cast keeps TS from narrowing to null: stack() assigns it inside a closure.
+  let driver = null as ReturnType<typeof driveLayers> | null
+  /** The contact stack for this play (layering.ts). Field beats fire cues early; offsets are the fallback. */
+  const stack = () => {
+    driver = driveLayers(layersFor(event, call), sfx, opts.scale ?? motionScale())
+    opts.onBeatSink?.(driver.onBeat)
+  }
   const texts = announcementsFor(event)
   const next = async () => {
     const t = texts.shift()
@@ -53,34 +61,30 @@ export async function playSequence(
 
   // The field animates WHILE the board text shows and the booth talks: a play never waits on a line.
   if (event.kind === 'strike') {
-    sfx.whiff(); sfx.umpStrike()
+    stack()
     await Promise.all([field?.playStrike(event.strike), moment(event.strike === 1 ? 'strike1' : 'strike2')]) // STRIKE ONE! / TWO!
     return
   }
 
   switch (event.outcome) {
     case 'strikeout':
-      sfx.umpStrike3()
-      sfx.groan()
+      stack()
       await Promise.all([field?.playStrike(3), moment('strikeout')]) // STRIKE THREE!
       break
     case 'walk':
-      sfx.mitt(); sfx.umpBall4()
+      stack()
       await Promise.all([field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored), moment('walk')]) // TAKE YOUR BASE!
       break
     default: {
-      // One crowd cheer per play, only for the big moments: a home run or 2+ runs.
-      if (event.outcome === 'homeRun') sfx.crackHomeRun()
-      else sfx.crack()
-      if (event.outcome === 'homeRun') sfx.cheerHr()
-      else if (event.runsScored >= 2) sfx.cheerBig()
+      stack() // one cheer per play (layering.ts cheerFor)
       const hit = event.outcome
       await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
     } // HOME RUN! / DOUBLE! / BASE HIT!
   }
 
   if (event.runsScored > 0) {
-    sfx.organ('charge')
+    if (driver) driver.organCharge()
+    else sfx.organ('charge')
     await moment(event.runsScored === 1 ? 'run' : 'runs') // RUN SCORED! / N RUNS SCORED!
   }
 
@@ -94,7 +98,7 @@ export async function playSequence(
   }
 
   if (event.gameOver) {
-    sfx.fanfare()
+    if (event.outcome !== 'homeRun') sfx.fanfare()
     await field?.playGameOver(event.runsScored)
     await moment('gameOver') // GAME OVER!
   } else if (event.inningEnded) {
