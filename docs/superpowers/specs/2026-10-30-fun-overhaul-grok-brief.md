@@ -83,6 +83,29 @@ Per frame, deliver these layers as separate PNGs with identical dimensions and r
 
 Grayscale layers are white where the surface is lit and mid-gray where it is shaded; the game multiplies the tint over them, so shading comes for free. One rig only: the right-handed stance. The game flips it for lefties.
 
+#### 3.3.1 Chroma-key delivery (what actually arrived)
+
+Brandon generated the art with Gemini (Nano Banana) using `docs/art/nano-banana-prompts.md`, and the raw outputs are committed under `art-src/` (see `art-src/README.md` for what exists and what is still missing). Image generators cannot output separate tint layers, so the batter arrives as a flat drawing in placeholder colors on a solid `#00FF00` background. The build pipeline (`npm run pack-art`, Phase 1) turns `art-src/` into `public/art/`:
+
+1. **Key the background.** `#00FF00` with a tight tolerance becomes alpha 0 on every file. Watch for green fringing on anti-aliased edges; erode one pixel if needed.
+2. **Split the batter into layers by color.** Each batter frame is drawn in these colors, with shading as a darker shade of the same hue. Classify each pixel by hue into a layer and store its luminance as the grayscale shading for that layer:
+
+   | Layer | Source color | Hex |
+   | --- | --- | --- |
+   | `jersey` | magenta | `#FF00FF` |
+   | `pants` | cyan | `#00FFFF` |
+   | `hat` | yellow | `#FFFF00` |
+   | `hat-brim` | orange | `#FF8000` |
+   | `trim` | blue | `#0000FF` |
+   | `skin` | red | `#FF0000` |
+   | `hair` | purple | `#8000FF` |
+   | `outline` and fixed parts | black, dark gray shoes, wood bat, white gloves | never tinted |
+
+3. **Slice and align.** Cut single-row sheets (1 x N) and two-row fielder sheets (2 x N) into equal cells, find each frame's foot baseline and shift so all frames in a clip share it, resize to the contract cell size, and pack atlases.
+4. **Scale.** Most files are 1024 px wide (128 px per cell on an 8-cell row), not the 2x masters in 3.2. Pack them as delivered; upscaling is a later decision once Nicole sees them in the game. If a sprite reads soft, the fix is regenerating at a higher size in Gemini, not filtering.
+
+`art-src/` is committed, not gitignored, because it is the only copy.
+
 ### 3.4 Animations and frame counts
 
 All animations at 12 frames per second unless noted. Frame counts are minimums; more is fine if the atlas stays under the size budget.
