@@ -62,7 +62,9 @@ const dirBytes = (dir) => (existsSync(dir) ? walk(dir).reduce((n, p) => n + stat
 /** Integrated loudness (LUFS) of one file via ffmpeg loudnorm analysis. */
 function lufs(file) {
   const r = spawnSync('ffmpeg', ['-hide_banner', '-nostats', '-i', file, '-af', 'loudnorm=print_format=json', '-f', 'null', '-'], { encoding: 'utf8' })
-  return Number(JSON.parse(r.stderr.slice(r.stderr.lastIndexOf('{'))).input_i)
+  // ffmpeg may print more lines after the JSON block, so cut at its closing brace.
+  const s = r.stderr
+  return Number(JSON.parse(s.slice(s.lastIndexOf('{'), s.lastIndexOf('}') + 1)).input_i)
 }
 
 function measure(dir) {
