@@ -11,10 +11,16 @@ import { announcementsFor } from './announcements'
 
 export interface SequenceSfx {
   crack(): void
+  crackHomeRun(): void
   whiff(): void
-  cheer(): void
-  walkChime(): void
-  strikeBuzz(): void
+  mitt(): void
+  umpStrike(): void
+  umpStrike3(): void
+  umpBall4(): void
+  ballWall(): void
+  cheerSmall(): void
+  cheerBig(): void
+  cheerHr(): void
   fanfare(): void
   groan(): void
   organ(riff: 'charge' | 'inning' | 'walkup'): void
@@ -47,25 +53,27 @@ export async function playSequence(
 
   // The field animates WHILE the board text shows and the booth talks: a play never waits on a line.
   if (event.kind === 'strike') {
-    sfx.whiff()
+    sfx.whiff(); sfx.umpStrike()
     await Promise.all([field?.playStrike(event.strike), moment(event.strike === 1 ? 'strike1' : 'strike2')]) // STRIKE ONE! / TWO!
     return
   }
 
   switch (event.outcome) {
     case 'strikeout':
-      sfx.strikeBuzz()
+      sfx.umpStrike3()
       sfx.groan()
       await Promise.all([field?.playStrike(3), moment('strikeout')]) // STRIKE THREE!
       break
     case 'walk':
-      sfx.walkChime()
+      sfx.mitt(); sfx.umpBall4()
       await Promise.all([field?.playWalk(event.basesBefore, event.basesAfter, event.runsScored), moment('walk')]) // TAKE YOUR BASE!
       break
     default: {
-      sfx.crack()
       // One crowd cheer per play, only for the big moments: a home run or 2+ runs.
-      if (event.outcome === 'homeRun' || event.runsScored >= 2) sfx.cheer()
+      if (event.outcome === 'homeRun') sfx.crackHomeRun()
+      else sfx.crack()
+      if (event.outcome === 'homeRun') sfx.cheerHr()
+      else if (event.runsScored >= 2) sfx.cheerBig()
       const hit = event.outcome
       await Promise.all([field?.playHit(hit, event.basesBefore, event.basesAfter, event.runsScored), moment(hit)])
     } // HOME RUN! / DOUBLE! / BASE HIT!

@@ -18,11 +18,11 @@ function recorder() {
     playPitch: rec('playPitch'), playStrike: rec('playStrike'), playHit: rec('playHit'), playWalk: rec('playWalk'),
     playInningEnd: rec('playInningEnd'), playGameOver: rec('playGameOver'), banner: rec('banner'),
   }
-  const sfx: SequenceSfx = {
-    crack: () => calls.push('sfx.crack'), whiff: () => calls.push('sfx.whiff'), cheer: () => calls.push('sfx.cheer'),
-    walkChime: () => calls.push('sfx.walkChime'), strikeBuzz: () => calls.push('sfx.strikeBuzz'), fanfare: () => calls.push('sfx.fanfare'),
-    groan: () => calls.push('sfx.groan'), organ: (riff) => calls.push(`sfx.organ(${riff})`),
-  }
+  const cueNames = ['crack', 'crackHomeRun', 'whiff', 'mitt', 'umpStrike', 'umpStrike3', 'umpBall4', 'ballWall', 'cheerSmall', 'cheerBig', 'cheerHr', 'fanfare', 'groan'] as const
+  const sfx = {
+    ...Object.fromEntries(cueNames.map((c) => [c, () => { calls.push(`sfx.${c}`) }])),
+    organ: (riff: string) => { calls.push(`sfx.organ(${riff})`) },
+  } as SequenceSfx
   const announce = vi.fn(async (text: string) => { calls.push(`announce(${text})`) })
   const commentary = vi.fn(async (event: AnnounceEvent, _ctx: CommentaryContext) => { calls.push(`say(${event})`) })
   return { field, sfx, announce, commentary, calls }
@@ -40,13 +40,13 @@ describe('playSequence', () => {
   it('crowd cheers once on 2+ runs', async () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'single', runsScored: 2 }), r.commentary)
-    expect(r.calls.filter((c) => c === 'sfx.cheer')).toHaveLength(1)
+    expect(r.calls.filter((c) => c.startsWith('sfx.cheer'))).toHaveLength(1)
   })
   it('crowd cheers once on a home run, even when runs score', async () => {
     for (const runsScored of [1, 4]) {
       const r = recorder()
       await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'homeRun', runsScored }), r.commentary)
-      expect(r.calls.filter((c) => c === 'sfx.cheer')).toHaveLength(1)
+      expect(r.calls.filter((c) => c.startsWith('sfx.cheer'))).toHaveLength(1)
     }
   })
   it('more than one run uses the plural commentary and passes the count', async () => {
@@ -61,7 +61,7 @@ describe('playSequence', () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'strikeout', inningEnded: true, nextInning: 2 }), r.commentary)
     expect(r.calls).toEqual([
-      'playPitch', 'sfx.strikeBuzz', 'sfx.groan', 'playStrike(3)', 'announce(STRIKE THREE!)', 'say(strikeout)',
+      'playPitch', 'sfx.umpStrike3', 'sfx.groan', 'playStrike(3)', 'announce(STRIKE THREE!)', 'say(strikeout)',
       'sfx.organ(inning)', 'announce(THREE OUTS!)', 'say(inningEnd)', 'playInningEnd(2)', 'announce(NEW INNING!)',
     ])
     expect(r.commentary).toHaveBeenCalledWith('inningEnd', { runs: 0, inning: 2, word: 'cat' })
@@ -80,7 +80,7 @@ describe('playSequence', () => {
   it('a strike never calls a hit', async () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, { kind: 'strike', strike: 1, attemptsSoFar: [] }, r.commentary)
-    expect(r.calls).toEqual(['playPitch', 'sfx.whiff', 'playStrike(1)', 'announce(STRIKE ONE!)', 'say(strike1)'])
+    expect(r.calls).toEqual(['playPitch', 'sfx.whiff', 'sfx.umpStrike', 'playStrike(1)', 'announce(STRIKE ONE!)', 'say(strike1)'])
   })
   it('strike two gets its own commentary event', async () => {
     const r = recorder()
@@ -90,7 +90,7 @@ describe('playSequence', () => {
   it('a walk trots the forced runners', async () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'walk' }), r.commentary)
-    expect(r.calls).toEqual(['playPitch', 'sfx.walkChime', 'playWalk', 'announce(TAKE YOUR BASE!)', 'say(walk)'])
+    expect(r.calls).toEqual(['playPitch', 'sfx.mitt', 'sfx.umpBall4', 'playWalk', 'announce(TAKE YOUR BASE!)', 'say(walk)'])
   })
   it('board text and commentary for the same moment run concurrently', async () => {
     const r = recorder()
@@ -101,7 +101,7 @@ describe('playSequence', () => {
     expect(announce).toHaveBeenCalledWith('DOUBLE!')
     expect(r.commentary).toHaveBeenCalledWith('double', expect.anything())
     expect(r.calls).toContain('playHit') // the swing doesn't wait for the board text or the line
-    expect(r.calls).not.toContain('sfx.cheer') // but the next moment does wait
+    expect(r.calls).not.toContain('sfx.organ(charge)') // but the next moment does wait
     release()
     await p
   })
