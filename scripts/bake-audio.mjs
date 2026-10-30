@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Bake the booth: render every Big Red / Smooth Eddie line in src/audio/announcer-lines.json to an
+ * Bake the booth: render every Big Red / Jack Dalton line in src/audio/announcer-lines.json to an
  * audio clip and regenerate public/audio/announcer-manifest.json (written last). Idempotent: re-runs
  * overwrite clips and the manifest. The quiet booth has no lines and is not baked.
  *
@@ -40,14 +40,19 @@ const lines = JSON.parse(readFileSync(join(ROOT, 'src/audio/announcer-lines.json
 
 const jobs = []
 const manifest = { version: 1, clips: { bigRed: {}, smoothEddie: {}, quiet: {} } }
+// BAKE_ONLY=smoothEddie re-bakes one booth; the others keep their existing clips (manifest entries still rewritten).
+const ONLY = process.env.BAKE_ONLY
 for (const [id, profile] of Object.entries(VOICES)) {
+  const skip = ONLY && ONLY !== id
   const dir = join(ROOT, 'public/audio/announcers', id)
-  rmSync(dir, { recursive: true, force: true }) // drop stale clips from removed lines
-  mkdirSync(dir, { recursive: true })
+  if (!skip) {
+    rmSync(dir, { recursive: true, force: true }) // drop stale clips from removed lines
+    mkdirSync(dir, { recursive: true })
+  }
   for (const [event, arr] of Object.entries(lines[id])) {
     manifest.clips[id][event] = arr.map((text, i) => {
       const name = `${event}-${String(i).padStart(2, '0')}.${EXT}`
-      jobs.push({ text: fill(text), profile, out: join(dir, name) })
+      if (!skip) jobs.push({ text: fill(text), profile, out: join(dir, name) })
       return `/audio/announcers/${id}/${name}`
     })
   }
