@@ -59,6 +59,8 @@ Sound effects are royalty-free clip pools in `public/audio/sfx/`; booth commenta
 
 ## Baked word audio (Replit App Storage)
 
+The bucket id (`word-audio`) lives in `.replit` under `[objectStorage]` so a GitHub-to-Replit force sync keeps it. Set `REPLIT_BUCKET_ID` to override.
+
 Spelling words and sentences are baked to MP3 on the server after a list save (Edge TTS, `en-US-JennyNeural`)
 and served at `/audio/words/{sha256}.mp3`; the game falls back to browser speech until a clip exists.
 

@@ -4,6 +4,12 @@ modules = ["nodejs-22"]
 [nix]
 channel = "stable-25_05"
 
+# App Storage bucket "word-audio" for baked word clips. Keep this in git:
+# force-syncing GitHub main to the Repl overwrites .replit, and without it
+# production cannot find the bucket. REPLIT_BUCKET_ID env var overrides.
+[objectStorage]
+defaultBucketID = "replit-objstore-239f9409-e9fc-48a2-b06b-f0fe47d0df09"
+
 # Workspace "Run": install, build frontend + server, serve on :3000 (same as production).
 [workflows]
 runButton = "Spelling Slugger"
