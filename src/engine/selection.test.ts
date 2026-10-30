@@ -42,3 +42,42 @@ describe('rng', () => {
     expect(xs).toEqual([1, 2, 3, 4, 5])
   })
 })
+
+describe('weeklyWords difficulty ramp', () => {
+  const mixed: SourceWord[] = (['easy', 'medium', 'hard'] as const).flatMap((d) =>
+    Array.from({ length: 6 }, (_, i) => ({ id: `${d}${i}`, text: `${d}w${i}`, sentence: null, source: 'current' as const, difficulty: d })),
+  )
+  const score = { easy: 0, medium: 1, hard: 2 } as const
+  const avg = (xs: { difficulty: 'easy' | 'medium' | 'hard' }[]) => xs.reduce((s, w) => s + score[w.difficulty], 0) / xs.length
+
+  it('keeps every word once with positions 0..n-1', () => {
+    const out = weeklyWords(mixed, seededRng(1))
+    expect(out.map((w) => w.sourceWordId).sort()).toEqual(mixed.map((w) => w.id).sort())
+    expect(out.map((w) => w.position)).toEqual(mixed.map((_, i) => i))
+  })
+
+  it('trends easy early and hard late across seeds', () => {
+    let early = 0, late = 0
+    for (let s = 0; s < 200; s++) {
+      const out = weeklyWords(mixed, seededRng(s))
+      early += avg(out.slice(0, 6))
+      late += avg(out.slice(12))
+    }
+    expect(early / 200).toBeLessThan(0.7)
+    expect(late / 200).toBeGreaterThan(1.3)
+  })
+
+  it('still mixes: not a strict easy→medium→hard sort', () => {
+    let unsorted = 0
+    for (let s = 0; s < 50; s++) {
+      const d = weeklyWords(mixed, seededRng(s)).map((w) => score[w.difficulty])
+      if (d.some((v, i) => i > 0 && v < (d[i - 1] as number))) unsorted++
+    }
+    expect(unsorted).toBeGreaterThan(45)
+  })
+
+  it('shuffles when every word has the same difficulty', () => {
+    const orders = new Set(Array.from({ length: 10 }, (_, s) => weeklyWords(current, seededRng(s)).map((w) => w.text).join()))
+    expect(orders.size).toBeGreaterThan(5)
+  })
+})

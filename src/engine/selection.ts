@@ -30,9 +30,24 @@ function toGameWords(items: SourceWord[]): GameWord[] {
   }))
 }
 
-/** The weekly game: the saved list (already 15 + review) shuffled. Never adds words. */
+const RAMP_SCORE: Record<Difficulty, number> = { easy: 0, medium: 1, hard: 2 }
+/** How far a word can drift from its band. Large enough that bands overlap (still mixed), small enough to trend. */
+export const RAMP_JITTER = 1.25
+
+/**
+ * Mixed order that trends easy → hard: each word's sort key is its difficulty score plus uniform
+ * jitter. Shuffled first so equal keys (e.g. an all-medium list) stay random.
+ */
+function ramp(words: SourceWord[], rng: () => number): SourceWord[] {
+  return shuffle(words, rng)
+    .map((w) => ({ w, key: RAMP_SCORE[w.difficulty] + (rng() * 2 - 1) * RAMP_JITTER }))
+    .sort((a, b) => a.key - b.key)
+    .map((x) => x.w)
+}
+
+/** The weekly game: the saved list (already 15 + review), ramped easy → hard. Never adds words. */
 export function weeklyWords(list: SourceWord[], rng: () => number): GameWord[] {
-  return toGameWords(shuffle(distinct(list), rng))
+  return toGameWords(ramp(distinct(list), rng))
 }
 
 export function practiceWords(list: SourceWord[], rng: () => number): GameWord[] {
