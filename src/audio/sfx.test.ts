@@ -11,6 +11,8 @@ function fakePlayer() {
     setVolume: vi.fn(),
     setMuted: vi.fn(),
     resume: vi.fn(),
+    duckStart: vi.fn(),
+    duckEnd: vi.fn(),
   }
   return { player, played }
 }

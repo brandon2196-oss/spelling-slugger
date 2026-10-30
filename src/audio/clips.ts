@@ -1,24 +1,40 @@
 /**
- * Buffer playback for pre-recorded clips (SFX pools, baked announcer lines). One shared AudioContext,
- * decoded buffers cached by URL, and a master gain for volume/mute. `play` never throws and never waits
- * more than MAX_WAIT_MS, so a broken or stuck clip can't lock the game.
+ * Buffer playback for pre-recorded clips (SFX pools, booth lines, baked spelling words). One shared
+ * AudioContext, decoded buffers cached by URL, a master gain for volume and mute, and four buses
+ * (sfx, crowd, music, voice) into master. Anything on `voice` ducks crowd and music (see mixer.ts)
+ * and gets a light stadium reverb. `play` never throws and never waits more than MAX_WAIT_MS.
  */
+import { BUSES, DUCKED_BUSES, REVERB_IR_URL, REVERB_WET, createDucker, type Bus } from './mixer'
+
 export const MAX_WAIT_MS = 7000
+
+export interface PlayOptions {
+  bus?: Bus
+}
 
 export interface ClipPlayer {
   load(url: string): Promise<void>
-  play(url: string): Promise<void>
+  play(url: string, opts?: PlayOptions): Promise<void>
   preload(urls: string[]): Promise<void>
   setVolume(v: number): void
   setMuted(m: boolean): void
   /** Create/resume the AudioContext. Call from a user gesture (iOS/Safari unlock). */
   resume(): void
+  /** Hold the voice duck (browser speech cannot enter the graph, so it ducks by hand). */
+  duckStart(): void
+  duckEnd(): void
 }
 
 export interface ClipPlayerOptions {
   fetchImpl?: typeof fetch
   /** Test seam; defaults to the browser AudioContext. */
   createContext?: () => AudioContext | null
+}
+
+interface Graph {
+  ctx: AudioContext
+  master: GainNode
+  buses: Record<Bus, GainNode>
 }
 
 function defaultContext(): AudioContext | null {
@@ -32,23 +48,53 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
   const fetchImpl = opts.fetchImpl ?? ((...a: Parameters<typeof fetch>) => fetch(...a))
   const makeCtx = opts.createContext ?? defaultContext
   const buffers = new Map<string, Promise<AudioBuffer>>()
-  let ctx: AudioContext | null = null
-  let master: GainNode | null = null
+  let graph: Graph | null = null
   let volume = 1
   let muted = false
 
   const level = () => (muted ? 0 : volume)
+  const ducker = createDucker(
+    () => (graph ? DUCKED_BUSES.map((b) => graph!.buses[b].gain) : []),
+    () => graph?.ctx.currentTime ?? 0,
+  )
 
-  function context(): { ctx: AudioContext; master: GainNode } | null {
-    if (!ctx) {
-      ctx = makeCtx()
+  function context(): Graph | null {
+    if (!graph) {
+      const ctx = makeCtx()
       if (!ctx) return null
-      master = ctx.createGain()
+      const master = ctx.createGain()
       master.gain.value = level()
       master.connect(ctx.destination)
+      const buses = Object.fromEntries(
+        BUSES.map((b) => {
+          const g = ctx.createGain()
+          g.gain.value = 1
+          g.connect(master)
+          return [b, g]
+        }),
+      ) as Record<Bus, GainNode>
+      graph = { ctx, master, buses }
+      void attachReverb(graph)
     }
-    if (ctx.state === 'suspended') void ctx.resume().catch(() => {})
-    return master ? { ctx, master } : null
+    if (graph.ctx.state === 'suspended') void graph.ctx.resume().catch(() => {})
+    return graph
+  }
+
+  /** Voice bus: dry into master (already wired) plus a convolver at REVERB_WET. No IR means dry only. */
+  async function attachReverb(g: Graph): Promise<void> {
+    if (typeof g.ctx.createConvolver !== 'function') return
+    try {
+      await load(REVERB_IR_URL)
+      const conv = g.ctx.createConvolver()
+      conv.buffer = await buffers.get(REVERB_IR_URL)!
+      const wet = g.ctx.createGain()
+      wet.gain.value = REVERB_WET
+      g.buses.voice.connect(conv)
+      conv.connect(wet)
+      wet.connect(g.master)
+    } catch {
+      /* spec open question 3: ship a dry voice bus */
+    }
   }
 
   function load(url: string): Promise<void> {
@@ -67,8 +113,9 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
     return p.then(() => undefined)
   }
 
-  async function play(url: string): Promise<void> {
+  async function play(url: string, o: PlayOptions = {}): Promise<void> {
     if (level() <= 0) return
+    const bus = o.bus ?? 'sfx'
     let buffer: AudioBuffer
     try {
       await load(url)
@@ -81,13 +128,22 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
     await new Promise<void>((resolve) => {
       const src = c.ctx.createBufferSource()
       src.buffer = buffer
-      src.connect(c.master)
+      src.connect(c.buses[bus])
+      let settled = false
+      const finish = () => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        if (bus === 'voice') ducker.end()
+        resolve()
+      }
       const timer = setTimeout(() => {
         try { src.stop() } catch { /* already stopped */ }
-        resolve()
+        finish()
       }, MAX_WAIT_MS)
-      src.onended = () => { clearTimeout(timer); resolve() }
-      try { src.start() } catch { clearTimeout(timer); resolve() }
+      src.onended = finish
+      if (bus === 'voice') ducker.start()
+      try { src.start() } catch { finish() }
     })
   }
 
@@ -99,17 +155,24 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
     },
     setVolume(v) {
       volume = Math.max(0, Math.min(1, v))
-      if (master) master.gain.value = level()
+      if (graph) graph.master.gain.value = level()
+    },
+    setMuted(m) {
+      muted = m
+      if (graph) graph.master.gain.value = level()
     },
     resume() {
       context()
     },
-    setMuted(m) {
-      muted = m
-      if (master) master.gain.value = level()
+    duckStart() {
+      context()
+      ducker.start()
+    },
+    duckEnd() {
+      ducker.end()
     },
   }
 }
 
-/** The app-wide player shared by SFX and baked announcer lines; settings drive its volume/mute. */
+/** The app-wide player shared by SFX, the booth and baked words; settings drive its volume/mute. */
 export const clips = createClipPlayer()

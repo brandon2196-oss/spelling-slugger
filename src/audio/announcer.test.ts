@@ -161,7 +161,7 @@ describe('sayAs', () => {
     played = []
     finish = []
     player = {
-      load: vi.fn(async () => {}), preload: vi.fn(async () => {}), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(),
+      load: vi.fn(async () => {}), preload: vi.fn(async () => {}), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(), duckStart: vi.fn(), duckEnd: vi.fn(),
       play: vi.fn((url: string) => { played.push(url); return new Promise<void>((r) => finish.push(r)) }),
     }
     setAnnouncerPlayerForTests(player)

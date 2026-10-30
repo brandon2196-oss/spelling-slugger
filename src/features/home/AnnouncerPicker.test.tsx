@@ -56,7 +56,7 @@ describe('AnnouncerPicker', () => {
   it('clicking a talker calls onChange and plays a sample line', async () => {
     const onChange = vi.fn()
     const play = vi.fn(async (_url: string) => {})
-    setAnnouncerPlayerForTests({ load: vi.fn(), preload: vi.fn(), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(), play })
+    setAnnouncerPlayerForTests({ load: vi.fn(), preload: vi.fn(), setVolume: vi.fn(), setMuted: vi.fn(), resume: vi.fn(), duckStart: vi.fn(), duckEnd: vi.fn(), play })
     const gameStart = ANNOUNCERS.smoothEddie.lines.gameStart.map((_, i) => `/audio/announcers/smoothEddie/gameStart-${String(i).padStart(2, '0')}.ogg`)
     setManifestForTests({ version: 1, clips: { bigRed: {}, smoothEddie: { gameStart }, quiet: {} } })
     render(<AnnouncerPicker value="bigRed" onChange={onChange} />)
