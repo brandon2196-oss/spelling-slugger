@@ -3,7 +3,8 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router'
 import { ANNOUNCERS, announcerState, sayAs, type AnnounceEvent, type CommentaryContext } from '../../audio/announcer'
 import { useAudioSettings } from '../../audio/settings'
 import { sfx } from '../../audio/sfx'
-import { primeSpeech, speakSentence, speakSlowly, speakWord, speechAvailable } from '../../audio/speech'
+import { primeSpeech, speechAvailable } from '../../audio/speech'
+import { sayWord } from '../../audio/word-audio'
 import { Button } from '../../components/Button'
 import { Modal } from '../../components/Modal'
 import { Stadium } from '../../components/Page'
@@ -64,9 +65,9 @@ export function GamePage() {
       if (!word || !canSpeak) return
       primeSpeech()
       sfx.unlock()
-      if (how === 'slow') void speakSlowly(word.text)
-      else if (how === 'sentence' && word.sentence) void speakSentence(word.sentence)
-      else void speakWord(word.text)
+      if (how === 'slow') void sayWord('slow', word.text)
+      else if (how === 'sentence' && word.sentence) void sayWord('sentence', word.sentence)
+      else void sayWord('word', word.text)
     },
     [word, canSpeak],
   )
@@ -216,7 +217,7 @@ export function GamePage() {
           <p className="text-ink/70">The word was</p>
           <p className="font-display text-4xl text-navy tracking-wide my-2">{reveal?.word}</p>
           <div className="mt-5 flex flex-wrap gap-3 justify-end">
-            {canSpeak ? <Button variant="secondary" onClick={() => reveal && void speakWord(reveal.word)}>Hear it again</Button> : null}
+            {canSpeak ? <Button variant="secondary" onClick={() => reveal && void sayWord('word', reveal.word)}>Hear it again</Button> : null}
             <Button onClick={nextAfterReveal} autoFocus>{reveal?.gameOver ? 'See results' : 'Next word'}</Button>
           </div>
         </div>

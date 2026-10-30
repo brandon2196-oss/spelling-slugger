@@ -27,6 +27,13 @@ let volume = 1
 export function setSpeechVolume(v: number): void {
   volume = Math.max(0, Math.min(1, v))
 }
+export const getSpeechVolume = () => volume
+
+/** Stop any utterance in flight (a baked clip is about to play instead). */
+export function stopSpeech(): void {
+  finishCurrent?.()
+  synth()?.cancel()
+}
 
 /** The browser's voice list (empty when speech is unavailable or voices haven't loaded yet). */
 export function availableVoices(): SpeechSynthesisVoice[] {

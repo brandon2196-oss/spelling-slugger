@@ -33,6 +33,8 @@ export default defineConfig({
         navigateFallback: '/index.html',
         runtimeCaching: [
           { urlPattern: ({ url }) => url.pathname.startsWith('/api/'), handler: 'NetworkOnly' },
+          // Baked word clips are content-addressed and immutable: cache once, play offline later.
+          { urlPattern: ({ url }) => url.pathname.startsWith('/audio/words/'), handler: 'CacheFirst', options: { cacheName: 'word-audio', expiration: { maxEntries: 600 }, cacheableResponse: { statuses: [200] } } },
           { urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//, handler: 'StaleWhileRevalidate', options: { cacheName: 'fonts' } },
         ],
       },
@@ -40,7 +42,7 @@ export default defineConfig({
     }),
   ],
   // `VITE_STORE=api npm run dev` against `npm run dev:api` on :3000.
-  server: { proxy: { '/api': 'http://localhost:3000' } },
+  server: { proxy: { '/api': 'http://localhost:3000', '/audio/words': 'http://localhost:3000' } },
   build: {
     rolldownOptions: {
       output: {
