@@ -1,5 +1,5 @@
 import { EMPTY_BASES } from '../engine/bases'
-import { basesDiff } from './layout'
+import { basesDiff, FIELD, runnerScaleX, type Base } from './layout'
 
 describe('basesDiff', () => {
   it('moves the batter to second on a double with nobody on', () => {
@@ -25,5 +25,22 @@ describe('basesDiff homeRun', () => {
     expect(basesDiff({ first: true, second: false, third: true }, { first: false, second: false, third: false }, 'homeRun', 3)).toEqual([
       { from: 'third', to: 'score' }, { from: 'first', to: 'score' }, { from: 'home', to: 'score' },
     ])
+  })
+})
+
+describe('runnerScaleX (run/trot art faces LEFT; flip when the leg goes right)', () => {
+  const legs: [Base, Base, number][] = [
+    ['home', 'first', -1],
+    ['first', 'second', 1],
+    ['second', 'third', 1],
+    ['third', 'home', -1],
+  ]
+  it.each(legs)('%s -> %s sets scaleX %d', (from, to, want) => {
+    expect(runnerScaleX(FIELD[from], FIELD[to])).toBe(want)
+  })
+  it.each(['R', 'L'] as const)('%s-handed batter running home -> first faces right (flipped)', (hand) => {
+    // Runner starts at the plate whichever box the batter stood in; facing ignores the lefty batter mirror.
+    const start = { ...FIELD.home, x: FIELD.home.x + (hand === 'L' ? 8 : -8) }
+    expect(runnerScaleX(start, FIELD.first)).toBe(-1)
   })
 })

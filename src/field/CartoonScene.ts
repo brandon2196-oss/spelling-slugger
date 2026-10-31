@@ -8,7 +8,7 @@ import Phaser from 'phaser'
 import type { Bases } from '../engine/types'
 import { FieldCamera } from './camera'
 import type { FieldBeat, FieldController, PlayerLook } from './controller'
-import { basesDiff, type Base, type Destination, type Point } from './layout'
+import { basesDiff, runnerScaleX, type Base, type Destination, type Point } from './layout'
 import { DEFAULT_COORDS, parseManifest, type BatterClip, type BatterClipName, type Coordinates, type FieldManifest } from './manifest'
 import { hex, placeholderColors } from './rig'
 import { batterLayerColor } from './batterTint'
@@ -452,8 +452,8 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
       let running = true
       const legsDone = (async () => {
         for (const p of legs) {
-          // Clips face right; face the way this leg goes.
-          if (clip) fig.setScale(p.x < fig.x ? -1 : 1, 1)
+          // Run/trot art faces left; set facing outright from this leg's direction.
+          if (clip) fig.setScale(runnerScaleX({ x: fig.x, y: fig.y }, p), 1)
           await this.tween({ targets: fig, x: p.x, y: p.y, duration: per, ease: 'Sine.easeInOut' })
         }
         running = false
