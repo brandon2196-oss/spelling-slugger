@@ -120,4 +120,8 @@ describe('public/art output', () => {
   it('chrome stays missing (only PNG concepts exist, the contract wants SVG)', () => {
     for (const a of Object.values(m.chrome) as { status: string }[]) expect(a.status).toBe('missing')
   })
+  it('foreground-fence and the batter number layer stay missing (no usable masters, docs/art/POLISH-AUDIT.md)', () => {
+    expect(m.stadium.layers['foreground-fence'].status).toBe('missing')
+    for (const c of Object.values(m.batter.clips) as { missingLayers: string[] }[]) expect(c.missingLayers).toContain('number')
+  })
 })

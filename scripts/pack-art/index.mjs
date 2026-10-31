@@ -45,7 +45,7 @@ const keyed = async (rel) => keyGreen(await load(rel))
 // (crowd strips and stadium layers skip grid clearing: dense rows would read as lines)
 
 // ------------------------------------------------------------------ stadium
-/** foreground-fence is optional and the generated one paints a black bar and netting across home plate, so it is not shipped. */
+/** foreground-fence is optional. The generated master starts at game y ~776 and covers home plate (y 840), so it is not shipped. See docs/art/POLISH-AUDIT.md. */
 const LAYERS = ['sky', 'outfield-wall', 'stands-far', 'grass', 'dirt', 'chalk', 'bases', 'dugout-near']
 async function stadium(m) {
   const layers = {}
