@@ -28,7 +28,7 @@ export function ResultsPage() {
       // the source of truth, so derive the summary from it when needed.
       if (g.summary) setSummary(g.summary)
       else {
-        const rebuilt = rebuild(g.words, g.attempts)
+        const rebuilt = rebuild(g.words, g.attempts, g.id)
         setSummary(rebuilt.status === 'complete' ? summarize(rebuilt) : null)
       }
       const others = (await store.listGames(g.playerId, { mode: g.mode, status: 'complete' })).filter((x) => x.id !== g.id)

@@ -12,6 +12,8 @@ const state: GameState = {
   tallies: { runs: 5, hits: 4, homeRuns: 0, singles: 1, doubles: 3, walks: 0, strikeouts: 2, totalStrikes: 7, firstTry: 3, secondTry: 1, thirdTry: 0, missed: 2 },
   atBats: [],
   status: 'active',
+  gameId: 'g1',
+  visitors: [1],
 }
 
 const player = { name: 'Cooper', jerseyNumber: 7, teamName: 'Sluggers' }
