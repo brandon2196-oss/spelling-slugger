@@ -5,6 +5,7 @@
 import type { GameSummary } from '../../src/engine/results'
 import { summarize } from '../../src/engine/results'
 import { rebuild } from '../../src/engine/replay'
+import { gameResult, visitorScore } from '../../src/engine/opponent'
 import type { Difficulty, GameWord, Hand, Outcome, WordSource } from '../../src/engine/types'
 import type {
   Appearance, GameFilter, GameMode, GameRecord, NewGame, NewPlayer, NewWord, Player, Store, StoredAttempt, Word, WordList,
@@ -31,6 +32,7 @@ interface WordRow { id: string; list_id: string; position: number; text: string;
 interface GameRow {
   id: string; player_id: string; list_id: string | null; mode: GameMode; status: GameRecord['status']
   warnings: string[] | null; summary: GameSummary | null; started_at: unknown; completed_at: unknown
+  result: 'win' | 'loss' | null; visitor_runs: number | null
 }
 interface GameWordRow { game_id: string; position: number; text: string; sentence: string | null; source: GameWord['source']; source_word_id: string | null; difficulty: Difficulty; outcome: Outcome | null }
 interface AttemptRow { game_id: string; position: number; attempt_number: number; text: string; correct: boolean }
@@ -57,12 +59,13 @@ function toGame(r: GameRow, gws: GameWordRow[], atts: AttemptRow[]): GameRecord 
   return {
     id: r.id, playerId: r.player_id, listId: r.list_id, mode: r.mode, status: r.status,
     words: mine.map((w) => ({ position: w.position, text: w.text, sentence: w.sentence, source: w.source, difficulty: w.difficulty, sourceWordId: w.source_word_id })),
-    attempts, warnings: r.warnings ?? [], summary: r.summary, startedAt: iso(r.started_at), completedAt: isoOrNull(r.completed_at),
+    attempts, warnings: r.warnings ?? [], summary: r.summary,
+    result: r.result ?? null, visitorRuns: r.visitor_runs ?? null, startedAt: iso(r.started_at), completedAt: isoOrNull(r.completed_at),
   }
 }
 
 const LIST_COLS = "id, player_id, title, to_char(week_start, 'YYYY-MM-DD') as week_start, is_active, created_at"
-const GAME_COLS = 'id, player_id, list_id, mode, status, warnings, summary, started_at, completed_at'
+const GAME_COLS = 'id, player_id, list_id, mode, status, warnings, summary, result, visitor_runs, started_at, completed_at'
 
 export async function createFamily(db: Queryable): Promise<string> {
   const { rows } = await db.query<{ id: string }>('insert into families default values returning id')
@@ -233,10 +236,13 @@ export function createServerStore(db: Db, familyId: string): Store {
     async completeGame(gameId) {
       await ownGame(db, gameId)
       const game = (await getGame(gameId))!
-      const summary = summarize(rebuild(game.words, game.attempts))
+      const state = rebuild(game.words, game.attempts, gameId)
+      const summary = summarize(state)
+      const result = gameResult(state, gameId)
+      const visitorRuns = state.status === 'complete' ? visitorScore(state, gameId).reduce((a, b) => a + b, 0) : null
       await db.query(
-        `update games set status = 'complete', summary = $2::jsonb, completed_at = now() where id = $1 and status = 'in_progress'`,
-        [gameId, JSON.stringify(summary)],
+        `update games set status = 'complete', summary = $2::jsonb, result = $3, visitor_runs = $4, completed_at = now() where id = $1 and status = 'in_progress'`,
+        [gameId, JSON.stringify(summary), result, visitorRuns],
       )
     },
     getGame,

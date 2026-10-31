@@ -3,6 +3,8 @@
  * project exists and for end-to-end tests. Single implicit family; no real security.
  */
 import type { GameSummary } from '../engine/results'
+import { gameResult, visitorScore } from '../engine/opponent'
+import { rebuild } from '../engine/replay'
 import type {
   GameFilter, GameRecord, NewGame, NewPlayer, NewWord, Player, Store, StoredAttempt, Word, WordList,
 } from './types'
@@ -23,6 +25,8 @@ function load(): Blob {
     const raw = localStorage.getItem(KEY)
     if (!raw) return empty()
     const b: Blob = { ...empty(), ...(JSON.parse(raw) as Partial<Blob>) }
+    // Games saved before Phase 3 have no result fields; they stay null (left out of the season record).
+    b.games = b.games.map((g) => ({ ...g, result: g.result ?? null, visitorRuns: g.visitorRuns ?? null }))
     // Normalize words saved before difficulty/source existed.
     b.lists = b.lists.map((l) => ({
       ...l, words: l.words.map((w) => ({ ...w, difficulty: w.difficulty ?? 'medium', source: w.source ?? 'current' })),
@@ -146,7 +150,7 @@ export function createLocalStore(): Store {
       return mutate((b) => {
         const g: GameRecord = {
           id: uid(), playerId: input.playerId, listId: input.listId, mode: input.mode, status: 'in_progress',
-          words: input.words.map((w) => ({ ...w })), attempts: [], warnings: [...input.warnings], summary: null,
+          words: input.words.map((w) => ({ ...w })), attempts: [], warnings: [...input.warnings], summary: null, result: null, visitorRuns: null,
           startedAt: now(), completedAt: null,
         }
         b.games.push(g)
@@ -168,6 +172,10 @@ export function createLocalStore(): Store {
         if (g.status === 'complete') return
         g.status = 'complete'
         g.summary = summary
+        // Same as the server: the result comes from the attempt log, never the caller.
+        const state = rebuild(g.words, g.attempts, g.id)
+        g.result = gameResult(state, g.id)
+        g.visitorRuns = state.status === 'complete' ? visitorScore(state, g.id).reduce((a, c) => a + c, 0) : null
         g.completedAt = now()
       })
     },

@@ -74,6 +74,10 @@ export interface GameRecord {
   attempts: StoredAttempt[]
   warnings: string[]
   summary: GameSummary | null
+  /** Phase 3: filled when the game completes; null for older games and games in progress. A tie is a win. */
+  result: 'win' | 'loss' | null
+  /** Phase 3: the Visitors' final total; null for older games and games in progress. */
+  visitorRuns: number | null
   startedAt: string
   completedAt: string | null
 }
