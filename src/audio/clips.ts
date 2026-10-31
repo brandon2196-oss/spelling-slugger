@@ -4,7 +4,7 @@
  * (sfx, crowd, music, voice) into master. Anything on `voice` ducks crowd and music (see mixer.ts)
  * and gets a light stadium reverb. `play` never throws and never waits more than MAX_WAIT_MS.
  */
-import { BUSES, DUCKED_BUSES, REVERB_IR_URL, REVERB_WET, createDucker, type Bus } from './mixer'
+import { BUSES, DUCKED_BUSES, DUCK_GAIN, REVERB_IR_URL, REVERB_WET, createDucker, type Bus } from './mixer'
 
 export const MAX_WAIT_MS = 7000
 
@@ -69,7 +69,7 @@ export function createClipPlayer(opts: ClipPlayerOptions = {}): ClipPlayer {
 
   const level = () => (muted ? 0 : volume)
   const ducker = createDucker(
-    () => (graph ? DUCKED_BUSES.map((b) => graph!.buses[b].gain) : []),
+    () => (graph ? DUCKED_BUSES.map((b) => ({ param: graph!.buses[b].gain, gain: DUCK_GAIN[b] })) : []),
     () => graph?.ctx.currentTime ?? 0,
   )
 

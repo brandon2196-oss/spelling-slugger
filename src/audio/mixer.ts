@@ -6,9 +6,16 @@ export const BUSES = ['sfx', 'crowd', 'music', 'voice'] as const
 export type Bus = (typeof BUSES)[number]
 
 /** Buses that drop while anything plays on `voice`. */
-export const DUCKED_BUSES: readonly Bus[] = ['crowd', 'music']
-export const DUCK_DB = -9
-export const DUCK_GAIN = 10 ** (DUCK_DB / 20)
+export const DUCKED_BUSES = ['crowd', 'music'] as const satisfies readonly Bus[]
+export type DuckedBus = (typeof DUCKED_BUSES)[number]
+/** Duck depth per bus. Music (organ, fanfare) drops further so the word VO stays clear. */
+export const DUCK_DB_CROWD = -9
+export const DUCK_DB_MUSIC = -18
+export const DUCK_DB: Record<DuckedBus, number> = { crowd: DUCK_DB_CROWD, music: DUCK_DB_MUSIC }
+export const DUCK_GAIN: Record<DuckedBus, number> = {
+  crowd: 10 ** (DUCK_DB_CROWD / 20),
+  music: 10 ** (DUCK_DB_MUSIC / 20),
+}
 export const DUCK_ATTACK_S = 0.08
 export const DUCK_RELEASE_S = 0.4
 
@@ -24,6 +31,12 @@ export interface DuckParam {
   linearRampToValueAtTime(v: number, t: number): unknown
 }
 
+/** One param to duck and the gain it ramps to while held. */
+export interface DuckTarget {
+  param: DuckParam
+  gain: number
+}
+
 export interface Ducker {
   start(): void
   end(): void
@@ -32,14 +45,14 @@ export interface Ducker {
 }
 
 /** Reference-counted duck: the first start ramps down, the last end ramps back up. */
-export function createDucker(params: () => DuckParam[], now: () => number): Ducker {
+export function createDucker(targets: () => DuckTarget[], now: () => number): Ducker {
   let holds = 0
-  const ramp = (to: number, over: number) => {
+  const ramp = (down: boolean, over: number) => {
     const t = now()
-    for (const p of params()) {
+    for (const { param: p, gain } of targets()) {
       p.cancelScheduledValues(t)
       p.setValueAtTime(p.value, t)
-      p.linearRampToValueAtTime(to, t + over)
+      p.linearRampToValueAtTime(down ? gain : 1, t + over)
     }
   }
   return {
@@ -48,12 +61,12 @@ export function createDucker(params: () => DuckParam[], now: () => number): Duck
     },
     start() {
       holds++
-      if (holds === 1) ramp(DUCK_GAIN, DUCK_ATTACK_S)
+      if (holds === 1) ramp(true, DUCK_ATTACK_S)
     },
     end() {
       if (holds === 0) return
       holds--
-      if (holds === 0) ramp(1, DUCK_RELEASE_S)
+      if (holds === 0) ramp(false, DUCK_RELEASE_S)
     },
   }
 }
