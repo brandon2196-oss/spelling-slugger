@@ -43,9 +43,9 @@ it('keeps season W/L prominent and makes Play this week the gold CTA', async () 
   expect(screen.getByRole('link', { name: 'Past weeks' })).toHaveClass('btn-cream')
 })
 
-it('announcer row shows placeholders, not pixel portraits', async () => {
+it('announcer row shows the three booth-window images, not pixel portraits', async () => {
   renderHome()
   const row = await screen.findByRole('group', { name: 'Announcer' })
-  expect(row.querySelectorAll('[data-testid="booth-placeholder"]')).toHaveLength(3)
+  expect(row.querySelectorAll('img[data-testid="booth-art"]')).toHaveLength(3)
   expect(row.querySelector('svg')).toBeNull()
 })

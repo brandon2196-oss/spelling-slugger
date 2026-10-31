@@ -80,14 +80,15 @@ describe('AnnouncerPicker', () => {
     expect(fake.synth.speak).not.toHaveBeenCalled()
   })
 
-  it('each booth shows a neutral placeholder, not a pixel portrait', () => {
+  it('each booth shows its packed booth-window art, not a pixel portrait', () => {
     render(<AnnouncerPicker value="bigRed" onChange={() => {}} />)
-    for (const name of [/big red/i, /jack dalton/i, /quiet/i]) {
-      const btn = screen.getByRole('button', { name })
-      expect(btn.querySelector('[data-testid="booth-placeholder"]')).not.toBeNull()
+    const art = { 'big red': 'menu-bigRed', 'jack dalton': 'menu-jackDalton', quiet: 'menu-quiet' }
+    for (const [name, file] of Object.entries(art)) {
+      const btn = screen.getByRole('button', { name: new RegExp(name, 'i') })
+      const img = btn.querySelector('img[data-testid="booth-art"]')
+      expect(img?.getAttribute('src')).toMatch(new RegExp(`art/booth/${file}\\.png$`))
+      expect(img?.getAttribute('src')).not.toMatch(/mouth/)
       expect(btn.querySelector('svg')).toBeNull()
     }
-    expect(screen.getByRole('button', { name: /big red/i }).querySelector('[data-testid="booth-placeholder"]')).toHaveTextContent('BB')
-    expect(screen.getByRole('button', { name: /jack dalton/i }).querySelector('[data-testid="booth-placeholder"]')).toHaveTextContent('JD')
   })
 })

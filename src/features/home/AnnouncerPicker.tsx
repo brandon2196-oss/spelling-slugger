@@ -1,27 +1,32 @@
 /**
  * Who's in the booth: three big toggle buttons. Tapping a talker plays one of his game-start lines so
- * the kid can hear the voice before choosing. Faces are neutral placeholders until Brandon's cartoon
- * booth art lands (art-only follow-up PR); bots do not draw announcer art.
+ * the kid can hear the voice before choosing. Each tile shows Brandon's cartoon booth-window
+ * art (art/booth/menu-*.png); bots do not draw announcer art.
  */
 import { ANNOUNCERS, previewLine, type AnnouncerId } from '../../audio/announcer'
 
 const ORDER: AnnouncerId[] = ['bigRed', 'smoothEddie', 'quiet']
 
-function initials(name: string) {
-  return name.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join('')
+/** Packed booth-window poses (scripts/pack-art booth step). Menu only; the game booth keeps its own portraits. */
+const BOOTH_ART: Record<AnnouncerId, string> = {
+  bigRed: 'menu-bigRed',
+  smoothEddie: 'menu-jackDalton',
+  quiet: 'menu-quiet',
 }
 
-export function BoothPlaceholder({ id }: { id: AnnouncerId }) {
-  const label = id === 'quiet' ? '—' : initials(ANNOUNCERS[id].name)
+export function BoothArt({ id }: { id: AnnouncerId }) {
   return (
-    <span
-      data-testid="booth-placeholder"
+    <img
+      data-testid="booth-art"
       data-announcer={id}
+      src={`${import.meta.env.BASE_URL}art/booth/${BOOTH_ART[id]}.png`}
+      alt=""
       aria-hidden="true"
-      className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-dashed border-gold/60 bg-navy/60 font-display text-xl text-gold"
-    >
-      {label}
-    </span>
+      width={512}
+      height={512}
+      draggable={false}
+      className="h-20 w-20 object-contain"
+    />
   )
 }
 
@@ -52,7 +57,7 @@ export function AnnouncerPicker({ value, onChange }: AnnouncerPickerProps) {
                 : 'border-chalk/20 bg-navy/40 text-chalk/80 hover:border-chalk/50 active:scale-95')
             }
           >
-            <BoothPlaceholder id={id} />
+            <BoothArt id={id} />
             <span className="font-display text-xs leading-snug sm:text-sm">{a.name}</span>
             <span className="text-xs leading-snug text-chalk/70">{a.tagline}</span>
           </button>
