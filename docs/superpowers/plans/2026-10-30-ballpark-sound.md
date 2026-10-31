@@ -22,7 +22,7 @@
 - CC0 only (Brandon, 2026-10-30). No paid packs. Not allowed: CC-BY-NC, attribution-in-UI licenses, anything ripped from video, real broadcast or real stadium PA recordings.
 - If no free clip is good enough for a pool, that pool ships as a stub: zero files, plays nothing, no error, no fallback beep.
 - `ping` (aluminum bat) is not added in this plan. It stays off until Brandon says yes.
-- Duck: `crowd` drops 9 dB and `music` drops 18 dB over 80 ms when any voice starts, recover over 400 ms after the last voice ends.
+- Duck: `crowd` drops 15 dB and `music` drops 18 dB over 80 ms when any voice starts, recover over 400 ms after the last voice ends.
 - Voice reverb: CC0 short stadium IR at 12 percent wet. No IR found means a dry voice bus, noted in the PR.
 - Processing: trim leading silence, loudnorm to about -16 LUFS, mono, Ogg Vorbis q5. `npm run process-audio` regenerates everything from `audio-src/`.
 - `public/audio/sfx/` stays under 4 MB total.
@@ -91,7 +91,7 @@ Intentional deviations from the spec wording, all inside the approved design:
 **Interfaces:**
 - Consumes: nothing new.
 - Produces:
-  - `src/audio/mixer.ts`: `BUSES: readonly ['sfx','crowd','music','voice']`, `type Bus`, `DUCKED_BUSES: readonly Bus[]`, `DUCK_DB_CROWD = -9`, `DUCK_DB_MUSIC = -18`, `DUCK_GAIN: Record<DuckedBus, number>`, `DUCK_ATTACK_S = 0.08`, `DUCK_RELEASE_S = 0.4`, `REVERB_WET = 0.12`, `REVERB_IR_URL = '/audio/ir/stadium.ogg'`, `interface DuckParam`, `interface Ducker { start(): void; end(): void; readonly holds: number }`, `createDucker(params: () => DuckParam[], now: () => number): Ducker`.
+  - `src/audio/mixer.ts`: `BUSES: readonly ['sfx','crowd','music','voice']`, `type Bus`, `DUCKED_BUSES: readonly Bus[]`, `DUCK_DB_CROWD = -15`, `DUCK_DB_MUSIC = -18`, `DUCK_GAIN: Record<DuckedBus, number>`, `DUCK_ATTACK_S = 0.08`, `DUCK_RELEASE_S = 0.4`, `REVERB_WET = 0.12`, `REVERB_IR_URL = '/audio/ir/stadium.ogg'`, `interface DuckParam`, `interface Ducker { start(): void; end(): void; readonly holds: number }`, `createDucker(params: () => DuckParam[], now: () => number): Ducker`.
   - `src/audio/clips.ts`: `interface PlayOptions { bus?: Bus }`, `ClipPlayer.play(url: string, opts?: PlayOptions): Promise<void>` (default bus `sfx`), `ClipPlayer.duckStart(): void`, `ClipPlayer.duckEnd(): void`. Playing on `voice` holds the duck for the clip's lifetime.
 
 - [ ] **Step 1: Write the failing mixer test**
