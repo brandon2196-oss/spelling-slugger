@@ -9,7 +9,7 @@ export type Bus = (typeof BUSES)[number]
 export const DUCKED_BUSES = ['crowd', 'music'] as const satisfies readonly Bus[]
 export type DuckedBus = (typeof DUCKED_BUSES)[number]
 /** Duck depth per bus. Music (organ, fanfare) drops further so the word VO stays clear. */
-export const DUCK_DB_CROWD = -9
+export const DUCK_DB_CROWD = -15
 export const DUCK_DB_MUSIC = -18
 export const DUCK_DB: Record<DuckedBus, number> = { crowd: DUCK_DB_CROWD, music: DUCK_DB_MUSIC }
 export const DUCK_GAIN: Record<DuckedBus, number> = {

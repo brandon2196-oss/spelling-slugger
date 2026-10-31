@@ -123,7 +123,7 @@ describe('ClipPlayer', () => {
     expect(f.sources[1]!.connects).toEqual([f.bus('crowd')])
   })
 
-  it('a voice clip ducks crowd 9 dB and music 18 dB, then recovers when it ends', async () => {
+  it('a voice clip ducks crowd 15 dB and music 18 dB, then recovers when it ends', async () => {
     const f = fakeCtx()
     const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
     await p.load('/w.mp3')

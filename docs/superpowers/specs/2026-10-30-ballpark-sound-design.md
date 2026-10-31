@@ -44,7 +44,7 @@ From brief section 5.2.
 ## Mixing and ducking
 
 - Voice bus chain: source, voice gain, then split dry plus a `ConvolverNode` (CC0 short stadium IR) at 12 percent wet, both into master.
-- Duck: when any voice source starts, `crowd` ramps down 9 dB and `music` ramps down 18 dB over 80 ms. When the last voice source ends, they recover over 400 ms. Overlapping voices keep the duck held (reference count).
+- Duck: when any voice source starts, `crowd` ramps down 15 dB and `music` ramps down 18 dB over 80 ms. When the last voice source ends, they recover over 400 ms. Overlapping voices keep the duck held (reference count).
 - Booth `sayAs` and baked `sayWord` both call `clips.play(url, { bus: 'voice' })`. Word MP3s move off `HTMLAudioElement` onto the graph, so they get ducking and reverb.
 - `speechSynthesis` fallback cannot enter the graph. It calls `mixer.duckStart()` on `onstart` and `mixer.duckEnd()` on `onend` or `onerror`. No reverb.
 - Level-match the two booth voices within 1 dB (brief 5.3).

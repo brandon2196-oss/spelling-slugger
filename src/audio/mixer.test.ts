@@ -12,8 +12,8 @@ function param(): DuckParam & { calls: Array<[string, number, number?]> } {
 }
 
 describe('createDucker', () => {
-  it('ducks crowd 9 dB and music 18 dB', () => {
-    expect(20 * Math.log10(DUCK_GAIN.crowd)).toBeCloseTo(-9, 5)
+  it('ducks crowd 15 dB and music 18 dB', () => {
+    expect(20 * Math.log10(DUCK_GAIN.crowd)).toBeCloseTo(-15, 5)
     expect(20 * Math.log10(DUCK_GAIN.music)).toBeCloseTo(-18, 5)
   })
 
