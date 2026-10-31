@@ -94,6 +94,8 @@ export type SubmitEvent =
       visitorRunsThisInning: number | null
       /** Visitors total before this play's reveal. */
       visitorsBefore: number
+      /** The kid's total runs after this play. */
+      homeTotal: number
       /** null unless gameOver. A tie is a win. */
       gameResult: 'win' | 'loss' | null
     }

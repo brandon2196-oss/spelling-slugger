@@ -177,6 +177,7 @@ export function submitAnswer(state: GameState, text: string): { state: GameState
       word,
       visitorRunsThisInning,
       visitorsBefore,
+      homeTotal: tallies.runs,
       gameResult,
     },
   }

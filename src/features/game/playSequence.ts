@@ -8,7 +8,7 @@ import type { AnnounceEvent, CommentaryContext } from '../../audio/announcer'
 import { driveLayers, layersFor, pickPitchCall, type FieldBeat, type PitchCall, type SequenceSfx } from '../../audio/layering'
 import type { SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
-import { announcementsFor } from './announcements'
+import { announcementsFor, isWalkOff, retookLead, visitorsCall } from './announcements'
 import { motionScale } from './timing'
 
 export type { FieldBeat, PitchCall, SequenceSfx } from '../../audio/layering'
@@ -23,6 +23,8 @@ export interface SequenceOptions {
    * the play. Any beat the field never reports falls back to its motionScale offset.
    */
   onBeatSink?: (onBeat: (beat: FieldBeat) => void) => void
+  /** Phase 3: called when the Visitors' runs for this inning should appear on the line score. */
+  revealVisitors?: () => void
 }
 
 export type Announce = (text: string) => Promise<void>
@@ -87,7 +89,9 @@ export async function playSequence(
     if (event.runsScored > 0) {
       if (driver) driver.organCharge()
       else sfx.organ('charge')
-      await moment(event.runsScored === 1 ? 'run' : 'runs') // RUN SCORED! / N RUNS SCORED!
+      // Coming from behind gets its own booth call; the walk-off call waits for the final.
+      const call = !event.gameOver && retookLead(event) ? 'kidRetakesLead' : event.runsScored === 1 ? 'run' : 'runs'
+      await moment(call) // RUN SCORED! / N RUNS SCORED!
     }
 
     if (event.inningEnded) {
@@ -99,12 +103,26 @@ export async function playSequence(
       }
     }
 
+    // The Visitors bat at inning end only: their runs land on the line score now, never mid-inning.
+    const visitors = async () => {
+      opts.revealVisitors?.()
+      const call = visitorsCall(event)
+      if (call) await moment(call) // VISITORS SCORE N!
+    }
+
     if (event.gameOver) {
-      if (event.outcome !== 'homeRun') sfx.fanfare()
-      await field?.playGameOver(event.runsScored)
-      await moment('gameOver') // GAME OVER!
+      await visitors()
+      if (event.gameResult === 'loss') {
+        // A quiet finish: no fanfare, no celebration. The booth is kind (announcer-lines.json loss).
+        await Promise.all([field?.banner('TOUGH LOSS'), moment('loss')]) // TOUGH LOSS
+      } else {
+        if (event.outcome !== 'homeRun') sfx.fanfare()
+        await field?.playGameOver(event.runsScored)
+        const call = event.gameResult === null ? 'gameOver' : isWalkOff(event) ? 'walkOff' : 'win'
+        await moment(call) // GAME OVER! / WALK OFF! / HOME TEAM WINS!
+      }
     } else if (event.inningEnded) {
-      await field?.playInningEnd(event.nextInning)
+      await Promise.all([field?.playInningEnd(event.nextInning), visitors()])
       await next() // NEW INNING!
     }
   } finally {
