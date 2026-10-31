@@ -49,8 +49,22 @@ describe('Broadcast', () => {
 
   it('names the team and jersey number in the bug', () => {
     renderBroadcast()
-    expect(screen.getByText('Sluggers')).toBeInTheDocument()
+    expect(screen.getAllByText('Sluggers').length).toBeGreaterThan(0)
     expect(screen.getByText('#7')).toBeInTheDocument()
+  })
+
+  it('shows a HOME and VISITORS line score, keeping the runs test id', () => {
+    renderBroadcast()
+    const line = screen.getByTestId('line-score')
+    expect(line).toHaveTextContent('Sluggers')
+    expect(line).toHaveTextContent('Visitors')
+    expect(screen.getByTestId('runs')).toHaveTextContent('5')
+    expect(screen.getByTestId('visitors')).toHaveTextContent('1')
+  })
+
+  it('the line score shows only the Visitors innings revealed so far', () => {
+    renderBroadcast({ visitors: [] })
+    expect(screen.getByTestId('visitors')).toHaveTextContent('0')
   })
 
   it('shows the announcer name on the booth plate', () => {

@@ -17,19 +17,21 @@ export interface BroadcastProps {
   caption: string | null
   /** The big pop on the board ("DOUBLE!"). Null hides it. */
   announcement: string | null
+  /** Visitors line as revealed so far (lags the engine until the inning-end play). Defaults to state.visitors. */
+  visitors?: number[]
 }
 
 const MODE_LABEL: Record<BroadcastMode, string> = { weekly: 'Weekly', practice: 'Practice', missed: 'Missed words' }
 
 /** A 90s TV set around the field: score bug, announcer window, caption bar and the LIVE tag over the glass. */
-export function Broadcast({ children, state, player, mode, announcer, caption, announcement }: BroadcastProps) {
+export function Broadcast({ children, state, player, mode, announcer, caption, announcement, visitors }: BroadcastProps) {
   return (
     <div className="broadcast">
       <div className="broadcast-screen">
         {children}
         <div className="broadcast-overlay pointer-events-none">
           <div className="absolute left-[2%] top-[2.5%]">
-            <Scoreboard state={state} player={player} />
+            <Scoreboard state={state} player={player} visitors={visitors} />
           </div>
           <div className="absolute right-[2%] top-[2.5%]">
             <AnnouncerWindow {...announcer} />
