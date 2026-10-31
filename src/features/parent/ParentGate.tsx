@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router'
 import { Banner } from '../../components/Banner'
 import { Card } from '../../components/Card'
-import { Paper } from '../../components/Page'
+import { BallparkShell } from '../../components/BallparkShell'
 import { useStore } from '../../data/store'
 import { PinPad } from './PinPad'
 
@@ -42,7 +42,7 @@ export function ParentGate() {
   }
 
   if (unlocked) return <Outlet />
-  if (hasPin === null) return <Paper className="p-8" aria-busy="true" />
+  if (hasPin === null) return <BallparkShell variant="parent" className="p-8" aria-busy="true" />
 
   async function onPin(pin: string) {
     setError(null)
@@ -62,7 +62,7 @@ export function ParentGate() {
   }
 
   return (
-    <Paper className="flex flex-col items-center justify-center px-4 py-10">
+    <BallparkShell variant="parent" className="flex flex-col items-center justify-center px-4 py-10">
       <Card className="w-full max-w-sm text-center">
         <h1 className="text-3xl text-navy">{hasPin ? 'Parent zone' : 'Set a parent PIN'}</h1>
         <p className="mt-2 mb-6 text-ink/70">
@@ -76,6 +76,6 @@ export function ParentGate() {
         {error ? <div className="mt-4"><Banner kind="error">{error}</Banner></div> : null}
         <p className="mt-6"><Link to="/players" className="underline text-navy/70">Back to players</Link></p>
       </Card>
-    </Paper>
+    </BallparkShell>
   )
 }

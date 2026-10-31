@@ -80,10 +80,14 @@ describe('AnnouncerPicker', () => {
     expect(fake.synth.speak).not.toHaveBeenCalled()
   })
 
-  it('each booth has a portrait', () => {
+  it('each booth shows a neutral placeholder, not a pixel portrait', () => {
     render(<AnnouncerPicker value="bigRed" onChange={() => {}} />)
-    expect(screen.getByRole('button', { name: /big red/i }).querySelector('svg')).not.toBeNull()
-    expect(screen.getByRole('button', { name: /jack dalton/i }).querySelector('svg')).not.toBeNull()
-    expect(screen.getByRole('button', { name: /quiet/i }).querySelector('svg')).not.toBeNull()
+    for (const name of [/big red/i, /jack dalton/i, /quiet/i]) {
+      const btn = screen.getByRole('button', { name })
+      expect(btn.querySelector('[data-testid="booth-placeholder"]')).not.toBeNull()
+      expect(btn.querySelector('svg')).toBeNull()
+    }
+    expect(screen.getByRole('button', { name: /big red/i }).querySelector('[data-testid="booth-placeholder"]')).toHaveTextContent('BB')
+    expect(screen.getByRole('button', { name: /jack dalton/i }).querySelector('[data-testid="booth-placeholder"]')).toHaveTextContent('JD')
   })
 })

@@ -341,3 +341,24 @@ Block and three sheets, same pattern as the pitcher: an original fuzzy gold masc
 1. Put accepted originals under `art-src/` with the exact names above. Keep this folder; it is the master.
 2. Give the bots the `art-src/` folder. They key out the green, split the batter's chroma colors into the tint layers, cut sprite rows into frames, resize to the contract sizes, pack the atlases, and fill `public/art/manifest.json`.
 3. The brief in PR 10 needs one short amendment so the bots expect this: section 3.3 gains a "chroma-key delivery" option with the color table from Part A. Say the word and that gets added.
+
+### B10. Menu booth portraits (one chat, upload the style sheet first)
+
+Used on the kid home "In the booth tonight" row. Square, friendly, waving from the broadcast booth window. Brandon generates these; bots never do.
+
+**B10.1** File: `art-src/booth/menu-bigRed.png`
+```
+Match this style exactly. Cartoon baseball radio announcer Big Red Brannigan leaning out of a little stadium broadcast booth window, waving at the viewer: big friendly man in his sixties, round red face, thick red mustache, red hair under a flat cap, headset with microphone, bow tie, wide grin. Booth window frame in navy and gold. Thick black outlines, flat fills. Square image, flat solid #00FF00 background. No text, no logos.
+```
+
+**B10.2** File: `art-src/booth/menu-jackDalton.png`
+```
+Match this style exactly. Cartoon baseball announcer Jack Dalton leaning on the sill of a little stadium broadcast booth window, giving a thumbs up: calm man in his forties, dark skin, short black hair, neat beard, purple cap, headset with microphone, open collar shirt, small confident smile. Booth window frame in navy and gold. Thick black outlines, flat fills. Square image, flat solid #00FF00 background. No text, no logos.
+```
+
+**B10.3** File: `art-src/booth/menu-quiet.png`
+```
+Match this style exactly. An empty cartoon stadium broadcast booth window at night, microphone on its stand with a small "off" switch, headset hanging on a hook, navy and gold frame. Thick black outlines, flat fills. Square image, flat solid #00FF00 background. No text, no logos, no people.
+```
+
+Big Red and Jack are original characters. Reject anything that looks like a real announcer.
