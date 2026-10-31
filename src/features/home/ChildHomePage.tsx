@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { Button } from '../../components/Button'
-import { Stadium } from '../../components/Page'
+import { BallparkShell } from '../../components/BallparkShell'
+import { StadiumStill } from '../../components/StadiumStill'
 import { useStore } from '../../data/store'
 import { useAudioSettings } from '../../audio/settings'
 import { primeSpeech } from '../../audio/speech'
@@ -36,8 +36,8 @@ export function ChildHomePage() {
     store.listGames(playerId, { mode: 'weekly', status: 'complete' }).then((gs) => setRecord(recordLine(seasonRecord(gs))))
   }, [store, playerId])
 
-  if (player === undefined || active === undefined) return <Stadium className="p-8" aria-busy="true" />
-  if (!player) return <Stadium className="p-8"><Link to="/players" className="btn-secondary">Back to players</Link></Stadium>
+  if (player === undefined || active === undefined) return <BallparkShell className="p-8" aria-busy="true" />
+  if (!player) return <BallparkShell className="p-8"><Link to="/players" className="btn-cream">Back to players</Link></BallparkShell>
 
   function playWeek() {
     if (!active) return
@@ -52,21 +52,27 @@ export function ChildHomePage() {
   }
 
   return (
-    <Stadium className="px-4 py-6">
+    <BallparkShell
+      className="px-4 py-6"
+      hero={
+        <div className="relative">
+          <StadiumStill />
+          <div className="absolute inset-x-0 bottom-0 flex justify-center">
+            <PlayerPreview appearance={player.appearance} hand={player.hand} jerseyNumber={player.jerseyNumber} size={180} />
+          </div>
+        </div>
+      }
+    >
       <div className="mx-auto max-w-3xl">
-        <header className="flex items-center justify-between text-chalk/70">
-          <Link to="/players" className="underline underline-offset-4">Switch player</Link>
-          <Link to="/parent" className="underline underline-offset-4">Parent zone</Link>
+        <header className="mt-4 flex items-center justify-between gap-3">
+          <Link to="/players" className="btn-cream min-h-11 text-base">Switch player</Link>
+          <Link to="/parent" className="btn-cream min-h-11 text-base">Parent zone</Link>
         </header>
 
-        <div className="mt-4 flex flex-col sm:flex-row items-center gap-4">
-          <PlayerPreview appearance={player.appearance} hand={player.hand} jerseyNumber={player.jerseyNumber} size={180} />
-          <div className="text-center sm:text-left">
-            <p className="text-gold font-display text-xl">Now batting</p>
-            <h1 className="font-display text-5xl leading-none">{player.name}</h1>
-            <p className="mt-1 text-chalk/70">{player.teamName || 'Grand Slammers'} · #{player.jerseyNumber}</p>
-            {record ? <p className="mt-1 font-display text-lg text-gold" data-testid="season-record">{record}</p> : null}
-          </div>
+        <div className="mt-4 text-center">
+          <h1 className="board-text text-gold text-3xl leading-tight">{player.name}</h1>
+          <p className="mt-1 text-chalk/70">{player.teamName || 'Grand Slammers'} · #{player.jerseyNumber}</p>
+          {record ? <p className="mt-2 font-display text-3xl text-gold" data-testid="season-record">{record}</p> : null}
         </div>
 
         {resume ? (
@@ -81,28 +87,28 @@ export function ChildHomePage() {
 
         <div className="mt-6 grid gap-3">
           {active ? (
-            <Button size="xl" onClick={() => void playWeek()}>Play this week&apos;s game</Button>
+            <button type="button" className="btn-gold min-h-16 text-2xl px-8 py-4" onClick={() => void playWeek()}>Play this week&apos;s game</button>
           ) : (
-            <div className="rounded-3xl border-2 border-dashed border-chalk/30 p-5 text-center">
+            <div className="ballpark-card border-dashed p-5 text-center">
               <p className="font-display text-2xl">No words yet</p>
               <p className="text-chalk/70">Ask a grown-up to add this week&apos;s words in the parent zone.</p>
             </div>
           )}
           <div className="grid grid-cols-3 gap-3">
-            <Link to={`/play/${playerId}/pick/practice`} className="btn-secondary flex-col py-4">Practice</Link>
-            <Button variant="secondary" size="lg" className="py-4" onClick={() => void playMissed()}>Missed words</Button>
-            <Link to={`/play/${playerId}/pick/previous`} className="btn-secondary flex-col py-4">Past weeks</Link>
+            <Link to={`/play/${playerId}/pick/practice`} className="btn-cream flex-col py-4">Practice</Link>
+            <button type="button" className="btn-cream py-4" onClick={() => void playMissed()}>Missed words</button>
+            <Link to={`/play/${playerId}/pick/previous`} className="btn-cream flex-col py-4">Past weeks</Link>
           </div>
           {notice ? <p className="text-center text-gold">{notice}</p> : null}
         </div>
 
-        <section aria-label="Announcer" className="mt-8">
+        <section aria-label="Announcer booth" className="mt-8">
           <BoothHeading />
           <AnnouncerPicker value={audio.announcer} onChange={(id) => { primeSpeech(); sfx.unlock(); audio.set({ announcer: id }) }} />
         </section>
       </div>
       {modal}
-    </Stadium>
+    </BallparkShell>
   )
 }
 
