@@ -107,17 +107,17 @@ export function ResultsPage() {
       <div className="mx-auto max-w-3xl">
         <section aria-label="Postgame show" className="postgame-panel rounded-xl p-5 sm:p-7">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="on-air-tag pixel-text inline-flex items-center gap-2 rounded-sm px-3 py-2 text-[10px] uppercase" aria-hidden="true">
+            <span className="on-air-tag board-text inline-flex items-center gap-2 rounded-sm px-3 py-2 text-[10px] uppercase" aria-hidden="true">
               <span className="live-dot inline-block h-2 w-2 bg-chalk" />
               Postgame show
             </span>
-            <p className="pixel-text text-gold text-xs sm:text-sm uppercase">{newBest ? 'New personal best!' : 'Final score'}</p>
+            <p className="board-text text-gold text-xs sm:text-sm uppercase">{newBest ? 'New personal best!' : 'Final score'}</p>
           </div>
-          <h1 className="pixel-text announce-pixel mt-5 leading-none text-[clamp(3rem,12vw,5.5rem)]">
+          <h1 className="board-text announce-board mt-5 leading-none text-[clamp(3rem,12vw,5.5rem)]">
             {s.runs}<span className="ml-[0.4em] text-[0.35em] text-chalk [text-shadow:none]">run{s.runs === 1 ? '' : 's'}</span>
           </h1>
           {result ? (
-            <p data-testid="result" className={`pixel-text mt-4 text-2xl uppercase ${result === 'win' ? 'text-gold' : 'text-chalk'}`}>{result === 'win' ? 'Win' : 'Loss'}</p>
+            <p data-testid="result" className={`board-text mt-4 text-2xl uppercase ${result === 'win' ? 'text-gold' : 'text-chalk'}`}>{result === 'win' ? 'Win' : 'Loss'}</p>
           ) : null}
           {state ? <LineScore state={state} visitors={state.visitors} home={player?.teamName || 'Slammers'} className="mt-3 text-base" /> : null}
           {season ? <p className="mt-2 text-chalk/80" data-testid="season-record">Record: {season}</p> : null}
@@ -130,8 +130,8 @@ export function ResultsPage() {
           <dl className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
             {rows.map(([k, v]) => (
               <div key={k} className="postgame-cell rounded-md p-3">
-                <dt className="pixel-text text-[9px] uppercase text-chalk/60">{k}</dt>
-                <dd className="pixel-text mt-2 text-xl text-gold">{v}</dd>
+                <dt className="board-text text-[9px] uppercase text-chalk/60">{k}</dt>
+                <dd className="board-text mt-2 text-xl text-gold">{v}</dd>
               </div>
             ))}
           </dl>
@@ -143,7 +143,7 @@ export function ResultsPage() {
 
           {s.missedWords.length ? (
             <section className="mt-6">
-              <h2 className="pixel-text text-sm sm:text-base uppercase">Words to work on</h2>
+              <h2 className="board-text text-sm sm:text-base uppercase">Words to work on</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {s.missedWords.map((w) => <li key={w} className="rounded-full bg-red/80 px-3 py-1 font-display text-lg">{w}</li>)}
               </ul>
@@ -172,7 +172,7 @@ export function ResultsPage() {
 function Breakdown({ title, b }: { title: string; b: { total: number; firstTry: number; missed: number } }) {
   return (
     <div className="postgame-cell rounded-md p-4">
-      <h3 className="pixel-text text-xs uppercase text-chalk/80">{title}</h3>
+      <h3 className="board-text text-xs uppercase text-chalk/80">{title}</h3>
       <p className="text-chalk/80 mt-1">{b.firstTry} of {b.total} on the first try · {b.missed} missed</p>
     </div>
   )

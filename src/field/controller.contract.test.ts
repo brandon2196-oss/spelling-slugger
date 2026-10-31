@@ -38,7 +38,6 @@ vi.mock('phaser', () => {
   return { default: Phaser, ...Phaser }
 })
 
-const { FieldScene } = await import('./FieldScene')
 const { CartoonScene } = await import('./CartoonScene')
 
 const look: PlayerLook = {
@@ -50,7 +49,6 @@ const loaded = { first: true, second: true, third: false }
 
 type Scene = FieldController & { create(): void; ready: Promise<void> }
 const scenes: [string, () => Scene][] = [
-  ['pixel', () => new FieldScene({ look, bases: empty, motion: 0 }) as unknown as Scene],
   ['cartoon', () => new CartoonScene({ look, bases: empty, motion: 0 }) as unknown as Scene],
 ]
 

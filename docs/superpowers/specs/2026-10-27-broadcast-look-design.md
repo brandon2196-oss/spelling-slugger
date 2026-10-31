@@ -1,3 +1,5 @@
+> **Superseded** by `2026-10-30-fun-overhaul-grok-brief.md` (Phase 4 retired the pixel field and Press Start 2P). Kept for history.
+
 # Retro Broadcast look, sound pools and announcers
 
 Brandon, 2026-10-27, after his wife and Cooper played the first version: "think more 16 bit gaming and

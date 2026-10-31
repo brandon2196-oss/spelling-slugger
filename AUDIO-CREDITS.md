@@ -4,6 +4,9 @@ Every file in `public/audio/sfx/` and `public/audio/ir/` is CC0 1.0 or public do
 `audio-src/`; `npm run process-audio` regenerates the shipped files (trim leading silence, loudnorm to
 -16 LUFS, mono, Ogg Vorbis q5; ambience is not trimmed; the IR is only re-encoded).
 
+Phase 4 (retire pixel field) audit: every pool below is still played by `src/audio/sfx.ts`, and every
+booth clip is listed in `public/audio/announcer-manifest.json`, so no clips or rows were retired.
+
 Pools marked "pending, CC0 search failed" are stubs with no files; the game skips that layer.
 
 ## Ballpark sound (Phase 2)

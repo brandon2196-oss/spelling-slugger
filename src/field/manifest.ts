@@ -69,7 +69,7 @@ function parseClip(batter: unknown, name: BatterClipName): BatterClip | null {
   }
 }
 
-/** Cartoon game pixels are the pixel layout times this. */
+/** Cartoon game pixels are the 320x240 reference layout times this. */
 export const CARTOON_SCALE = 4
 const s = (p: Point): Point => ({ x: p.x * CARTOON_SCALE, y: p.y * CARTOON_SCALE })
 
