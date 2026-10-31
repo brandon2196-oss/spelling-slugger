@@ -27,6 +27,32 @@ export function keyGreen(im, { minG = 200, maxRB = 90, spill = 24 } = {}) {
   return im
 }
 
+/**
+ * Green spill on the outline: keyGreen only despills the 1px ring touching the key, but sheets drawn on
+ * soft-edged green (pitcher) keep a green halo a few pixels deep. Within `radius` px of transparency,
+ * clamp green to max(red, blue) so the outline reads neutral. Interior pixels are left alone.
+ */
+export function despillEdges(im, radius = 3) {
+  const { width: w, height: h, data: d } = im
+  let dist = new Uint8Array(w * h).fill(255)
+  for (let p = 0; p < w * h; p++) if (d[p * 4 + 3] === 0) dist[p] = 0
+  for (let r = 1; r <= radius; r++) {
+    const next = dist.slice()
+    for (let p = 0; p < w * h; p++) {
+      if (dist[p] !== 255) continue
+      const x = p % w
+      if ((x > 0 && dist[p - 1] === r - 1) || (x < w - 1 && dist[p + 1] === r - 1) || (p >= w && dist[p - w] === r - 1) || (p < w * (h - 1) && dist[p + w] === r - 1)) next[p] = r
+    }
+    dist = next
+  }
+  for (let p = 0; p < w * h; p++) {
+    if (dist[p] === 0 || dist[p] === 255) continue
+    const i = p * 4, m = Math.max(d[i], d[i + 2])
+    if (d[i + 1] > m) d[i + 1] = m
+  }
+  return im
+}
+
 /** Flood-fill near-white background from the borders (the batter sheet arrived on white, not green). */
 export function keyWhiteFromEdges(im, min = 235) {
   const { width: w, height: h, data: d } = im
