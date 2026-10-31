@@ -8,7 +8,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync, statSync }
 import { dirname, join } from 'node:path'
 import sharp from 'sharp'
 import {
-  alignFrames, blobs, dropGroundStrips, keyShadowGreen, bbox, clearGridLines, crop, img, keyGreen, keyWhiteFromEdges, packAtlas, sliceSheet, splitBatter,
+  alignFrames, blobs, dropGroundStrips, keyShadowGreen, bbox, clearGridLines, crop, img, keyGreen, keyWhiteFromEdges, packAtlas, sliceSheet, splitBatter, batterLayer,
 } from './lib.mjs'
 
 const ROOT = process.argv[2] ?? process.cwd()
@@ -220,27 +220,119 @@ function rotate(im) {
 }
 const unrotate = rotate
 
-// ------------------------------------------------------------------ batter (swing-contact only)
-async function batter(m) {
-  const im = keyWhiteFromEdges(await load('batter/swing-contact.png'))
-  const frames = alignFrames(sliceSheet(im, {})[0])
-  const clip = m.batter.clips['swing-contact']
-  const files = []
-  const made = new Set()
-  for (const [i, f] of frames.entries()) {
-    const layers = splitBatter(f)
-    for (const [layer, li] of Object.entries(layers)) {
-      const rel = `batter/swing-contact/${String(i).padStart(2, '0')}-${layer}.png`
-      await save(rel, li)
-      files.push(`art/${rel}`)
-      made.add(layer)
+// ------------------------------------------------------------------ batter (every clip in art-src/batter)
+/** Hat top to shoe bottom, in game-art pixels, for every clip so the batter never changes size mid-at-bat. */
+const BATTER_BODY_H = 200
+/** Clip -> source sheet. swing-contact arrived on white (first run); the rest are on #00FF00. */
+const BATTER_CLIPS = {
+  'stance-idle': { rel: 'batter/stance-idle.png' },
+  'swing-miss': { rel: 'batter/swing-miss.png' },
+  'swing-contact': { rel: 'batter/swing-contact.png', white: true, contactFrame: 4 },
+  'take-walk': { rel: 'batter/take-walk.png' },
+  run: { rel: 'batter/run.png' },
+  trot: { rel: 'batter/trot.png' },
+  'strikeout-slump': { rel: 'batter/strikeout-slump.png' },
+  celebrate: { rel: 'batter/celebrate.png' },
+}
+const HAIRS = ['short', 'long', 'curly', 'buzz']
+const isHat = (d, i) => batterLayer(d[i], d[i + 1], d[i + 2], true) === 'hat'
+/** Top of the yellow hat (falls back to the figure top) to the lowest opaque row. */
+function bodyHeight(f) {
+  const b = bbox(f)
+  if (!b) return 1
+  for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) {
+    const i = (y * f.width + x) * 4
+    if (f.data[i + 3] > 16 && isHat(f.data, i)) return b.y + b.h - y
+  }
+  return b.h
+}
+/** The purple hair pixels of one overlay head (mirrored: heads face left, bodies face right) as a gray layer. */
+async function hairOverlay(style) {
+  // hair-short.png is a dim capture (#217921 background), so key by hue rather than keyGreen.
+  const im = await load(`batter/hair-${style}.png`)
+  const { width: w, height: h, data: d } = im
+  const hair = img(w, h), hat = img(w, h)
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = (y * w + x) * 4, o = (y * w + (w - 1 - x)) * 4
+    const l = batterLayer(d[i], d[i + 1], d[i + 2], true)
+    if (l === 'hat') hat.data[o + 3] = 255
+    if (l === 'hair-short') {
+      const v = Math.max(d[i], d[i + 1], d[i + 2])
+      hair.data[o] = hair.data[o + 1] = hair.data[o + 2] = v
+      hair.data[o + 3] = 255
     }
   }
-  clip.status = 'ready'
-  clip.files = files
-  clip.delivered = { frames: frames.length, frameSize: { width: frames[0].width, height: frames[0].height }, contactFrame: 4 }
-  clip.missingLayers = m.batter.layers.filter((l) => !made.has(l))
-  clip._note = 'Packed from one flat Gemini drawing split by hue (brief 3.3.1). The drawn hair is the only hairstyle and ships as hair-short. Layers listed in missingLayers have no pixels; the game skips them.'
+  // Keep only the main hair mass (drops stray purple specks from the capture).
+  const main = blobs(hair, 20)
+  const keep = img(w, h)
+  for (const b of main.filter((b) => b.area >= 0.05 * main[0].area)) {
+    for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) {
+      const i = (y * w + x) * 4
+      if (hair.data[i + 3]) for (let c = 0; c < 4; c++) keep.data[i + c] = hair.data[i + c]
+    }
+  }
+  const hb = blobs(hat, 50)[0]
+  return { hair: keep, hat: hb }
+}
+/**
+ * Brief 3.3.1: the body clips carry one drawn hairstyle (short). For the other styles, place each mirrored
+ * overlay on the frame by matching the overlay's cap to the frame's cap (scale by cap width, anchor at
+ * the cap's top-left). Front-facing celebrate gets no side-view overlays.
+ */
+function fitHair(frameHat, o) {
+  const fb = frameHat && bbox(frameHat)
+  if (!fb || !o.hat) return null
+  const k = fb.w / o.hat.w
+  const out = img(frameHat.width, frameHat.height)
+  const ov = o.hair
+  const n = Math.max(1, Math.ceil(k))
+  for (let y = 0; y < ov.height; y++) for (let x = 0; x < ov.width; x++) {
+    const si = (y * ov.width + x) * 4
+    if (!ov.data[si + 3]) continue
+    const x0 = Math.round(fb.x + (x - o.hat.x) * k), y0 = Math.round(fb.y + (y - o.hat.y) * k)
+    for (let dy = 0; dy < n; dy++) for (let dx = 0; dx < n; dx++) {
+      const tx = x0 + dx, ty = y0 + dy
+      if (tx < 0 || ty < 0 || tx >= out.width || ty >= out.height) continue
+      const di = (ty * out.width + tx) * 4
+      for (let c = 0; c < 4; c++) out.data[di + c] = ov.data[si + c]
+    }
+  }
+  return bbox(out) ? out : null
+}
+async function batter(m) {
+  const ov = {}
+  for (const s of HAIRS.slice(1)) ov[s] = await hairOverlay(s)
+  for (const [name, spec] of Object.entries(BATTER_CLIPS)) {
+    const clip = m.batter.clips[name]
+    const im = await load(spec.rel)
+    if (spec.white) keyWhiteFromEdges(im)
+    else { keyGreen(im); keyShadowGreen(im); clearGridLines(im) }
+    let frames = sliceSheet(im, { perRow: clip.frames })[0]
+    // One scale per clip, from its tallest body, so every clip draws the batter at BATTER_BODY_H.
+    const k = BATTER_BODY_H / Math.max(...frames.map(bodyHeight))
+    frames = await Promise.all(frames.map((f) => resize(f, Math.max(1, Math.round(f.width * k)), Math.max(1, Math.round(f.height * k)))))
+    frames = alignFrames(frames)
+    const files = []
+    const made = new Set()
+    for (const [i, f] of frames.entries()) {
+      const layers = splitBatter(f)
+      if (name !== 'celebrate') for (const s of HAIRS.slice(1)) {
+        const fit = fitHair(layers.hat, ov[s])
+        if (fit) layers[`hair-${s}`] = fit
+      }
+      for (const [layer, li] of Object.entries(layers)) {
+        const rel = `batter/${name}/${String(i).padStart(2, '0')}-${layer}.png`
+        await save(rel, li)
+        files.push(`art/${rel}`)
+        made.add(layer)
+      }
+    }
+    clip.status = 'ready'
+    clip.files = files
+    clip.delivered = { frames: frames.length, frameSize: { width: frames[0].width, height: frames[0].height }, ...(spec.contactFrame !== undefined ? { contactFrame: spec.contactFrame } : {}) }
+    clip.missingLayers = m.batter.layers.filter((l) => !made.has(l))
+    clip._note = 'Split by hue (brief 3.3.1). hair-short is the drawn hair; hair-long/curly/buzz are the mirrored art-src/batter/hair-* overlays fitted onto it. Layers in missingLayers have no pixels; the game skips them.'
+  }
 }
 
 // ------------------------------------------------------------------ singles

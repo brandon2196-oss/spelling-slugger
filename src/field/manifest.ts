@@ -28,9 +28,14 @@ export interface FieldManifest {
   missing: string[]
   /** Paths (relative to public/) of every asset marked ready. */
   ready: Set<string>
-  /** Packed batter swing (the only batter clip delivered so far), or null for the placeholder. */
+  /** Packed batter swing-contact clip, or null for the placeholder. */
   batterSwing: BatterClip | null
+  /** Every packed batter clip by name (stance-idle, swing-miss, swing-contact, run, ...). */
+  batterClips: Partial<Record<BatterClipName, BatterClip>>
 }
+
+export const BATTER_CLIP_NAMES = ['stance-idle', 'swing-miss', 'swing-contact', 'take-walk', 'run', 'trot', 'strikeout-slump', 'celebrate'] as const
+export type BatterClipName = (typeof BATTER_CLIP_NAMES)[number]
 
 export interface BatterClip {
   frames: number
@@ -39,22 +44,28 @@ export interface BatterClip {
   layers: string[]
   /** Path for one frame and layer. */
   file: (frame: number, layer: string) => string
+  /** True when that frame has pixels on that layer (a file was packed for it). */
+  has: (frame: number, layer: string) => boolean
 }
 
-function parseSwing(batter: unknown): BatterClip | null {
-  const clip = (batter as { clips?: Record<string, unknown> } | undefined)?.clips?.['swing-contact'] as
+function parseClip(batter: unknown, name: BatterClipName): BatterClip | null {
+  const clip = (batter as { clips?: Record<string, unknown> } | undefined)?.clips?.[name] as
     | { status?: string; files?: string[]; delivered?: { frames?: number; contactFrame?: number } }
     | undefined
   if (clip?.status !== 'ready' || !Array.isArray(clip.files) || !clip.files.length) return null
   const frames = clip.delivered?.frames ?? 0
   if (frames < 1) return null
-  const prefix = 'art/batter/swing-contact/'
-  const layers = [...new Set(clip.files.filter((f) => f.startsWith(prefix + '00-')).map((f) => f.slice(prefix.length + 3, -4)))]
+  const prefix = `art/batter/${name}/`
+  // Union over frames: a hair overlay may be absent from one frame but present in others.
+  const layers = [...new Set(clip.files.filter((f) => f.startsWith(prefix)).map((f) => f.slice(prefix.length + 3, -4)))]
+  const file = (frame: number, layer: string) => `${prefix}${String(frame).padStart(2, '0')}-${layer}.png`
+  const packed = new Set(clip.files)
   return {
     frames,
     contactFrame: clip.delivered?.contactFrame ?? Math.min(3, frames - 1),
     layers,
-    file: (frame, layer) => `${prefix}${String(frame).padStart(2, '0')}-${layer}.png`,
+    file,
+    has: (frame, layer) => packed.has(file(frame, layer)),
   }
 }
 
@@ -112,7 +123,10 @@ export function parseManifest(raw: RawManifest | null | undefined): FieldManifes
     },
     missing: assets.filter((a) => a.status !== 'ready' && !a.optional).map((a) => a.path),
     ready: new Set(all.filter((a) => a.status === 'ready').map((a) => a.path)),
-    batterSwing: parseSwing(r.batter),
+    batterSwing: parseClip(r.batter, 'swing-contact'),
+    batterClips: Object.fromEntries(
+      BATTER_CLIP_NAMES.map((n) => [n, parseClip(r.batter, n)] as const).filter(([, c]) => c !== null),
+    ) as FieldManifest['batterClips'],
   }
 }
 

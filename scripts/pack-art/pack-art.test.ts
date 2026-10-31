@@ -90,11 +90,22 @@ describe('public/art output', () => {
   it('stays under the size budget', () => {
     expect(bytes('public/art')).toBeLessThanOrEqual(m.sizeBudgetBytes)
   })
-  it('batter swing files listed exist; other batter clips stay missing', () => {
-    const clips = m.batter.clips
-    expect(clips['swing-contact'].status).toBe('ready')
-    for (const f of clips['swing-contact'].files) expect(existsSync(join('public', f)), f).toBe(true)
-    for (const [name, c] of Object.entries(clips) as [string, { status: string }][]) if (name !== 'swing-contact') expect(c.status).toBe('missing')
+  it('every batter clip is packed from art-src, with files on disk and the delivered frame count', () => {
+    const clips = m.batter.clips as Record<string, { status: string; frames: number; files: string[]; delivered: { frames: number }; missingLayers: string[] }>
+    expect(Object.keys(clips).sort()).toEqual(['celebrate', 'run', 'stance-idle', 'strikeout-slump', 'swing-contact', 'swing-miss', 'take-walk', 'trot'])
+    for (const [name, c] of Object.entries(clips)) {
+      expect(c.status, name).toBe('ready')
+      expect(c.delivered.frames, name).toBe(c.frames)
+      for (const f of c.files) expect(existsSync(join('public', f)), f).toBe(true)
+      for (const l of ['outline', 'skin', 'jersey', 'pants', 'hat', 'hair-short']) expect(c.missingLayers, `${name} ${l}`).not.toContain(l)
+    }
+  })
+  it('hair overlays are fitted onto the side-view clips but not the front-view celebrate', () => {
+    const files = (n: string) => m.batter.clips[n].files as string[]
+    for (const style of ['long', 'curly', 'buzz']) {
+      expect(files('stance-idle').some((f) => f.endsWith(`-hair-${style}.png`)), style).toBe(true)
+      expect(files('celebrate').some((f) => f.endsWith(`-hair-${style}.png`)), style).toBe(false)
+    }
   })
   it('atlas frames sit inside their sheet and follow <clip>-NN naming', () => {
     for (const name of ['pitcher', 'fielders', 'catcher-ump', 'crowd', 'mascot']) {
