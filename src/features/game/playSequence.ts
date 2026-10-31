@@ -112,3 +112,18 @@ export async function playSequence(
     if (field && !opts.onBeatSink) field.onBeat = undefined
   }
 }
+
+/**
+ * Walk-up organ for a new batter. Returns a function to call when an at-bat comes up; it plays
+ * organ('walkup') once per at-bat index and ignores repeats (re-renders, Hear again, extra pitches).
+ * The word that follows rides the voice bus, which ducks the organ under it.
+ */
+export function walkupOnce(sfx: Pick<SequenceSfx, 'organ'>): (atBatIndex: number) => boolean {
+  let last = -1
+  return (atBatIndex) => {
+    if (atBatIndex === last) return false
+    last = atBatIndex
+    sfx.organ('walkup')
+    return true
+  }
+}
