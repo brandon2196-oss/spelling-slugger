@@ -25,10 +25,19 @@ describe('parseManifest', () => {
     expect(m.batterSwing?.layers).toContain('jersey')
     expect(m.batterSwing?.file(3, 'jersey')).toBe('art/batter/swing-contact/03-jersey.png')
   })
+  it('exposes every packed batter clip and which frame layers exist', () => {
+    const m = parseManifest(JSON.parse(readFileSync('public/art/manifest.json', 'utf8')))
+    expect(Object.keys(m.batterClips).sort()).toEqual(['celebrate', 'run', 'stance-idle', 'strikeout-slump', 'swing-contact', 'swing-miss', 'take-walk', 'trot'])
+    expect(m.batterClips['stance-idle']?.frames).toBe(4)
+    expect(m.batterClips['stance-idle']?.has(0, 'outline')).toBe(true)
+    expect(m.batterClips['stance-idle']?.has(0, 'number')).toBe(false)
+    expect(m.batterClips['stance-idle']?.layers).toContain('hair-curly')
+  })
   it('uses defaults when nothing is delivered', () => {
     const m = parseManifest({ coordinates: { homePlate: null } })
     expect(m.coords.homePlate).toEqual(DEFAULT_COORDS.homePlate)
     expect(m.batterSwing).toBeNull()
+    expect(m.batterClips).toEqual({})
     expect(m.ready.size).toBe(0)
   })
   it('takes real coordinates when present', () => {

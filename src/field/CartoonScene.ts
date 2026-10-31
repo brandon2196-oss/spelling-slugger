@@ -9,7 +9,7 @@ import type { Bases } from '../engine/types'
 import { FieldCamera } from './camera'
 import type { FieldBeat, FieldController, PlayerLook } from './controller'
 import { basesDiff, type Base, type Destination, type Point } from './layout'
-import { DEFAULT_COORDS, parseManifest, type Coordinates, type FieldManifest } from './manifest'
+import { DEFAULT_COORDS, parseManifest, type BatterClip, type BatterClipName, type Coordinates, type FieldManifest } from './manifest'
 import { hex, placeholderColors } from './rig'
 
 export interface CartoonSceneInit {
@@ -32,8 +32,13 @@ const ATLAS = {
 } as const
 type AtlasKey = keyof typeof ATLAS
 const HEIGHT = { pitcher: 120, infield: 100, outfield: 80, catcher: 100, umpire: 130, batter: 150 } as const
+/** pack-art draws every batter clip with a 200 px body (cap to shoes); scale that to HEIGHT.batter. */
+const BATTER_PX = HEIGHT.batter / 200
 const ART_FPS = 12
 const url = (path: string) => `/${path}`
+const batKey = (clip: string, f: number, layer: string) => `bat-${clip}-${f}-${layer}`
+/** Back to front. Only one hair layer draws (the kid's style); it sits behind the head. */
+const BATTER_DRAW = ['hair', 'skin', 'pants', 'jersey', 'trim', 'number', 'shoes-bat-glove', 'hat', 'hat-brim', 'outline'] as const
 
 export const CARTOON = { width: 1280, height: 960 } as const
 const DEPTH = { fielder: 4, runner: 5, batter: 10, ball: 20, flash: 30, particles: 40, banner: 50 } as const
@@ -59,6 +64,9 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
   private catcher?: Fig
   private umpire?: Fig
   private runners: Record<RunnerBase, Fig | null> = { first: null, second: null, third: null }
+  private idleTimer?: Phaser.Time.TimerEvent
+  /** Batter clips in flight; the idle waggle pauses while this is above zero. */
+  private busy = 0
   private readyResolve!: () => void
   readonly ready: Promise<void>
 
@@ -111,8 +119,11 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
     }
     if (this.has('art/ball/ball.png')) this.load.image('ball', url('art/ball/ball.png'))
     if (this.has('art/ball/ball-shadow.png')) this.load.image('ball-shadow', url('art/ball/ball-shadow.png'))
-    const sw = m.batterSwing
-    if (sw) for (let f = 0; f < sw.frames; f++) for (const l of sw.layers) this.load.image(`bat-${f}-${l}`, url(sw.file(f, l)))
+    for (const [name, clip] of Object.entries(m.batterClips ?? {})) {
+      for (let f = 0; f < clip.frames; f++) for (const l of clip.layers) {
+        if (clip.has(f, l)) this.load.image(batKey(name, f, l), url(clip.file(f, l)))
+      }
+    }
   }
 
   private makeAnims(): void {
@@ -237,6 +248,15 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
     return this.look.hand === 'L' ? this.c.batterBoxRight : this.c.batterBoxLeft
   }
 
+  /** The kid's own layered art as the runner leaving home, or null before batter art is packed. */
+  private batterRunner(name: BatterClipName): Fig | null {
+    if (!this.clip(name)) return null
+    const fig = this.batterArt(this.basePt('home'))
+    if (!fig) return null
+    this.batterFrame(name, 0, fig)
+    return fig.setDepth(DEPTH.runner)
+  }
+
   private makeRunner(at: Point): Fig {
     const col = placeholderColors(this.look)
     const f = this.person(at, col.jersey, String(this.look.jerseyNumber), 36, 70).setDepth(DEPTH.runner)
@@ -260,10 +280,12 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
   // ------------------------------------------------------------ controller API
   setPlayer(look: PlayerLook): void {
     this.look = look
+    this.idleTimer?.remove()
     this.batter?.destroy()
-    const art = this.batterArt()
+    const art = this.batterArt(this.batterPoint())
     if (art) {
       this.batter = art
+      this.startIdle()
     } else {
       const col = placeholderColors(look)
       this.batter = this.person(this.batterPoint(), col.jersey, String(look.jerseyNumber), 56, 110)
@@ -275,40 +297,83 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
   /** Tint for each batter layer from the kid's look; undefined means draw as packed (never tinted). */
   private layerTint(layer: string): number | undefined {
     const a = this.look.appearance
+    if (layer.startsWith('hair-')) return hex(a.hairColor)
     const t: Record<string, string> = {
       skin: a.skinTone, jersey: a.jerseyColor, pants: a.pantsColor, hat: a.hatColor,
-      'hat-brim': a.secondaryColor, trim: a.primaryColor, 'hair-short': a.hairColor,
+      'hat-brim': a.secondaryColor, trim: a.primaryColor,
     }
     return t[layer] ? hex(t[layer]) : undefined
   }
 
-  /** The layered, tinted batter from the packed swing-contact clip; null until it is packed and loaded. */
-  private batterArt(): Fig | null {
-    const sw = this.manifest.batterSwing
-    if (!sw || !this.tex(`bat-0-${sw.layers[0]}`)) return null
-    // Only the one drawn hairstyle exists (packed as hair-short); show it for every style until the rest land.
-    const parts = sw.layers.map((l) => {
-      const img = this.add.image(0, 0, `bat-0-${l}`).setOrigin(0.5, 1)
+  private clip(name: BatterClipName): BatterClip | undefined {
+    const c = this.manifest.batterClips?.[name]
+    return c && this.tex(batKey(name, 0, 'outline')) ? c : undefined
+  }
+
+  /** Hair layer for the kid's style, falling back to the drawn short hair. */
+  private hairLayer(): string {
+    const want = `hair-${this.look.appearance.hairstyle}`
+    const any = Object.values(this.manifest.batterClips ?? {}).some((c) => c.layers.includes(want))
+    return any ? want : 'hair-short'
+  }
+
+  /** The layered, tinted batter from the packed clips; null until they are packed and loaded. */
+  private batterArt(at: Point): Fig | null {
+    const first = (['stance-idle', 'swing-contact'] as const).find((n) => this.clip(n))
+    if (!first) return null
+    const hair = this.hairLayer()
+    const parts = BATTER_DRAW.map((slot) => {
+      const l = slot === 'hair' ? hair : slot
+      const img = this.add.image(0, 0, batKey(first, 0, 'outline')).setOrigin(0.5, 1)
       const tint = this.layerTint(l)
       if (tint !== undefined) img.setTint(tint)
       img.setData('layer', l)
       return img
     })
-    const k = HEIGHT.batter / (parts[0]!.height || HEIGHT.batter)
-    parts.forEach((p) => p.setScale(k))
-    const p = this.batterPoint()
-    const fig = this.add.container(p.x, p.y, parts)
+    const fig = this.add.container(at.x, at.y, parts)
     fig.setData('layers', parts)
+    this.batterFrame(first, 0, fig)
     return fig
   }
 
-  private batterFrame(f: number): void {
-    const parts = this.batter?.getData?.('layers') as Phaser.GameObjects.Image[] | undefined
-    if (!parts) return
+  /** Show one frame of a clip; layers with no pixels on that frame hide. Scaled so the body is HEIGHT.batter. */
+  private batterFrame(name: BatterClipName, f: number, fig: Fig | undefined = this.batter): boolean {
+    const parts = fig?.getData?.('layers') as Phaser.GameObjects.Image[] | undefined
+    const clip = this.clip(name)
+    if (!parts || !clip) return false
     for (const p of parts) {
-      const key = `bat-${f}-${p.getData('layer') as string}`
-      if (this.tex(key)) p.setTexture(key)
+      const key = batKey(name, f, p.getData('layer') as string)
+      if (this.tex(key)) p.setTexture(key).setVisible(true).setScale(BATTER_PX)
+      else p.setVisible(false)
     }
+    return true
+  }
+
+  /** Play a batter clip once (or `loops` times) on a figure; false when the clip is not packed. */
+  private async batterClip(name: BatterClipName, fig: Fig | undefined = this.batter, fps = ART_FPS, loops = 1): Promise<boolean> {
+    const clip = this.clip(name)
+    if (!clip || !fig?.getData?.('layers')) return false
+    this.busy++
+    try {
+      for (let n = 0; n < loops; n++) for (let f = 0; f < clip.frames; f++) {
+        this.batterFrame(name, f, fig)
+        await this.delay(1000 / fps)
+      }
+    } finally {
+      this.busy--
+    }
+    return true
+  }
+
+  /** stance-idle bat waggle while nothing else is playing. */
+  private startIdle(): void {
+    const clip = this.clip('stance-idle')
+    if (!clip || !this.time) return
+    let f = 0
+    this.idleTimer = this.time.addEvent({
+      delay: 1000 / 6, loop: true,
+      callback: () => { if (!this.busy && this.batter?.active) this.batterFrame('stance-idle', (f = (f + 1) % clip.frames)) },
+    })
   }
 
   setBases(b: Bases): void {
@@ -343,14 +408,10 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
     this.beat('pitchArrival')
   }
 
-  private async swing(): Promise<void> {
-    const sw = this.manifest.batterSwing
-    if (sw && this.batter?.getData?.('layers')) {
-      for (let f = 0; f < sw.frames; f++) {
-        this.batterFrame(f)
-        await this.delay(1000 / ART_FPS)
-      }
-      this.batterFrame(0)
+  private async swing(hit = false): Promise<void> {
+    const name = hit || !this.clip('swing-miss') ? 'swing-contact' : 'swing-miss'
+    if (await this.batterClip(name)) {
+      this.batterFrame(this.clip('stance-idle') ? 'stance-idle' : name, 0)
       return
     }
     await this.tween({ targets: this.batter, angle: this.look.hand === 'L' ? 25 : -25, duration: 120, yoyo: true })
@@ -364,7 +425,11 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
     await Promise.all([motion, into])
     this.ball.setVisible(false)
     this.shadow.setVisible(false).setAlpha(1)
-    if (n === 3) await this.tween({ targets: this.batter, scaleY: 0.85, duration: 300, yoyo: true, hold: 400 }) // strikeout-slump
+    if (n === 3) {
+      if (await this.batterClip('strikeout-slump', this.batter, 8)) await this.delay(300)
+      else await this.tween({ targets: this.batter, scaleY: 0.85, duration: 300, yoyo: true, hold: 400 })
+      this.batterFrame('stance-idle', 0)
+    }
     await this.banner(n === 1 ? 'STRIKE ONE' : n === 2 ? 'STRIKE TWO' : 'STRIKE THREE', 900)
   }
 
@@ -376,8 +441,11 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
   private async moveRunners(moves: { from: Base; to: Destination }[], legMs: number): Promise<void> {
     const jobs = moves.map(async ({ from, to }) => {
       let fig: Fig
+      let clip: BatterClipName | null = null
       if (from === 'home') {
-        fig = this.makeRunner(this.basePt('home'))
+        clip = to === 'score' ? 'trot' : 'run'
+        fig = this.batterRunner(clip) ?? this.makeRunner(this.basePt('home'))
+        if (!fig.getData('layers')) clip = null
         this.batter.setVisible(false)
       } else {
         fig = this.runners[from as RunnerBase] ?? this.makeRunner(this.basePt(from))
@@ -385,7 +453,18 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
       }
       const legs = this.path(from, to)
       const per = legMs
-      for (const p of legs) await this.tween({ targets: fig, x: p.x, y: p.y, duration: per, ease: 'Sine.easeInOut' })
+      let running = true
+      const legsDone = (async () => {
+        for (const p of legs) {
+          // Clips face right; face the way this leg goes.
+          if (clip) fig.setScale(p.x < fig.x ? -1 : 1, 1)
+          await this.tween({ targets: fig, x: p.x, y: p.y, duration: per, ease: 'Sine.easeInOut' })
+        }
+        running = false
+      })()
+      if (clip) { const c = clip; void (async () => { while (running && fig.active) await this.batterClip(c, fig) })() }
+      await legsDone
+      if (clip && to !== 'score') this.batterFrame(clip, 0, fig)
       if (to === 'score') {
         this.beat('runScored')
         void this.burst(this.c.homePlate, 1)
@@ -410,7 +489,7 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
   }
 
   async playHit(outcome: 'single' | 'double' | 'homeRun', before: Bases, after: Bases, runs: number): Promise<void> {
-    const sw = this.swing()
+    const sw = this.swing(true)
     await this.delay(60)
     const h = this.c.homePlate
     const contact = { x: h.x, y: h.y - 60 }
@@ -458,7 +537,9 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
     await this.tween({ targets: [this.ball, this.shadow], y: this.c.catcher.y, alpha: 0, duration: 200 })
     this.ball.setVisible(false).setAlpha(1)
     this.shadow.setVisible(false).setAlpha(1)
+    await this.batterClip('take-walk', this.batter, 10)
     await this.moveRunners(basesDiff(before, after, 'walk', runs), this.legMs('walk'))
+    this.batterFrame('stance-idle', 0)
     this.bases = after
     await this.banner('BALL FOUR', 900)
   }
@@ -488,9 +569,12 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
   async playGameOver(runs: number): Promise<void> {
     // Before Phase 3, any game counts as a win: celebrate at home.
     this.batter.setPosition(this.c.homePlate.x, this.c.homePlate.y)
-    const hop = this.tween({ targets: this.batter, y: this.c.homePlate.y - 40, duration: 220, yoyo: true, repeat: 2 })
+    const hop = this.clip('celebrate')
+      ? this.batterClip('celebrate', this.batter, 8, 2).then(() => undefined)
+      : this.tween({ targets: this.batter, y: this.c.homePlate.y - 40, duration: 220, yoyo: true, repeat: 2 })
     await Promise.all([hop, this.burst(this.c.homePlate, Math.min(4, 1 + runs))])
     this.batter.setPosition(this.batterPoint().x, this.batterPoint().y)
+    this.batterFrame('stance-idle', 0)
     await this.banner('GAME OVER', 1200)
   }
 
