@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 // @ts-expect-error plain .mjs build script, no types
-import { alignFrames, batterLayer, blobs, img, keyGreen, mergeSlivers, packAtlas, sliceSheet } from './lib.mjs'
+import { alignFrames, batterLayer, blobs, despillEdges, img, keyGreen, mergeSlivers, packAtlas, sliceSheet } from './lib.mjs'
 
 type Im = { width: number; height: number; data: Uint8ClampedArray }
 const solid = (w: number, h: number, rgb: [number, number, number]): Im => {
@@ -17,6 +17,16 @@ const paint = (im: Im, x0: number, y0: number, w: number, h: number, rgb: [numbe
 const alpha = (im: Im, x: number, y: number) => im.data[(y * im.width + x) * 4 + 3]
 
 describe('pack-art helpers', () => {
+  it('despillEdges neutralizes a green halo near transparency but keeps interior green', () => {
+    const im = solid(10, 1, [0, 255, 0])
+    paint(im, 1, 0, 9, 1, [40, 90, 40])
+    im.data[3] = 0
+    despillEdges(im, 3)
+    const g = (x: number) => im.data[x * 4 + 1]
+    expect([g(1), g(2), g(3)]).toEqual([40, 40, 40])
+    expect(g(5)).toBe(90)
+  })
+
   it('keys #00FF00 but keeps grass green and strips spill at the edge', () => {
     const im = solid(7, 1, [10, 250, 5])
     paint(im, 1, 0, 1, 1, [120, 200, 100]) // fringe touching the key

@@ -8,7 +8,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync, statSync }
 import { dirname, join } from 'node:path'
 import sharp from 'sharp'
 import {
-  alignFrames, blobs, dropGroundStrips, keyShadowGreen, bbox, clearGridLines, crop, img, keyGreen, keyWhiteFromEdges, packAtlas, sliceSheet, splitBatter, batterLayer,
+  alignFrames, blobs, despillEdges, dropGroundStrips, keyShadowGreen, bbox, clearGridLines, crop, img, keyGreen, keyWhiteFromEdges, packAtlas, sliceSheet, splitBatter, batterLayer,
 } from './lib.mjs'
 
 const ROOT = process.argv[2] ?? process.cwd()
@@ -147,11 +147,12 @@ async function stadium(m) {
 }
 
 // ------------------------------------------------------------------ atlases
-async function sheetFrames(rel, { rows = 1, perRow, grid = true }) {
+async function sheetFrames(rel, { rows = 1, perRow, grid = true, despill = false }) {
   const im0 = await load(rel)
   keyGreen(im0)
   keyShadowGreen(im0)
   dropGroundStrips(im0, rows)
+  if (despill) despillEdges(im0)
   // Gemini's cell counts do not always match the contract, so cut by figure (gaps between
   // figures after the grid lines are gone); when that disagrees with the contract count, the sheet
   // is a clean grid and equal cells win. Delivered counts are recorded in the manifest.
@@ -162,9 +163,9 @@ async function sheetFrames(rel, { rows = 1, perRow, grid = true }) {
 async function atlas(key, file, clips, m) {
   const named = []
   const refH = {}
-  for (const { clip, rel, rows = 1, suffixes = [''], grid = true } of clips) {
+  for (const { clip, rel, rows = 1, suffixes = [''], grid = true, despill = false } of clips) {
     const perRow = m[key].clips[clip].frames
-    const bands = await sheetFrames(rel, { rows, perRow, grid })
+    const bands = await sheetFrames(rel, { rows, perRow, grid, despill })
     for (const [r, frames] of bands.entries()) {
       let aligned = alignFrames(frames)
       // Gemini drew some clips smaller (windup, punchout). Scale each clip so the character keeps the
@@ -384,9 +385,9 @@ export async function packArt() {
   for (const d of ['stadium', 'batter', 'ball', 'booth', 'chrome']) rmSync(join(OUT, d), { recursive: true, force: true })
   await stadium(m)
   await atlas('pitcher', 'pitcher', [
-    { clip: 'pitcher-idle', rel: 'pitcher/pitcher-idle.png' },
-    { clip: 'pitcher-windup-throw', rel: 'pitcher/pitcher-windup-throw.png' },
-    { clip: 'pitcher-react-hit', rel: 'pitcher/pitcher-react-hit.png' },
+    { clip: 'pitcher-idle', rel: 'pitcher/pitcher-idle.png', despill: true },
+    { clip: 'pitcher-windup-throw', rel: 'pitcher/pitcher-windup-throw.png', despill: true },
+    { clip: 'pitcher-react-hit', rel: 'pitcher/pitcher-react-hit.png', despill: true },
   ], m)
   await atlas('fielders', 'fielders', ['idle', 'chase', 'catch', 'watch-hr'].map((c) => ({
     clip: `fielder-${c}`, rel: `fielders/fielder-${c}.png`, rows: 2, suffixes: ['-a', '-b'],
