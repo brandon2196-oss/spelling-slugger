@@ -1,15 +1,28 @@
 /**
- * Who's in the booth: three big toggle buttons with pixel portraits. Tapping a talker plays one of
- * his game-start lines so the kid can hear the voice before choosing.
+ * Who's in the booth: three big toggle buttons. Tapping a talker plays one of his game-start lines so
+ * the kid can hear the voice before choosing. Faces are neutral placeholders until Brandon's cartoon
+ * booth art lands (art-only follow-up PR); bots do not draw announcer art.
  */
 import { ANNOUNCERS, previewLine, type AnnouncerId } from '../../audio/announcer'
-import { BoothPortrait } from '../game/Broadcast'
 
 const ORDER: AnnouncerId[] = ['bigRed', 'smoothEddie', 'quiet']
 
-/** Same art as the broadcast booth, so the face on the home screen is the face in the game. */
-export function Portrait({ id, size = 64 }: { id: AnnouncerId; size?: number }) {
-  return <BoothPortrait id={ANNOUNCERS[id].portrait} size={size} />
+function initials(name: string) {
+  return name.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join('')
+}
+
+export function BoothPlaceholder({ id }: { id: AnnouncerId }) {
+  const label = id === 'quiet' ? '—' : initials(ANNOUNCERS[id].name)
+  return (
+    <span
+      data-testid="booth-placeholder"
+      data-announcer={id}
+      aria-hidden="true"
+      className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-dashed border-gold/60 bg-navy/60 font-display text-xl text-gold"
+    >
+      {label}
+    </span>
+  )
 }
 
 export interface AnnouncerPickerProps {
@@ -39,7 +52,7 @@ export function AnnouncerPicker({ value, onChange }: AnnouncerPickerProps) {
                 : 'border-chalk/20 bg-navy/40 text-chalk/80 hover:border-chalk/50 active:scale-95')
             }
           >
-            <Portrait id={id} />
+            <BoothPlaceholder id={id} />
             <span className="font-display text-xs leading-snug sm:text-sm">{a.name}</span>
             <span className="text-xs leading-snug text-chalk/70">{a.tagline}</span>
           </button>
