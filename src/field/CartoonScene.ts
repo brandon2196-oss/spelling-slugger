@@ -8,7 +8,7 @@ import Phaser from 'phaser'
 import type { Bases } from '../engine/types'
 import { FieldCamera } from './camera'
 import type { FieldBeat, FieldController, PlayerLook } from './controller'
-import { basesDiff, runnerScaleX, type Base, type Destination, type Point } from './layout'
+import { basesDiff, restScaleX, runnerScaleX, type Base, type Destination, type Point } from './layout'
 import { DEFAULT_COORDS, parseManifest, type BatterClip, type BatterClipName, type Coordinates, type FieldManifest } from './manifest'
 import { hex, placeholderColors } from './rig'
 import { batterLayerColor } from './batterTint'
@@ -446,6 +446,16 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
       } else {
         fig = this.runners[from as RunnerBase] ?? this.makeRunner(this.basePt(from))
         this.runners[from as RunnerBase] = null
+        // On-base runners use the same run/trot art as home -> first when the kid's art is packed.
+        clip = to === 'score' ? 'trot' : 'run'
+        if (!fig.getData('layers')) {
+          const art = this.batterRunner(clip)
+          if (art) {
+            art.setPosition(fig.x, fig.y)
+            fig.destroy()
+            fig = art
+          } else clip = null
+        }
       }
       const legs = this.path(from, to)
       const per = legMs
@@ -460,7 +470,11 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
       })()
       if (clip) { const c = clip; void (async () => { while (running && fig.active) await this.batterClip(c, fig) })() }
       await legsDone
-      if (clip && to !== 'score') this.batterFrame(clip, 0, fig)
+      if (clip && to !== 'score') {
+        this.batterFrame(clip, 0, fig)
+        // Stopped: face the next base, not the direction of the last leg.
+        fig.setScale(restScaleX(to as Base, { home: this.basePt('home'), first: this.basePt('first'), second: this.basePt('second'), third: this.basePt('third') }), 1)
+      }
       if (to === 'score') {
         this.beat('runScored')
         void this.burst(this.c.homePlate, 1)

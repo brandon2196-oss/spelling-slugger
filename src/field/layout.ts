@@ -60,3 +60,13 @@ export function basesDiff(before: Bases, after: Bases, outcome: Outcome, runsSco
 export function runnerScaleX(from: Point, to: Point): 1 | -1 {
   return to.x > from.x ? -1 : 1
 }
+
+/** The base a runner standing on `at` would run to next (home after third). */
+export function nextBase(at: Base): Base {
+  return ORDER[(ORDER.indexOf(at) + 1) % 4]!
+}
+
+/** Facing for a runner stopped on a base: look toward the next base (same left-facing art rule as runnerScaleX). */
+export function restScaleX(at: Base, pts: Record<Base, Point> = FIELD): 1 | -1 {
+  return runnerScaleX(pts[at], pts[nextBase(at)])
+}
