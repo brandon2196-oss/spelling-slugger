@@ -13,7 +13,7 @@ import type { Bases, SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
 import { usePlayer } from '../players/usePlayers'
 import { Broadcast } from './Broadcast'
-import { playSequence } from './playSequence'
+import { playSequence, walkupOnce } from './playSequence'
 import { LetterHint } from './LetterHint'
 import { SpellingInput } from './SpellingInput'
 import { breathExtraMs, wait } from './timing'
@@ -44,6 +44,8 @@ export function GamePage() {
   const spokenIndex = useRef<number>(-1)
   const introDone = useRef(false)
   const fieldRef = useRef<FieldController | null>(null)
+  /** Walk-up organ, once per new batter (see playSequence.ts walkupOnce). */
+  const walkup = useRef(walkupOnce(sfx)).current
   const canSpeak = speechAvailable()
   /** What the booth is doing right now: drives the mouth flap and the caption bar. */
   const [booth, setBooth] = useState(announcerState.get())
@@ -88,6 +90,7 @@ export function GamePage() {
     if (!state || !word || busy || reveal) return
     if (spokenIndex.current === state.index) return
     spokenIndex.current = state.index
+    walkup(state.index) // new batter: organ first, the word ducks it
     if (!introDone.current && state.index === 0 && state.atBats.every((ab) => ab.attempts.length === 0)) {
       introDone.current = true
       const forIndex = state.index

@@ -3,7 +3,7 @@ import { EMPTY_BASES } from '../../engine/bases'
 import type { SubmitEvent } from '../../engine/types'
 import type { FieldController } from '../../field/controller'
 import { CUES } from '../../audio/layering'
-import { playSequence, type SequenceSfx } from './playSequence'
+import { playSequence, walkupOnce, type SequenceSfx } from './playSequence'
 
 const O = { pitchCall: 'whiff' as const, scale: 0 }
 
@@ -160,5 +160,22 @@ describe('playSequence', () => {
     expect(typeof seen).toBe('function')
     expect(r.calls.filter((c) => c === 'sfx.ballWall')).toHaveLength(1)
     expect(r.field.onBeat).toBeUndefined()
+  })
+})
+
+describe('walkupOnce', () => {
+  it('plays organ walkup once per at-bat, not on repeats', () => {
+    const r = recorder()
+    const walkup = walkupOnce(r.sfx)
+    expect(walkup(0)).toBe(true)
+    expect(walkup(0)).toBe(false)
+    expect(walkup(1)).toBe(true)
+    expect(walkup(1)).toBe(false)
+    expect(r.calls).toEqual(['sfx.organ(walkup)', 'sfx.organ(walkup)'])
+  })
+  it('never plays during a normal pitch sequence', async () => {
+    const r = recorder()
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'single' }), r.commentary, O)
+    expect(r.calls).not.toContain('sfx.organ(walkup)')
   })
 })
