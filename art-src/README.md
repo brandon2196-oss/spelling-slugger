@@ -23,24 +23,28 @@ All files are PNG on a flat `#00FF00` background unless noted. Most are 1024 px 
 | `mascot/` | 3 | idle, happy, sad, 4 cells each. Optional. |
 | `_rejected/` | 2 | First versions of ball-shadow and ump-punchout that Gemini's own audit rejected. Reference only. |
 
-## What is missing (not generated in the chat, despite Gemini's audit table saying PASS)
+## Batter and chrome, second run (2026-10-30, later that evening)
 
-Gemini wrote image placeholders as text for these turns instead of calling its image tool, and later claimed they existed. They do not. They need a fresh Gemini chat using the same prompts, with the style sheet uploaded first.
+Brandon regenerated the missing pieces in a fresh Gemini chat with the style sheet attached. All of B3 and B10 now exist:
 
-- `batter/turnaround.png` (B3.1)
-- `batter/stance-idle.png` (B3.2)
-- `batter/swing-miss.png` (B3.3)
-- `batter/take-walk.png` (B3.5)
-- `batter/run.png` (B3.6)
-- `batter/trot.png` (B3.7)
-- `batter/strikeout-slump.png` (B3.8)
-- `batter/celebrate.png` (B3.9)
-- `batter/hair-short.png`, `hair-long.png`, `hair-curly.png`, `hair-buzz.png` (B3.10)
-- `chrome/banners.png` (B10.3)
-- `chrome/frame.png` (B10.4)
-- The "fixed" B4.1, B4.2, B6.1 and B9.1 that Gemini's audit mentions were never produced; the originals are here and are usable.
+| File | Cells | Width | Notes |
+| --- | --- | --- | --- |
+| `batter/turnaround.png` | 4 views | 2000 | front, three-quarter, side, back |
+| `batter/stance-idle.png` | 4 | 2000 | bat waggle |
+| `batter/swing-miss.png` | 8 | 1024 | redo after a green smear; half scale |
+| `batter/swing-contact.png` | 8 | 1024 | from the first run |
+| `batter/take-walk.png` | 6 | 2000 | |
+| `batter/run.png` | 6 | 2000 | loops |
+| `batter/trot.png` | 6 | 1024 | redo after a green smear; half scale |
+| `batter/strikeout-slump.png` | 4 | 1024 | |
+| `batter/celebrate.png` | 6 | 1024 | FRONT view; frame 1 has bare red forearms instead of blue sleeves and gloves, a known nit |
+| `batter/hair-all.png` plus `hair-short`, `hair-long`, `hair-curly`, `hair-buzz` | 4 | 1024 (256 each) | heads face LEFT; every body clip faces RIGHT, so mirror the overlays before matching them to the rig |
+| `chrome/banners.png` | 16 words | 572 x 1024 | concept for the SVG redraw |
+| `chrome/frame.png` | full frame plus ON AIR tag | 1024 | concept; the contract asked for four corners, slice them from this |
 
-The batter is the one that matters: without it Phase 1 runs on placeholder shapes. Everything else can ship.
+All body clips face right. Lefties are the mirrored rig, as the contract says.
+
+Nothing is missing from the prompt pack any more. Gemini's earlier audit table claiming PASS on these was false; this second run is the real one.
 
 ## Sky layer
 
