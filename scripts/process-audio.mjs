@@ -19,6 +19,7 @@ const LOUD = 'loudnorm=I=-16:TP=-1.5:LRA=11'
 const ENCODE = ['-ac', '1', '-ar', '44100', '-c:a', 'libvorbis', '-q:a', '5']
 // ffmpeg 7.1 aborts (best_input assertion) on silenceremove,loudnorm into libvorbis; fixed frame sizes avoid it.
 const FRAME_FIX = 'asetnsamples=n=1024'
+const MIN_CLIP_SECONDS = 0.05
 const MAX_SFX_BYTES = 4 * 1024 * 1024
 
 const argv = process.argv.slice(2)
@@ -97,7 +98,13 @@ if (flag('--dry-run')) {
 for (const j of jobs) {
   mkdirSync(dirname(j.out), { recursive: true })
   execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', j.in, '-af', `${j.filters},${FRAME_FIX}`, ...ENCODE, j.out], { stdio: 'inherit' })
-  console.log(`ok  ${j.out}`)
+  // A silent master (or one under the trim threshold) encodes to Vorbis header pages only; never ship that.
+  const dur = Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', j.out], { encoding: 'utf8' }).trim())
+  if (!(dur >= MIN_CLIP_SECONDS)) {
+    console.error(`${j.out} decoded to ${dur || 0}s of audio; check ${j.in} is not silent (trim threshold -50 dB)`)
+    process.exit(1)
+  }
+  console.log(`ok  ${j.out} (${dur.toFixed(2)} s)`)
 }
 
 const bytes = dirBytes(join(out, 'sfx'))

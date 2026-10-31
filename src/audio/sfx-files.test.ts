@@ -16,7 +16,31 @@ function walk(dir: string): string[] {
 }
 const onDisk = () => walk(SFX_DIR).map((p) => `/${relative(PUBLIC, p).split('\\').join('/')}`).sort()
 
+/** Seconds of audio in an Ogg Vorbis file: last page granule position / sample rate. 0 if header pages only. */
+export function oggSeconds(buf: Buffer): number {
+  let off = 0
+  let rate = 0
+  let granule = 0n
+  while (off + 27 <= buf.length && buf.toString('latin1', off, off + 4) === 'OggS') {
+    const g = buf.readBigInt64LE(off + 6)
+    const segs = buf[off + 26]!
+    let body = 0
+    for (let i = 0; i < segs; i++) body += buf[off + 27 + i]!
+    const start = off + 27 + segs
+    if (!rate && buf.toString('latin1', start + 1, start + 7) === 'vorbis' && buf[start] === 1) rate = buf.readUInt32LE(start + 12)
+    if (g > 0n) granule = g
+    off = start + body
+  }
+  return rate ? Number(granule) / rate : 0
+}
+
 describe('shipped SFX files', () => {
+  it('every ogg decodes to real audio (not header pages only)', () => {
+    for (const p of walk(SFX_DIR).filter((f) => f.endsWith('.ogg'))) {
+      expect(oggSeconds(readFileSync(p)), relative(PUBLIC, p)).toBeGreaterThan(0.05)
+    }
+  })
+
   it('match POOL_SPEC and the ambience loops exactly (no strays, no gaps)', () => {
     expect(onDisk()).toEqual([...ALL_SFX_URLS].sort())
   })
