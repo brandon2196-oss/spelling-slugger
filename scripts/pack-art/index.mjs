@@ -162,9 +162,9 @@ async function sheetFrames(rel, { rows = 1, perRow, grid = true }) {
 async function atlas(key, file, clips, m) {
   const named = []
   const refH = {}
-  for (const { clip, rel, rows = 1, suffixes = [''] } of clips) {
+  for (const { clip, rel, rows = 1, suffixes = [''], grid = true } of clips) {
     const perRow = m[key].clips[clip].frames
-    const bands = await sheetFrames(rel, { rows, perRow })
+    const bands = await sheetFrames(rel, { rows, perRow, grid })
     for (const [r, frames] of bands.entries()) {
       let aligned = alignFrames(frames)
       // Gemini drew some clips smaller (windup, punchout). Scale each clip so the character keeps the
@@ -390,6 +390,9 @@ export async function packArt() {
   ], m)
   await atlas('fielders', 'fielders', ['idle', 'chase', 'catch', 'watch-hr'].map((c) => ({
     clip: `fielder-${c}`, rel: `fielders/fielder-${c}.png`, rows: 2, suffixes: ['-a', '-b'],
+    // Front-facing kid sheets (Imagine) were pre-cleaned of grid lines; the column test would
+    // otherwise cut through the two stacked figures.
+    grid: c === 'watch-hr',
   })), m)
   await atlas('catcherUmp', 'catcher-ump', ['catcher-idle', 'catcher-receive', 'ump-idle', 'ump-strike', 'ump-punchout'].map((c) => ({
     clip: c, rel: `catcher-ump/${c}.png`,
