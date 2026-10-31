@@ -16,9 +16,9 @@ export const POOL_SPEC = {
   'crack-hr': { n: 3, bus: 'sfx' },
   whiff: { n: 4, bus: 'sfx' },
   mitt: { n: 4, bus: 'sfx' },
-  'ump-strike': { n: 0, bus: 'sfx' }, // stub: no CC0 "Strike!" call found
+  'ump-strike': { n: 0, bus: 'sfx' }, // stub: no CC0 "Strike!" call found (re-searched 2026-10-30)
   'ump-strike3': { n: 2, bus: 'sfx' },
-  'ump-ball4': { n: 0, bus: 'sfx' }, // stub: only one CC0 "Ball four" take found
+  'ump-ball4': { n: 1, bus: 'sfx' }, // one CC0 take (jcookvoice 625473)
   'ball-wall': { n: 2, bus: 'sfx' },
   'cheer-small': { n: 3, bus: 'crowd' },
   'cheer-big': { n: 3, bus: 'crowd' },

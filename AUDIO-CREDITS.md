@@ -57,8 +57,8 @@ Pools marked "pending, CC0 search failed" are stubs with no files; the game skip
 | ambience/ | ambience-low.ogg | G29-37-Large Sports Crowd.wav (12 to 52 s) (Freesound HQ preview) | https://freesound.org/people/craigsmith/sounds/438397/ | craigsmith | CC0 1.0 | seamless 38 s loop (2 s equal-power crossfade of tail into head), loudnorm -16 LUFS, mono, q5 (no trim) |
 | ambience/ | ambience-high.ogg | R07-27-Sporting Event with Steady Cheers.wav (2 to 30 s) (Freesound HQ preview) | https://freesound.org/people/craigsmith/sounds/486214/ | craigsmith | CC0 1.0 | seamless 26 s loop (2 s equal-power crossfade of tail into head), loudnorm -16 LUFS, mono, q5 (no trim) |
 | ir/ | stadium.ogg | IR_Residential Area.5-Storey Residential Buildings 2_EM (whole file) (Freesound HQ preview) | https://freesound.org/people/newlocknew/sounds/816877/ | newlocknew | CC0 1.0 | fade out tail, re-encode only (no trim, no loudnorm) |
-| ump-strike/ | (none) | pending, CC0 search failed | searched: freesound CC0, OpenGameArt CC0 (Sonniss GDC excluded: not CC0) | | | |
-| ump-ball4/ | (none) | pending, CC0 search failed | searched: freesound CC0, OpenGameArt CC0 (Sonniss GDC excluded: not CC0); only one CC0 take exists and it continues "take your base" | | | |
+| ump-strike/ | (none) | pending, CC0 search failed | searched: freesound CC0, OpenGameArt CC0 (Sonniss GDC excluded: not CC0); re-searched 2026-10-30 (freesound CC0: umpire, strike call/one/two/voice/shout, steerike, baseball umpire/voice/announcer; OpenGameArt CC0 umpire): only CC0 umpire voice is jcookvoice 625473, which has no standalone "Strike" | | | |
+| ump-ball4/ | ump-ball4-1.ogg | American Baseball The Umpire.wav (8.44 to 9.12 s, "Ball four" only, cut before "take your base") (Freesound HQ preview) | https://freesound.org/people/jcookvoice/sounds/625473/ | jcookvoice | CC0 1.0 | slice, fade in 10 ms, fade out 80 ms, trim lead silence, loudnorm -16 LUFS, mono, q5 |
 
 ## Booth announcer clips (`public/audio/announcers/`)
 
