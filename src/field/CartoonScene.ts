@@ -11,6 +11,7 @@ import type { FieldBeat, FieldController, PlayerLook } from './controller'
 import { basesDiff, type Base, type Destination, type Point } from './layout'
 import { DEFAULT_COORDS, parseManifest, type BatterClip, type BatterClipName, type Coordinates, type FieldManifest } from './manifest'
 import { hex, placeholderColors } from './rig'
+import { batterLayerColor } from './batterTint'
 
 export interface CartoonSceneInit {
   look: PlayerLook
@@ -296,13 +297,8 @@ export class CartoonScene extends Phaser.Scene implements FieldController {
 
   /** Tint for each batter layer from the kid's look; undefined means draw as packed (never tinted). */
   private layerTint(layer: string): number | undefined {
-    const a = this.look.appearance
-    if (layer.startsWith('hair-')) return hex(a.hairColor)
-    const t: Record<string, string> = {
-      skin: a.skinTone, jersey: a.jerseyColor, pants: a.pantsColor, hat: a.hatColor,
-      'hat-brim': a.secondaryColor, trim: a.primaryColor,
-    }
-    return t[layer] ? hex(t[layer]) : undefined
+    const c = batterLayerColor(layer, this.look.appearance)
+    return c ? hex(c) : undefined
   }
 
   private clip(name: BatterClipName): BatterClip | undefined {
