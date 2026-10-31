@@ -67,6 +67,10 @@ export interface GameState {
   tallies: Tallies
   atBats: AtBat[]
   status: 'active' | 'complete'
+  /** Seeds the Visitors (opponent.ts). '' in engine-only tests. */
+  gameId: string
+  /** Visitors runs per inning, filled at inning end (and at game end). Never mid-inning. */
+  visitors: number[]
 }
 
 /** What happened when the child submitted a word. The UI animates FROM this; it never decides outcomes. */
@@ -86,4 +90,12 @@ export type SubmitEvent =
       gameOver: boolean
       correctSpelling: string
       word: GameWord
+      /** Visitors runs revealed with this play (inning end or game end), else null. */
+      visitorRunsThisInning: number | null
+      /** Visitors total before this play's reveal. */
+      visitorsBefore: number
+      /** The kid's total runs after this play. */
+      homeTotal: number
+      /** null unless gameOver. A tie is a win. */
+      gameResult: 'win' | 'loss' | null
     }

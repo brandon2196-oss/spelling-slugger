@@ -149,3 +149,29 @@ describe('parent pin and account', () => {
     expect(await store.hasParentPin()).toBe(false)
   })
 })
+
+describe('Phase 3 result fields', () => {
+  it('fills result and visitorRuns from the log on complete; legacy games load as null', async () => {
+    localStorage.clear()
+    const { createLocalStore } = await import('./local-store')
+    const { rebuild } = await import('../engine/replay')
+    const store = createLocalStore()
+    const p = await store.createPlayer({ name: 'A', teamName: '', jerseyNumber: 1, hand: 'R', appearance: { primaryColor: '#000', secondaryColor: '#fff', jerseyColor: '#000', pantsColor: '#fff', hatColor: '#000', skinTone: '#fff', hairColor: '#000', hairstyle: 'short' } })
+    const words = [{ position: 0, text: 'cat', sentence: null, source: 'current' as const, difficulty: 'easy' as const, sourceWordId: null }]
+    const g = await store.createGame({ playerId: p.id, listId: null, mode: 'weekly', words, warnings: [] })
+    expect(g.result).toBeNull()
+    await store.recordAttempt(g.id, { position: 0, attemptNumber: 1, text: 'cat', correct: true, outcome: 'single' })
+    await store.completeGame(g.id, {} as never)
+    const done = (await store.getGame(g.id))!
+    const st = rebuild(done.words, done.attempts, done.id)
+    expect(done.visitorRuns).toBe(st.visitors[0])
+    expect(done.result).toBe(st.tallies.runs >= done.visitorRuns! ? 'win' : 'loss')
+
+    const raw = JSON.parse(localStorage.getItem('slugger.v1')!)
+    for (const x of raw.games) { delete x.result; delete x.visitorRuns }
+    localStorage.setItem('slugger.v1', JSON.stringify(raw))
+    const legacy = (await createLocalStore().getGame(g.id))!
+    expect(legacy.result).toBeNull()
+    expect(legacy.visitorRuns).toBeNull()
+  })
+})

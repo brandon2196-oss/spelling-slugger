@@ -18,6 +18,7 @@ function game(id: string, listId: string | null, words: string[], wrong: number[
     id, playerId: 'p', listId, mode: opts.mode ?? 'weekly', status: 'complete', words: gw(words, opts.review), attempts, warnings: [],
     summary: { runs: opts.runs ?? 0, hits: 0, homeRuns: 0, singles: 0, doubles: 0, walks: 0, strikeouts: 0, totalStrikes: 0, firstTry, secondTry: 0, thirdTry: 0, missed: 0,
       firstTryAccuracy: Math.round((firstTry / words.length) * 100), current: { total: 0, firstTry: 0, missed: 0 }, review: { total: 0, firstTry: 0, missed: 0 }, missedWords: [] },
+    result: null, visitorRuns: null,
     startedAt: opts.startedAt ?? '2026-10-20T00:00:00Z', completedAt: '2026-10-20T00:10:00Z',
   }
 }

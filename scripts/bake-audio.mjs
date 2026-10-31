@@ -42,17 +42,19 @@ const jobs = []
 const manifest = { version: 1, clips: { bigRed: {}, smoothEddie: {}, quiet: {} } }
 // BAKE_ONLY=smoothEddie re-bakes one booth; the others keep their existing clips (manifest entries still rewritten).
 const ONLY = process.env.BAKE_ONLY
+// BAKE_EVENTS=win,loss bakes only those events and keeps every other clip as is (no directory wipe).
+const EVENTS = process.env.BAKE_EVENTS ? new Set(process.env.BAKE_EVENTS.split(',')) : null
 for (const [id, profile] of Object.entries(VOICES)) {
   const skip = ONLY && ONLY !== id
   const dir = join(ROOT, 'public/audio/announcers', id)
-  if (!skip) {
+  if (!skip && !EVENTS) {
     rmSync(dir, { recursive: true, force: true }) // drop stale clips from removed lines
     mkdirSync(dir, { recursive: true })
   }
   for (const [event, arr] of Object.entries(lines[id])) {
     manifest.clips[id][event] = arr.map((text, i) => {
       const name = `${event}-${String(i).padStart(2, '0')}.${EXT}`
-      if (!skip) jobs.push({ text: fill(text), profile, out: join(dir, name) })
+      if (!skip && (!EVENTS || EVENTS.has(event))) jobs.push({ text: fill(text), profile, out: join(dir, name) })
       return `/audio/announcers/${id}/${name}`
     })
   }

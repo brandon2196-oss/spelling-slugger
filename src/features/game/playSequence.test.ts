@@ -10,7 +10,7 @@ const O = { pitchCall: 'whiff' as const, scale: 0 }
 const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null, difficulty: 'medium' as const }
 const done = (over: Partial<Extract<SubmitEvent, { kind: 'at-bat-complete' }>>): SubmitEvent => ({
   kind: 'at-bat-complete', outcome: 'double', attempts: [], runsScored: 0, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
-  outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word, ...over,
+  outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word, visitorRunsThisInning: null, visitorsBefore: 0, homeTotal: 0, gameResult: null, ...over,
 })
 
 function recorder() {
@@ -177,5 +177,58 @@ describe('walkupOnce', () => {
     const r = recorder()
     await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'single' }), r.commentary, O)
     expect(r.calls).not.toContain('sfx.organ(walkup)')
+  })
+})
+
+describe('playSequence: the Visitors (Phase 3)', () => {
+  it('reveals the Visitors at inning end, after the inning-end call and before NEW INNING', async () => {
+    const r = recorder()
+    const reveal = vi.fn(() => { r.calls.push('reveal') })
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'strikeout', inningEnded: true, nextInning: 2, homeTotal: 3, visitorRunsThisInning: 1, visitorsBefore: 0 }), r.commentary, { ...O, revealVisitors: reveal })
+    expect(r.calls.slice(r.calls.indexOf('say(inningEnd)'))).toEqual([
+      'say(inningEnd)', 'playInningEnd(2)', 'reveal', 'announce(VISITORS SCORE 1!)', 'say(visitorsScore)', 'announce(NEW INNING!)',
+    ])
+  })
+  it('never reveals mid-inning', async () => {
+    const r = recorder()
+    const reveal = vi.fn()
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'single', runsScored: 1, homeTotal: 1 }), r.commentary, { ...O, revealVisitors: reveal })
+    expect(reveal).not.toHaveBeenCalled()
+  })
+  it('calls a tie and a Visitors lead', async () => {
+    const tie = recorder()
+    await playSequence(tie.field, tie.sfx, tie.announce, done({ outcome: 'strikeout', inningEnded: true, nextInning: 2, homeTotal: 2, visitorRunsThisInning: 2, visitorsBefore: 0 }), tie.commentary, O)
+    expect(tie.calls).toContain('say(visitorsTie)')
+    const lead = recorder()
+    await playSequence(lead.field, lead.sfx, lead.announce, done({ outcome: 'strikeout', inningEnded: true, nextInning: 2, homeTotal: 2, visitorRunsThisInning: 3, visitorsBefore: 1 }), lead.commentary, O)
+    expect(lead.calls).toContain('say(visitorsLead)')
+  })
+  it('calls the kid retaking the lead on a scoring play', async () => {
+    const r = recorder()
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'double', runsScored: 2, homeTotal: 4, visitorsBefore: 3 }), r.commentary, O)
+    expect(r.calls).toContain('say(kidRetakesLead)')
+    expect(r.calls).toContain('announce(2 RUNS SCORED!)')
+  })
+  it('a loss: no fanfare, no celebration, TOUGH LOSS banner and the kind loss call', async () => {
+    const r = recorder()
+    await playSequence(r.field, r.sfx, r.announce, done({ outcome: 'single', gameOver: true, homeTotal: 1, visitorRunsThisInning: 2, visitorsBefore: 1, gameResult: 'loss' }), r.commentary, O)
+    expect(r.calls).not.toContain('sfx.fanfare')
+    expect(r.calls).not.toContain('playGameOver(0)')
+    expect(r.calls).toContain('banner')
+    expect(r.calls).toContain('announce(TOUGH LOSS)')
+    expect(r.calls).toContain('say(loss)')
+    expect(r.calls.indexOf('say(visitorsLead)')).toBeLessThan(r.calls.indexOf('say(loss)'))
+  })
+  it('a win celebrates; a come-from-behind final play is a walk off', async () => {
+    const win = recorder()
+    await playSequence(win.field, win.sfx, win.announce, done({ outcome: 'single', gameOver: true, homeTotal: 5, visitorRunsThisInning: 0, visitorsBefore: 2, gameResult: 'win' }), win.commentary, O)
+    expect(win.calls).toContain('playGameOver(0)')
+    expect(win.calls).toContain('announce(HOME TEAM WINS!)')
+    expect(win.calls).toContain('say(win)')
+    const wo = recorder()
+    await playSequence(wo.field, wo.sfx, wo.announce, done({ outcome: 'homeRun', runsScored: 2, gameOver: true, homeTotal: 4, visitorRunsThisInning: 1, visitorsBefore: 2, gameResult: 'win' }), wo.commentary, O)
+    expect(wo.calls).toContain('announce(WALK OFF!)')
+    expect(wo.calls).toContain('say(walkOff)')
+    expect(wo.calls).not.toContain('say(kidRetakesLead)')
   })
 })

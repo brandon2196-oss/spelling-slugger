@@ -14,6 +14,7 @@ import { PlayerPreview } from '../players/PlayerPreview'
 import { usePlayer } from '../players/usePlayers'
 import { AnnouncerPicker } from './AnnouncerPicker'
 import { useGuardedStart } from './useGuardedStart'
+import { recordLine, seasonRecord } from '../../engine/season'
 
 export function ChildHomePage() {
   const { playerId = '' } = useParams()
@@ -22,6 +23,7 @@ export function ChildHomePage() {
   const [active, setActive] = useState<WordList | null | undefined>(undefined)
   const [resume, setResume] = useState<GameRecord | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [record, setRecord] = useState('')
   const { start, modal } = useGuardedStart(playerId)
   const audio = useAudioSettings()
 
@@ -32,6 +34,7 @@ export function ChildHomePage() {
   useEffect(() => {
     store.listWordLists(playerId).then((ls) => setActive(ls.find((l) => l.isActive) ?? null))
     resumeOrNull(store, playerId).then(setResume)
+    store.listGames(playerId, { mode: 'weekly', status: 'complete' }).then((gs) => setRecord(recordLine(seasonRecord(gs))))
   }, [store, playerId])
 
   if (player === undefined || active === undefined) return <Stadium className="p-8" aria-busy="true" />
@@ -63,6 +66,7 @@ export function ChildHomePage() {
             <p className="text-gold font-display text-xl">Now batting</p>
             <h1 className="font-display text-5xl leading-none">{player.name}</h1>
             <p className="mt-1 text-chalk/70">{player.teamName || 'Grand Slammers'} · #{player.jerseyNumber}</p>
+            {record ? <p className="mt-1 font-display text-lg text-gold" data-testid="season-record">{record}</p> : null}
           </div>
         </div>
 

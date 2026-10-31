@@ -5,7 +5,7 @@ import { CUES, OFFSETS, ambienceFor, cheerFor, driveLayers, layersFor, pickPitch
 const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null, difficulty: 'medium' as const }
 const done = (outcome: Outcome, runsScored = 0): SubmitEvent => ({
   kind: 'at-bat-complete', outcome, attempts: [], runsScored, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
-  outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word,
+  outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word, visitorRunsThisInning: null, visitorsBefore: 0, homeTotal: 0, gameResult: null,
 })
 const strike: SubmitEvent = { kind: 'strike', strike: 1, attemptsSoFar: [] }
 const cueList = (e: SubmitEvent, call: 'whiff' | 'mitt' = 'whiff') => layersFor(e, call).map((l) => l.cue)

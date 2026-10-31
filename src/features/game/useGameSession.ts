@@ -46,7 +46,7 @@ export function useGameSession(gameId: string | undefined): GameSession {
     store.getGame(gameId).then((rec) => {
       if (!alive) return
       setRecord(rec)
-      const s = rec ? rebuild(rec.words, rec.attempts) : null
+      const s = rec ? rebuild(rec.words, rec.attempts, rec.id) : null
       stateRef.current = s
       setState(s)
       setLoading(false)

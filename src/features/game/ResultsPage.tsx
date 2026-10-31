@@ -9,6 +9,12 @@ import type { GameRecord } from '../../data/types'
 import { rebuild } from '../../engine/replay'
 import { summarize } from '../../engine/results'
 import type { GameSummary } from '../../engine/results'
+import { bestPlay } from '../../engine/highlight'
+import { recordLine, seasonRecord } from '../../engine/season'
+import type { GameState } from '../../engine/types'
+import { usePlayer } from '../players/usePlayers'
+import { Highlight } from './Highlight'
+import { LineScore } from './Scoreboard'
 import { startMissedWordsGame, startPracticeGame, startThisGameMissesGame, startWeeklyGame } from './startGame'
 
 export function ResultsPage() {
@@ -19,6 +25,9 @@ export function ResultsPage() {
   const [summary, setSummary] = useState<GameSummary | null>(null)
   const [best, setBest] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [state, setState] = useState<GameState | null>(null)
+  const [season, setSeason] = useState('')
+  const player = usePlayer(record?.playerId)
 
   useEffect(() => {
     store.getGame(gameId).then(async (g) => {
@@ -26,11 +35,11 @@ export function ResultsPage() {
       if (!g) return
       // The saved summary can lag the final attempt by a network round-trip; the attempt log is
       // the source of truth, so derive the summary from it when needed.
+      const rebuilt = rebuild(g.words, g.attempts, g.id)
+      setState(rebuilt.status === 'complete' ? rebuilt : null)
       if (g.summary) setSummary(g.summary)
-      else {
-        const rebuilt = rebuild(g.words, g.attempts)
-        setSummary(rebuilt.status === 'complete' ? summarize(rebuilt) : null)
-      }
+      else setSummary(rebuilt.status === 'complete' ? summarize(rebuilt) : null)
+      if (g.mode === 'weekly') setSeason(recordLine(seasonRecord(await store.listGames(g.playerId, { mode: 'weekly', status: 'complete' }))))
       const others = (await store.listGames(g.playerId, { mode: g.mode, status: 'complete' })).filter((x) => x.id !== g.id)
       setBest(others.length ? Math.max(...others.map((x) => x.summary?.runs ?? 0)) : null)
     })
@@ -46,6 +55,10 @@ export function ResultsPage() {
     )
   }
   const s = summary
+  // The result comes from the same pure functions the store used; the saved field may lag a round-trip.
+  const result = record.result ?? (state ? (state.tallies.runs >= state.visitors.reduce((a, b) => a + b, 0) ? 'win' : 'loss') : null)
+  const play = state ? bestPlay(state) : null
+  const playWord = play ? record.words.find((w) => w.position === play.position) : undefined
   const newBest = best === null ? s.runs > 0 : s.runs > best
 
   async function playAgain() {
@@ -103,7 +116,16 @@ export function ResultsPage() {
           <h1 className="pixel-text announce-pixel mt-5 leading-none text-[clamp(3rem,12vw,5.5rem)]">
             {s.runs}<span className="ml-[0.4em] text-[0.35em] text-chalk [text-shadow:none]">run{s.runs === 1 ? '' : 's'}</span>
           </h1>
+          {result ? (
+            <p data-testid="result" className={`pixel-text mt-4 text-2xl uppercase ${result === 'win' ? 'text-gold' : 'text-chalk'}`}>{result === 'win' ? 'Win' : 'Loss'}</p>
+          ) : null}
+          {state ? <LineScore state={state} visitors={state.visitors} home={player?.teamName || 'Slammers'} className="mt-3 text-base" /> : null}
+          {season ? <p className="mt-2 text-chalk/80" data-testid="season-record">Record: {season}</p> : null}
           {best !== null ? <p className="mt-3 text-chalk/70">Personal best before today: {best}</p> : null}
+
+          {play && playWord && player ? (
+            <Highlight play={play} word={playWord} look={{ hand: player.hand, appearance: player.appearance, jerseyNumber: player.jerseyNumber }} />
+          ) : null}
 
           <dl className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-2">
             {rows.map(([k, v]) => (

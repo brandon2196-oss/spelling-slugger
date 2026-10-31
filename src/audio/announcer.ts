@@ -11,6 +11,8 @@ import LINES_JSON from './announcer-lines.json'
 
 export const ANNOUNCE_EVENTS = [
   'gameStart', 'homeRun', 'double', 'single', 'walk', 'strike1', 'strike2', 'strikeout', 'run', 'runs', 'inningEnd', 'gameOver',
+  // Phase 3: the Visitors and the final result.
+  'visitorsScore', 'visitorsTie', 'visitorsLead', 'kidRetakesLead', 'walkOff', 'win', 'loss',
 ] as const
 export type AnnounceEvent = (typeof ANNOUNCE_EVENTS)[number]
 
@@ -62,7 +64,7 @@ const quiet: Announcer = {
   tagline: 'Sounds only. No talking.',
   portrait: 'quiet',
   voice: { rate: 1, pitch: 1, prefer: /$^/ },
-  lines: { gameStart: [], homeRun: [], double: [], single: [], walk: [], strike1: [], strike2: [], strikeout: [], run: [], runs: [], inningEnd: [], gameOver: [] },
+  lines: Object.fromEntries(ANNOUNCE_EVENTS.map((e) => [e, []])) as unknown as Record<AnnounceEvent, string[]>,
 }
 
 export const ANNOUNCERS: Record<AnnouncerId, Announcer> = { bigRed, smoothEddie, quiet }

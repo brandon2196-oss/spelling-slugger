@@ -4,6 +4,7 @@
  */
 import { EMPTY_BASES, advance } from './bases'
 import { isBlank, isCorrect } from './grade'
+import { inningMix, visitorRuns } from './opponent'
 import type { Attempt, Difficulty, GameState, GameWord, Outcome, SubmitEvent, Tallies } from './types'
 
 export type { SubmitEvent } from './types'
@@ -26,7 +27,7 @@ const ZERO_TALLIES: Tallies = {
   missed: 0,
 }
 
-export function createGame(words: GameWord[]): GameState {
+export function createGame(words: GameWord[], gameId = ''): GameState {
   return {
     words: words.map((w) => ({ ...w })),
     index: 0,
@@ -37,6 +38,8 @@ export function createGame(words: GameWord[]): GameState {
     tallies: { ...ZERO_TALLIES },
     atBats: [],
     status: words.length === 0 ? 'complete' : 'active',
+    gameId,
+    visitors: [],
   }
 }
 
@@ -136,15 +139,24 @@ export function submitAnswer(state: GameState, text: string): { state: GameState
   const atBat = { position: word.position, inning: state.inning, attempts, strikes, outcome, runsScored: runs }
   const tallies = { ...tallyOutcome(state.tallies, outcome, attemptNumber, runs), totalStrikes }
 
+  const atBatsAfter = [...atBatsWithoutOpen, atBat]
+  // The Visitors bat at inning end (or game end), never mid-inning.
+  const visitorRunsThisInning =
+    inningEnded || gameOver ? visitorRuns(state.gameId, state.inning, inningMix({ ...state, atBats: atBatsAfter }, state.inning)) : null
+  const visitors = visitorRunsThisInning === null ? state.visitors : [...state.visitors, visitorRunsThisInning]
+  const visitorsBefore = state.visitors.reduce((a, b) => a + b, 0)
+  const gameResult = gameOver ? (tallies.runs >= visitorsBefore + (visitorRunsThisInning ?? 0) ? 'win' : 'loss') : null
+
   const next: GameState = {
     ...state,
+    visitors,
     index: nextIndex,
     strikes: 0,
     outs,
     inning,
     bases,
     tallies,
-    atBats: [...atBatsWithoutOpen, atBat],
+    atBats: atBatsAfter,
     status: gameOver ? 'complete' : 'active',
   }
 
@@ -163,6 +175,10 @@ export function submitAnswer(state: GameState, text: string): { state: GameState
       gameOver,
       correctSpelling: word.text,
       word,
+      visitorRunsThisInning,
+      visitorsBefore,
+      homeTotal: tallies.runs,
+      gameResult,
     },
   }
 }

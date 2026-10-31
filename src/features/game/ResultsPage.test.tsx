@@ -8,7 +8,9 @@ import { seededRng } from '../../engine/rng'
 import { rebuild } from '../../engine/replay'
 import { summarize } from '../../engine/results'
 import { ResultsPage } from './ResultsPage'
-import { startPracticeGame } from './startGame'
+import { startPracticeGame, startWeeklyGame } from './startGame'
+
+vi.mock('../../field/Field', () => ({ Field: () => <div data-testid="field" /> }))
 
 const cooper: NewPlayer = {
   name: 'Cooper', teamName: '', jerseyNumber: 7, hand: 'L',
@@ -36,7 +38,7 @@ describe('ResultsPage', () => {
       </StoreContext.Provider>,
     )
     expect(await screen.findByText(/New personal best!|Final score/)).toBeInTheDocument()
-    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/^1run$/)
     expect(screen.queryByText('No results for that game yet.')).toBeNull()
   })
   it('shows a Home runs row', async () => {
@@ -80,5 +82,29 @@ describe('ResultsPage', () => {
     expect(next.mode).toBe('missed')
     expect(next.words.map((w) => w.text)).toEqual([a!.text])
     expect(screen.queryByText('Practice missed words')).toBeNull()
+  })
+
+  it('a weekly game: WIN or LOSS, both teams on the line score, the record, and the play of the game', async () => {
+    localStorage.clear()
+    const store = createLocalStore()
+    const p = await store.createPlayer(cooper)
+    const l = await store.createWordList(p.id, { title: 'L', weekStart: '2026-10-19', words: ['cat', 'dog', 'sun'].map((text) => ({ text, sentence: null })) })
+    await store.setActiveList(p.id, l.id)
+    const g = await startWeeklyGame(store, p.id, l.id)
+    for (const w of g.words) await store.recordAttempt(g.id, { position: w.position, attemptNumber: 1, text: w.text, correct: true, outcome: 'double' })
+    await store.completeGame(g.id, summarize(rebuild(g.words, [])))
+    const saved = (await store.getGame(g.id))!
+    expect(saved.result).toMatch(/^(win|loss)$/)
+
+    const router = createMemoryRouter([{ path: '/game/:gameId/results', element: <ResultsPage /> }], { initialEntries: [`/game/${g.id}/results`] })
+    render(<StoreContext.Provider value={store}><RouterProvider router={router} /></StoreContext.Provider>)
+    expect(await screen.findByTestId('result')).toHaveTextContent(saved.result === 'win' ? 'Win' : 'Loss')
+    expect(screen.getByTestId('line-score')).toHaveTextContent('Visitors')
+    expect(screen.getByTestId('visitors')).toHaveTextContent(String(saved.visitorRuns))
+    expect(await screen.findByTestId('season-record')).toHaveTextContent(saved.result === 'win' ? 'Record: 1 and 0' : 'Record: 0 and 1')
+    expect(await screen.findByTestId('highlight-caption')).toHaveTextContent(/Double on "/)
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Skip' }))
+    expect(screen.queryByTestId('highlight')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Play again' })).toBeEnabled()
   })
 })

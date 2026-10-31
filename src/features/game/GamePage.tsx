@@ -41,6 +41,8 @@ export function GamePage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   /** What the stadium shows. Lags the engine until the play animation has run (see onSubmit). */
   const [fieldBases, setFieldBases] = useState<Bases | null>(null)
+  /** What the line score shows for the Visitors. Lags the engine until the inning-end play reveals it. */
+  const [shownVisitors, setShownVisitors] = useState<number[] | null>(null)
   const spokenIndex = useRef<number>(-1)
   const introDone = useRef(false)
   const fieldRef = useRef<FieldController | null>(null)
@@ -65,7 +67,8 @@ export function GamePage() {
   // On load (and reload) the field starts from the saved state.
   useEffect(() => {
     if (state && fieldBases === null) setFieldBases(state.bases)
-  }, [state, fieldBases])
+    if (state && shownVisitors === null) setShownVisitors(state.visitors)
+  }, [state, fieldBases, shownVisitors])
   // Crowd bed: low with the bases empty, high with anyone on, off when leaving the game screen.
   useEffect(() => {
     sfx.ambience(ambienceFor(fieldBases ?? EMPTY_BASES))
@@ -125,14 +128,25 @@ export function GamePage() {
     if (event.kind === 'strike') setLastMiss({ typed: event.attemptsSoFar[event.attemptsSoFar.length - 1]?.text ?? text, strike: event.strike })
     else setLastMiss(null)
     sfx.unlock()
+    /** Put this play's Visitors inning (if any) on the line score, once. */
+    let revealed = false
+    const reveal = () => {
+      if (revealed || event.kind !== 'at-bat-complete' || event.visitorRunsThisInning === null) return
+      revealed = true
+      const v = event.visitorRunsThisInning
+      setShownVisitors((prev) => [...(prev ?? []), v])
+    }
     try {
-      await playSequence(fieldRef.current, sfx, announce, event, commentary)
+      await playSequence(fieldRef.current, sfx, announce, event, commentary, { revealVisitors: reveal })
     } catch (err) {
       console.error('Field animation failed; continuing without it', err)
       setAnnouncement(null)
     } finally {
       // Only now does the stadium learn the new base state; during the play the scene moved the runners itself.
-      if (event.kind === 'at-bat-complete') setFieldBases(event.basesAfter)
+      if (event.kind === 'at-bat-complete') {
+        setFieldBases(event.basesAfter)
+        reveal()
+      }
     }
     if (event.kind === 'at-bat-complete' && event.outcome === 'strikeout') {
       setReveal({ word: event.correctSpelling, gameOver: event.gameOver, tries: event.attempts.filter((a) => !a.correct).map((a) => a.text) })
@@ -200,6 +214,7 @@ export function GamePage() {
               announcer={{ name: persona.name, portrait: persona.portrait, speaking: booth.speaking }}
               caption={booth.line}
               announcement={announcement}
+              visitors={shownVisitors ?? state.visitors}
             >
               <Suspense fallback={<div className="aspect-[4/3] w-full bg-grass-dark" aria-hidden="true" />}>
                 <Field

@@ -95,6 +95,55 @@
         "/audio/announcers/bigRed/gameOver-03.mp3",
         "/audio/announcers/bigRed/gameOver-04.mp3",
         "/audio/announcers/bigRed/gameOver-05.mp3"
+      ],
+      "visitorsScore": [
+        "/audio/announcers/bigRed/visitorsScore-00.mp3",
+        "/audio/announcers/bigRed/visitorsScore-01.mp3",
+        "/audio/announcers/bigRed/visitorsScore-02.mp3",
+        "/audio/announcers/bigRed/visitorsScore-03.mp3",
+        "/audio/announcers/bigRed/visitorsScore-04.mp3"
+      ],
+      "visitorsTie": [
+        "/audio/announcers/bigRed/visitorsTie-00.mp3",
+        "/audio/announcers/bigRed/visitorsTie-01.mp3",
+        "/audio/announcers/bigRed/visitorsTie-02.mp3",
+        "/audio/announcers/bigRed/visitorsTie-03.mp3",
+        "/audio/announcers/bigRed/visitorsTie-04.mp3"
+      ],
+      "visitorsLead": [
+        "/audio/announcers/bigRed/visitorsLead-00.mp3",
+        "/audio/announcers/bigRed/visitorsLead-01.mp3",
+        "/audio/announcers/bigRed/visitorsLead-02.mp3",
+        "/audio/announcers/bigRed/visitorsLead-03.mp3",
+        "/audio/announcers/bigRed/visitorsLead-04.mp3"
+      ],
+      "kidRetakesLead": [
+        "/audio/announcers/bigRed/kidRetakesLead-00.mp3",
+        "/audio/announcers/bigRed/kidRetakesLead-01.mp3",
+        "/audio/announcers/bigRed/kidRetakesLead-02.mp3",
+        "/audio/announcers/bigRed/kidRetakesLead-03.mp3",
+        "/audio/announcers/bigRed/kidRetakesLead-04.mp3"
+      ],
+      "walkOff": [
+        "/audio/announcers/bigRed/walkOff-00.mp3",
+        "/audio/announcers/bigRed/walkOff-01.mp3",
+        "/audio/announcers/bigRed/walkOff-02.mp3",
+        "/audio/announcers/bigRed/walkOff-03.mp3",
+        "/audio/announcers/bigRed/walkOff-04.mp3"
+      ],
+      "win": [
+        "/audio/announcers/bigRed/win-00.mp3",
+        "/audio/announcers/bigRed/win-01.mp3",
+        "/audio/announcers/bigRed/win-02.mp3",
+        "/audio/announcers/bigRed/win-03.mp3",
+        "/audio/announcers/bigRed/win-04.mp3"
+      ],
+      "loss": [
+        "/audio/announcers/bigRed/loss-00.mp3",
+        "/audio/announcers/bigRed/loss-01.mp3",
+        "/audio/announcers/bigRed/loss-02.mp3",
+        "/audio/announcers/bigRed/loss-03.mp3",
+        "/audio/announcers/bigRed/loss-04.mp3"
       ]
     },
     "smoothEddie": {
@@ -192,6 +241,55 @@
         "/audio/announcers/smoothEddie/gameOver-03.mp3",
         "/audio/announcers/smoothEddie/gameOver-04.mp3",
         "/audio/announcers/smoothEddie/gameOver-05.mp3"
+      ],
+      "visitorsScore": [
+        "/audio/announcers/smoothEddie/visitorsScore-00.mp3",
+        "/audio/announcers/smoothEddie/visitorsScore-01.mp3",
+        "/audio/announcers/smoothEddie/visitorsScore-02.mp3",
+        "/audio/announcers/smoothEddie/visitorsScore-03.mp3",
+        "/audio/announcers/smoothEddie/visitorsScore-04.mp3"
+      ],
+      "visitorsTie": [
+        "/audio/announcers/smoothEddie/visitorsTie-00.mp3",
+        "/audio/announcers/smoothEddie/visitorsTie-01.mp3",
+        "/audio/announcers/smoothEddie/visitorsTie-02.mp3",
+        "/audio/announcers/smoothEddie/visitorsTie-03.mp3",
+        "/audio/announcers/smoothEddie/visitorsTie-04.mp3"
+      ],
+      "visitorsLead": [
+        "/audio/announcers/smoothEddie/visitorsLead-00.mp3",
+        "/audio/announcers/smoothEddie/visitorsLead-01.mp3",
+        "/audio/announcers/smoothEddie/visitorsLead-02.mp3",
+        "/audio/announcers/smoothEddie/visitorsLead-03.mp3",
+        "/audio/announcers/smoothEddie/visitorsLead-04.mp3"
+      ],
+      "kidRetakesLead": [
+        "/audio/announcers/smoothEddie/kidRetakesLead-00.mp3",
+        "/audio/announcers/smoothEddie/kidRetakesLead-01.mp3",
+        "/audio/announcers/smoothEddie/kidRetakesLead-02.mp3",
+        "/audio/announcers/smoothEddie/kidRetakesLead-03.mp3",
+        "/audio/announcers/smoothEddie/kidRetakesLead-04.mp3"
+      ],
+      "walkOff": [
+        "/audio/announcers/smoothEddie/walkOff-00.mp3",
+        "/audio/announcers/smoothEddie/walkOff-01.mp3",
+        "/audio/announcers/smoothEddie/walkOff-02.mp3",
+        "/audio/announcers/smoothEddie/walkOff-03.mp3",
+        "/audio/announcers/smoothEddie/walkOff-04.mp3"
+      ],
+      "win": [
+        "/audio/announcers/smoothEddie/win-00.mp3",
+        "/audio/announcers/smoothEddie/win-01.mp3",
+        "/audio/announcers/smoothEddie/win-02.mp3",
+        "/audio/announcers/smoothEddie/win-03.mp3",
+        "/audio/announcers/smoothEddie/win-04.mp3"
+      ],
+      "loss": [
+        "/audio/announcers/smoothEddie/loss-00.mp3",
+        "/audio/announcers/smoothEddie/loss-01.mp3",
+        "/audio/announcers/smoothEddie/loss-02.mp3",
+        "/audio/announcers/smoothEddie/loss-03.mp3",
+        "/audio/announcers/smoothEddie/loss-04.mp3"
       ]
     },
     "quiet": {}

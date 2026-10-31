@@ -1,3 +1,4 @@
+import { rebuild } from '../../src/engine/replay'
 // @vitest-environment node
 import type { GameWord } from '../../src/engine/types'
 import type { NewPlayer, Store } from '../../src/data/types'
@@ -107,6 +108,12 @@ describe('games', () => {
     expect(done.completedAt).toBeTruthy()
     expect(done.summary).toMatchObject({ doubles: 1, strikeouts: 1, firstTry: 1, missed: 1, firstTryAccuracy: 50, missedWords: ['dog'] })
     expect(done.summary?.review).toEqual({ total: 1, firstTry: 0, missed: 1 })
+    // Phase 3: the result and Visitors total come from the log plus the game id, not the client.
+    const replayed = rebuild(done.words, done.attempts, done.id)
+    expect(done.visitorRuns).toBe(replayed.visitors.reduce((x, y) => x + y, 0))
+    expect(done.result).toBe(replayed.tallies.runs >= done.visitorRuns! ? 'win' : 'loss')
+    expect(mid.result).toBeNull()
+    expect(mid.visitorRuns).toBeNull()
     expect(await a.findInProgressGame(p.id)).toBeNull()
     expect(await a.listGames(p.id, { mode: 'weekly' })).toHaveLength(1)
     expect(await a.listGames(p.id, { status: 'in_progress' })).toHaveLength(0)

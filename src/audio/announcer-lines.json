@@ -93,6 +93,55 @@
       "Game over! The lights dim, the fans head home happy, and this booth is proud!",
       "That's a final! A hundred smiles in the stands tonight!",
       "The last pitch has been thrown! What a night at the ballpark, folks! Goodnight, everybody!"
+    ],
+    "visitorsScore": [
+      "The Visitors push one across! We'll get it back!",
+      "Visitors put a little something on the board. Shake it off!",
+      "The Visitors scratch out a run. Our turn to swing!",
+      "Visitors on the board! Keep those bats ready, folks!",
+      "A run for the Visitors. Plenty of game left!"
+    ],
+    "visitorsTie": [
+      "We are TIED UP, folks! OH MY STARS, what a ballgame!",
+      "All square! The Visitors catch up, and now it gets fun!",
+      "Tie game! Grab your seat, it's anybody's night!",
+      "Even steven! This one's going down to the wire!",
+      "The Visitors tie it! Time for some big swings!"
+    ],
+    "visitorsLead": [
+      "The Visitors sneak ahead! No worries, we've got bats!",
+      "Visitors take the lead! Let's go get it back, slugger!",
+      "Visitors in front for now. This crowd believes in you!",
+      "The Visitors jump ahead! Plenty of baseball left!",
+      "Visitors lead! Dig in, kid, here we come!"
+    ],
+    "kidRetakesLead": [
+      "We're back on top! OH MY STARS, listen to this crowd!",
+      "And we take the lead! What a swing, what a kid!",
+      "Back in front! The home crowd is going WILD!",
+      "Lead change! The Slammers are back in charge!",
+      "We're ahead again! Ring the bells, folks!"
+    ],
+    "walkOff": [
+      "WALK OFF! OH MY STARS, they're mobbing home plate!",
+      "A walk off winner! Send everybody home happy!",
+      "That's a WALK OFF! What a finish, folks!",
+      "Ballgame on that swing! Walk off! Walk off!",
+      "They win it at the end! WALK OFF! Unbelievable!"
+    ],
+    "win": [
+      "That's a WIN, folks! OH MY STARS, what a ballgame!",
+      "Put it in the win column! Tip your cap, slugger!",
+      "Home team wins! A hundred smiles in the stands tonight!",
+      "Victory! The fans head home happy, and so does this booth!",
+      "We win! What a night at the ballpark, everybody!"
+    ],
+    "loss": [
+      "They got us tonight. Same time tomorrow, slugger!",
+      "Not our night, but what effort! We'll be back!",
+      "The Visitors take this one. Big swings, kid, big swings!",
+      "Tough one tonight. Every great slugger has these. Next game!",
+      "Visitors win this round. Shake it off, we'll get 'em next time!"
     ]
   },
   "smoothEddie": {
@@ -190,6 +239,55 @@
       "That's the ballgame. Great swings today.",
       "Final out, and that will do it. Good game.",
       "And that wraps it up. Jack Dalton, signing off."
+    ],
+    "visitorsScore": [
+      "The Visitors score a run.",
+      "Visitors push across a run in that inning.",
+      "A run comes in for the Visitors.",
+      "The Visitors get on the board.",
+      "Visitors add to their total."
+    ],
+    "visitorsTie": [
+      "And that ties the game.",
+      "The Visitors tie it up.",
+      "We're all even.",
+      "Tie ballgame.",
+      "The Visitors draw even."
+    ],
+    "visitorsLead": [
+      "The Visitors take the lead.",
+      "Visitors move in front.",
+      "The Visitors go ahead.",
+      "Visitors lead for now.",
+      "The Visitors pull ahead."
+    ],
+    "kidRetakesLead": [
+      "And the home team retakes the lead.",
+      "Back in front for the home side.",
+      "That puts the home team ahead.",
+      "The lead changes hands again.",
+      "Home team goes back on top."
+    ],
+    "walkOff": [
+      "That's a walk off. Ballgame.",
+      "Walk off winner. The game is over.",
+      "And that ends it. A walk off.",
+      "They win it right there. Walk off.",
+      "Game over on that play. Walk off."
+    ],
+    "win": [
+      "That's the ballgame. A win for the home team.",
+      "Final out, and the home team wins.",
+      "And that will do it. A win today.",
+      "Ballgame. Home team takes this one.",
+      "That's a win. Nice job out there today."
+    ],
+    "loss": [
+      "The Visitors take this one. Good effort today.",
+      "That's the final. We'll get them next time.",
+      "Not today, but good swings out there.",
+      "The Visitors win it. Same time tomorrow.",
+      "That's the game. Nice try, see you next time."
     ]
   }
 }
