@@ -96,7 +96,7 @@ describe('ballpark sound end to end', () => {
     new Sfx(player).cheerBig()
     await player.play('/audio/words/abc.mp3', { bus: 'voice' })
     const crowd = gains[2]! // gains[0] master, then sfx, crowd, music, voice
-    expect(crowd.gain.calls).toContainEqual(['ramp', DUCK_GAIN, 0.08])
+    expect(crowd.gain.calls).toContainEqual(['ramp', DUCK_GAIN.crowd, 0.08])
     expect(crowd.gain.calls.at(-1)).toEqual(['ramp', 1, 0.4])
   })
 })

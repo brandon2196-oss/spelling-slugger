@@ -123,14 +123,14 @@ describe('ClipPlayer', () => {
     expect(f.sources[1]!.connects).toEqual([f.bus('crowd')])
   })
 
-  it('a voice clip ducks crowd and music 9 dB, then recovers when it ends', async () => {
+  it('a voice clip ducks crowd 9 dB and music 18 dB, then recovers when it ends', async () => {
     const f = fakeCtx()
     const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
     await p.load('/w.mp3')
     const run = p.play('/w.mp3', { bus: 'voice' })
     await flush()
-    expect(f.bus('crowd').gain.calls).toContainEqual(['ramp', DUCK_GAIN, 0.08])
-    expect(f.bus('music').gain.calls).toContainEqual(['ramp', DUCK_GAIN, 0.08])
+    expect(f.bus('crowd').gain.calls).toContainEqual(['ramp', DUCK_GAIN.crowd, 0.08])
+    expect(f.bus('music').gain.calls).toContainEqual(['ramp', DUCK_GAIN.music, 0.08])
     expect(f.bus('sfx').gain.calls).toEqual([])
     await run
     expect(f.bus('crowd').gain.calls.at(-1)).toEqual(['ramp', 1, 0.4])
@@ -141,7 +141,7 @@ describe('ClipPlayer', () => {
     const p = createClipPlayer({ fetchImpl: noIrFetch, createContext: () => f.ctx })
     p.resume()
     p.duckStart()
-    expect(f.bus('music').gain.calls).toContainEqual(['ramp', DUCK_GAIN, 0.08])
+    expect(f.bus('music').gain.calls).toContainEqual(['ramp', DUCK_GAIN.music, 0.08])
     p.duckEnd()
     expect(f.bus('music').gain.calls.at(-1)).toEqual(['ramp', 1, 0.4])
   })
