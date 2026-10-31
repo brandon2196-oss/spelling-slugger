@@ -199,7 +199,7 @@ Match this style exactly. A cartoon baseball pitcher on the visiting team, big h
 
 Block:
 ```
-Match this style exactly. Two cartoon baseball fielders on the visiting team, one tall and thin, one short and stocky, plain gray uniform with black trim and black cap, brown gloves, normal skin and hair colors, thick black outlines, flat fills. Flat solid #00FF00 background. No text, no logos, no watermark.
+Match this style exactly. Two cartoon kid baseball fielders on the visiting team, same age as the kid batter (about 8 to 10 years old), big heads, short bodies, oversized hands and gloves, one taller and thinner kid, one shorter and stockier kid, plain gray uniform with black trim and black cap, brown gloves, normal kid skin and hair colors, no facial hair, no mustaches, no adult proportions, thick black outlines, flat fills. Flat solid #00FF00 background. No text, no logos, no watermark.
 ```
 
 **B5.1** File: `art-src/fielders/fielder-idle.png` (4 cells, both bodies)
