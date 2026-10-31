@@ -172,6 +172,37 @@ h1, h2, h3 { font-family: var(--font-display); }
 /* Title screen hero: the cartoon stadium layers stacked into one still. */
 .stadium-still { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
 .stadium-still img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* ---- Ballpark shell (menus) ---- */
+.ballpark-shell {
+  background:
+    radial-gradient(ellipse at top, rgba(242, 177, 52, 0.10) 0%, transparent 45%),
+    linear-gradient(180deg, #1b3466 0%, #0f2148 45%, #081329 100%);
+}
+.ballpark-shell[data-variant='parent'] { background: linear-gradient(180deg, #142850 0%, #0b1733 100%); }
+.ballpark-frame {
+  margin-inline: auto;
+  max-width: 40rem;
+  border: 4px solid var(--gold);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 8px 0 #04070f, inset 0 0 0 2px #04070f;
+  background: #04070f;
+}
+.btn-gold, .btn-cream {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font-family: var(--font-display); font-weight: 700; border-radius: 1rem; min-height: 3.5rem;
+  padding: .75rem 1.5rem; user-select: none; transition: transform .08s;
+}
+.btn-gold { background: var(--gold); color: var(--navy); box-shadow: 0 5px 0 #a8741a; }
+.btn-cream { background: var(--chalk); color: var(--navy); box-shadow: 0 5px 0 #c9bfa8; border: 2px solid rgba(20, 40, 80, .1); }
+.btn-gold:active, .btn-cream:active { transform: translateY(3px); box-shadow: none; }
+.btn-gold:focus-visible, .btn-cream:focus-visible { outline: 4px solid var(--chalk); outline-offset: 2px; }
+.ballpark-card {
+  background: linear-gradient(180deg, #1f3a70 0%, #13284f 100%);
+  border: 2px solid rgba(242, 177, 52, .35);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, .35);
+}
 .on-air-tag {
   background: var(--red);
   color: var(--chalk);
