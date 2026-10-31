@@ -1,5 +1,5 @@
 import { EMPTY_BASES } from '../engine/bases'
-import { basesDiff, FIELD, runnerScaleX, type Base } from './layout'
+import { basesDiff, FIELD, nextBase, restScaleX, runnerScaleX, type Base } from './layout'
 
 describe('basesDiff', () => {
   it('moves the batter to second on a double with nobody on', () => {
@@ -42,5 +42,32 @@ describe('runnerScaleX (run/trot art faces LEFT; flip when the leg goes right)',
     // Runner starts at the plate whichever box the batter stood in; facing ignores the lefty batter mirror.
     const start = { ...FIELD.home, x: FIELD.home.x + (hand === 'L' ? 8 : -8) }
     expect(runnerScaleX(start, FIELD.first)).toBe(-1)
+  })
+})
+
+describe('on-base runners (advance and stop)', () => {
+  it.each([
+    ['first', 'second'],
+    ['second', 'third'],
+    ['third', 'home'],
+    ['home', 'first'],
+  ] as [Base, Base][])('next base after %s is %s', (at, want) => {
+    expect(nextBase(at)).toBe(want)
+  })
+  // first -> second and second -> third run LEFT (art as packed); third -> home runs RIGHT (flipped).
+  it.each([
+    ['first', 1],
+    ['second', 1],
+    ['third', -1],
+  ] as [Base, number][])('stopped on %s faces the next base (scaleX %d)', (at, want) => {
+    expect(restScaleX(at)).toBe(want)
+  })
+  it('a runner who just ran home -> first (flipped) turns to face second when stopped', () => {
+    expect(runnerScaleX(FIELD.home, FIELD.first)).toBe(-1)
+    expect(restScaleX('first')).toBe(1)
+  })
+  it('restScaleX follows the scene base points it is given', () => {
+    const pts = { home: { x: 0, y: 0 }, first: { x: 100, y: 0 }, second: { x: 300, y: 0 }, third: { x: 50, y: 0 } }
+    expect(restScaleX('first', pts)).toBe(-1)
   })
 })
