@@ -40,3 +40,13 @@ describe('PlayerEditorPage delete', () => {
     expect(await screen.findByRole('button', { name: /delete player/i })).toBeInTheDocument()
   })
 })
+
+describe('PlayerEditorPage preview', () => {
+  it('Build your player shows the cartoon batter, not the SVG stick figure', async () => {
+    await mount()
+    const batter = await screen.findByRole('img', { name: 'Left-handed batter wearing number 7' })
+    expect(batter).toHaveAttribute('data-testid', 'cartoon-batter')
+    expect(batter.querySelector('svg')).toBeNull()
+    expect(batter.querySelectorAll('img').length).toBeGreaterThan(0)
+  })
+})

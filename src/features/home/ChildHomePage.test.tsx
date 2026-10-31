@@ -12,7 +12,6 @@ vi.mock('../../data/store', () => ({ useStore: () => store }))
 vi.mock('../players/usePlayers', () => ({
   usePlayer: () => ({ id: 'a', name: 'Cooper', teamName: 'Sluggers', jerseyNumber: 7, hand: 'L', appearance: {}, createdAt: '' }),
 }))
-vi.mock('../players/PlayerPreview', () => ({ PlayerPreview: () => <div data-testid="batter" /> }))
 vi.mock('../game/startGame', () => ({ resumeOrNull: async () => null, startMissedWordsGame: vi.fn(), startWeeklyGame: vi.fn() }))
 vi.mock('../../audio/preload', () => ({ preloadAudio: async () => {} }))
 vi.mock('../../engine/season', () => ({ seasonRecord: () => ({}), recordLine: () => '3-1' }))
@@ -31,7 +30,8 @@ it('renders in the ballpark shell with the batter in front of a stadium still', 
   const hero = await screen.findByTestId('ballpark-hero')
   expect(screen.getByRole('main')).toHaveAttribute('data-shell', 'ballpark')
   expect(hero).toContainElement(screen.getByRole('img', { name: 'The cartoon baseball stadium' }))
-  expect(hero).toContainElement(screen.getByTestId('batter'))
+  expect(hero).toContainElement(screen.getByTestId('cartoon-batter'))
+  expect(hero.querySelector('svg')).toBeNull()
 })
 
 it('keeps season W/L prominent and makes Play this week the gold CTA', async () => {
