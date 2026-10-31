@@ -4,6 +4,7 @@ import { Sparkline } from './charts/Sparkline'
 import { prettyDate } from './dates'
 import { frequentlyMissed, mastered, reviewRetention, totals, weeklyTrend, wordStats } from './stats'
 import { useParentData } from './useParentData'
+import { countedResults, recordLine, seasonRecord } from '../../engine/season'
 
 function Tile({ label, value }: { label: string; value: string | number }) {
   return (
@@ -25,6 +26,8 @@ export function StatsPage() {
   const missed = frequentlyMissed(stats).slice(0, 10)
   const solid = mastered(stats)
   const retention = reviewRetention(games!)
+  const season = seasonRecord(games!)
+  const recent = countedResults(games!).slice(-10)
   const shortDate = (iso: string) => prettyDate(iso).replace(/, \d{4}$/, '')
 
   return (
@@ -39,6 +42,18 @@ export function StatsPage() {
         <Tile label="Practice sessions" value={t.practice} />
         <Tile label="High score" value={`${t.highScore} runs`} />
         <Tile label="First-try rate" value={`${t.firstTryRate}%`} />
+      </div>
+
+      <div className="rounded-2xl bg-white border border-navy/10 p-4 text-navy" data-testid="season-row">
+        <h2 className="font-display text-xl">Season record</h2>
+        {season.wins + season.losses ? (
+          <>
+            <p className="text-ink/70">{season.wins} wins, {season.losses} losses ({recordLine(season)}). Weekly games only.</p>
+            <Sparkline points={recent.map((r) => (r === 'win' ? 1 : 0))} max={1} labels={recent.map((r) => (r === 'win' ? 'W' : 'L'))} color="var(--grass-dark)" />
+          </>
+        ) : (
+          <p className="text-ink/70">The record starts with the next weekly game.</p>
+        )}
       </div>
 
       {trend.length ? (

@@ -12,11 +12,16 @@ export interface SeasonRecord {
 
 type Countable = Pick<GameRecord, 'mode' | 'status' | 'result' | 'startedAt' | 'completedAt'>
 
-export function seasonRecord(games: readonly Countable[]): SeasonRecord {
-  const counted = games
+/** Results of the counted games (completed weekly games with a result), oldest first. */
+export function countedResults(games: readonly Countable[]): ('win' | 'loss')[] {
+  return games
     .filter((g) => g.mode === 'weekly' && g.status === 'complete' && (g.result === 'win' || g.result === 'loss'))
     .sort((a, b) => (a.completedAt ?? a.startedAt).localeCompare(b.completedAt ?? b.startedAt))
     .map((g) => g.result as 'win' | 'loss')
+}
+
+export function seasonRecord(games: readonly Countable[]): SeasonRecord {
+  const counted = countedResults(games)
   const wins = counted.filter((r) => r === 'win').length
   let streak = 0
   const last = counted[counted.length - 1]

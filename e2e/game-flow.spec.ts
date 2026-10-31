@@ -46,13 +46,17 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   await input.fill('zzzzzzzz')
   await input.press('Enter')
   await expect(page.getByTestId('strikes')).toHaveText('1')
+  // Phase 3: the Visitors bat at inning end only, so mid-inning their line is still empty.
+  const visitorsBefore = await page.getByTestId('visitors').textContent()
+  expect(visitorsBefore).toBe('0')
 
-  // (24) reload mid-word: same word, same strike count
+  // (24) reload mid-word: same word, same strike count, same Visitors line
   await page.reload()
   await expect(page.getByLabel('Spell the word')).toBeEnabled()
   await page.locator('[data-field-ready="1"]').waitFor()
   await expect(page.getByTestId('strikes')).toHaveText('1')
   await expect(page.getByTestId('progress')).toContainText('Word 2/3')
+  await expect(page.getByTestId('visitors')).toHaveText(visitorsBefore!)
 
   // finish the game by typing whatever was spoken last; word 2 is a single that moves the runner
   // off second, word 3 a double that scores him — both vacate a base, which once froze the field
@@ -71,6 +75,10 @@ test('a family registers, adds words, and plays a game that survives a reload', 
   await page.waitForURL(/\/results$/)
   await expect(page.getByRole('heading', { level: 1, name: /runs?$/ })).toBeVisible()
   await expect(page.getByText('Final score').or(page.getByText('New personal best!'))).toBeVisible()
+  // Phase 3: WIN or LOSS, both teams on the line score, and the record after this game.
+  await expect(page.getByTestId('result')).toHaveText(/^(Win|Loss)$/)
+  await expect(page.getByTestId('line-score')).toContainText('Visitors')
+  await expect(page.getByTestId('season-record')).toContainText(/Record: (1 and 0|0 and 1)/)
   expect(await noHorizontalScroll(page)).toBe(true)
 })
 

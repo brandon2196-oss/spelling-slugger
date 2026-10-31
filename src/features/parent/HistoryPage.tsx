@@ -25,6 +25,8 @@ export function HistoryPage() {
                 <th className="py-2 pr-3 font-semibold">Mode</th>
                 <th className="py-2 pr-3 font-semibold">List</th>
                 <th className="py-2 pr-3 font-semibold text-right">Runs</th>
+                <th className="py-2 pr-3 font-semibold text-right">Visitors</th>
+                <th className="py-2 pr-3 font-semibold">Result</th>
                 <th className="py-2 pr-3 font-semibold text-right">Hits</th>
                 <th className="py-2 pr-3 font-semibold text-right">K</th>
                 <th className="py-2 pr-3 font-semibold text-right">First try</th>
@@ -37,6 +39,8 @@ export function HistoryPage() {
                   <td className="py-2 pr-3">{modeLabel[g.mode]}</td>
                   <td className="py-2 pr-3">{title(g.listId)}</td>
                   <td className="py-2 pr-3 text-right font-display text-lg text-navy">{g.summary?.runs ?? 0}</td>
+                  <td className="py-2 pr-3 text-right">{g.visitorRuns ?? ''}</td>
+                  <td className="py-2 pr-3">{g.result === 'win' ? 'W' : g.result === 'loss' ? 'L' : ''}</td>
                   <td className="py-2 pr-3 text-right">{g.summary?.hits ?? 0}</td>
                   <td className="py-2 pr-3 text-right">{g.summary?.strikeouts ?? 0}</td>
                   <td className="py-2 pr-3 text-right">{g.summary?.firstTryAccuracy ?? 0}%</td>
