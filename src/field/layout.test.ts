@@ -1,29 +1,5 @@
 import { EMPTY_BASES } from '../engine/bases'
-import { FIELD, basePoint, basesDiff, batterPlacement, grassStripes, infieldDiamond, runnerPath } from './layout'
-
-describe('batterPlacement', () => {
-  it("(20) a lefty stands in the first-base-side box (viewer's right) facing the plate, as drawn", () => {
-    const p = batterPlacement('L')
-    expect(p.x).toBeGreaterThan(FIELD.home.x)
-    expect(p.flipX).toBe(false)
-  })
-  it("(21) a righty stands in the third-base-side box (viewer's left) and is the mirror image", () => {
-    const p = batterPlacement('R')
-    expect(p.x).toBeLessThan(FIELD.home.x)
-    expect(p.flipX).toBe(true)
-  })
-  it('both boxes sit beside the plate, not on it', () => {
-    expect(Math.abs(batterPlacement('L').x - FIELD.home.x)).toBe(Math.abs(batterPlacement('R').x - FIELD.home.x))
-  })
-})
-
-describe('runnerPath', () => {
-  it('goes around the diamond in order', () => {
-    expect(runnerPath('first', 'third')).toEqual([basePoint('second'), basePoint('third')])
-    expect(runnerPath('home', 'second')).toEqual([basePoint('first'), basePoint('second')])
-    expect(runnerPath('third', 'score')).toEqual([basePoint('home')])
-  })
-})
+import { basesDiff } from './layout'
 
 describe('basesDiff', () => {
   it('moves the batter to second on a double with nobody on', () => {
@@ -41,39 +17,6 @@ describe('basesDiff', () => {
   })
   it('moves nobody on a strikeout', () => {
     expect(basesDiff({ first: true, second: false, third: false }, { first: true, second: false, third: false }, 'strikeout', 0)).toEqual([])
-  })
-})
-
-describe('infieldDiamond', () => {
-  it('is four integer points that enclose every base', () => {
-    const d = infieldDiamond()
-    expect(d).toHaveLength(4)
-    for (const p of d) {
-      expect(Number.isInteger(p.x)).toBe(true)
-      expect(Number.isInteger(p.y)).toBe(true)
-    }
-    const xs = d.map((p) => p.x)
-    const ys = d.map((p) => p.y)
-    for (const b of ['home', 'first', 'second', 'third'] as const) {
-      const p = basePoint(b)
-      expect(p.x).toBeGreaterThan(Math.min(...xs))
-      expect(p.x).toBeLessThan(Math.max(...xs))
-      expect(p.y).toBeGreaterThan(Math.min(...ys))
-      expect(p.y).toBeLessThan(Math.max(...ys))
-    }
-  })
-})
-
-describe('grassStripes', () => {
-  it('tiles [top, bottom) with alternating stripes at integer rows', () => {
-    const s = grassStripes(100, 140, 16)
-    expect(s.map((r) => [r.y, r.h, r.light])).toEqual([[100, 16, true], [116, 16, false], [132, 8, true]])
-  })
-  it('covers the whole field below the wall by default', () => {
-    const s = grassStripes(104, FIELD.height)
-    expect(s[0]!.y).toBe(104)
-    const last = s[s.length - 1]!
-    expect(last.y + last.h).toBe(FIELD.height)
   })
 })
 

@@ -1,4 +1,4 @@
-/* Design tokens — the one place colors and type are defined. */
+/* Design tokens: the one place colors and type are defined. */
 :root {
   --grass: #3f9a4a;
   --grass-dark: #2f7d3a;
@@ -12,8 +12,6 @@
   --sky: #8fd3ff;
   --font-display: 'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif;
   --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* Board text, score bug, captions and titles only. Fredoka keeps buttons and the word input. */
-  --font-pixel: 'Press Start 2P', 'Courier New', monospace;
   /* The 90s TV set the field is shown on. */
   --bezel: #0b0b12;
   --bezel-line: #e8c76a;

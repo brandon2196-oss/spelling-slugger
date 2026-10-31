@@ -4,10 +4,7 @@ import type { Bases } from '../engine/types'
 import { motionScale } from '../features/game/timing'
 import type { FieldController, PlayerLook } from './controller'
 import { CartoonScene, CARTOON } from './CartoonScene'
-import { readFieldKind } from './fieldChoice'
-import { FieldScene } from './FieldScene'
 import { loadManifest } from './manifest'
-import { FIELD } from './layout'
 
 export type { FieldController, PlayerLook } from './controller'
 
@@ -21,29 +18,25 @@ export interface FieldProps {
 /** Mounts one Phaser game into a 4:3 box; keeps the batter and bases in sync with props. */
 export function Field({ look, bases, controllerRef }: FieldProps) {
   const host = useRef<HTMLDivElement>(null)
-  const scene = useRef<FieldScene | CartoonScene | null>(null)
-  const kind = useRef(readFieldKind())
+  const scene = useRef<CartoonScene | null>(null)
   const game = useRef<Phaser.Game | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
     if (!host.current || game.current) return
     const parent = host.current
-    const cartoon = kind.current === 'cartoon'
     let cancelled = false
-    const start = (s: FieldScene | CartoonScene) => {
+    const start = (s: CartoonScene) => {
       scene.current = s
       game.current = new Phaser.Game({
         type: Phaser.AUTO,
         parent,
-        width: cartoon ? CARTOON.width : FIELD.width,
-        height: cartoon ? CARTOON.height : FIELD.height,
+        width: CARTOON.width,
+        height: CARTOON.height,
         backgroundColor: '#142850',
         transparent: false,
-        // Pixel: true 16-bit at 320x240 with nearest-neighbour, FIT scales it up. Cartoon: smooth 1280x960.
-        pixelArt: !cartoon,
-        roundPixels: !cartoon,
-        render: { antialias: cartoon },
+        // Smooth 1280x960 cartoon art; FIT scales it to the box.
+        render: { antialias: true },
         scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
         scene: s,
         audio: { noAudio: true },
@@ -55,13 +48,9 @@ export function Field({ look, bases, controllerRef }: FieldProps) {
         setReady(true)
       })
     }
-    if (cartoon) {
-      void loadManifest().then((manifest) => {
-        if (!cancelled) start(new CartoonScene({ look, bases, motion: motionScale(), manifest }))
-      })
-    } else {
-      start(new FieldScene({ look, bases, motion: motionScale() }))
-    }
+    void loadManifest().then((manifest) => {
+      if (!cancelled) start(new CartoonScene({ look, bases, motion: motionScale(), manifest }))
+    })
     return () => {
       cancelled = true
       game.current?.destroy(true)
@@ -79,7 +68,7 @@ export function Field({ look, bases, controllerRef }: FieldProps) {
   }, [look.hand, look.jerseyNumber, look.appearance]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // `bases` is what the stadium should show when nothing is animating: on mount/resume, and after a
-  // play has finished. The scene moves runners itself during a play (FieldScene.moveRunners).
+  // play has finished. The scene moves runners itself during a play (CartoonScene).
   useEffect(() => {
     const s = scene.current
     if (!s) return
@@ -90,8 +79,8 @@ export function Field({ look, bases, controllerRef }: FieldProps) {
     <div
       ref={host}
       data-field-ready={ready ? '1' : undefined}
-      data-field-kind={kind.current}
-      className={`aspect-[4/3] w-full overflow-hidden rounded-3xl bg-navy [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full ${kind.current === 'pixel' ? '[&>canvas]:[image-rendering:pixelated]' : ''}`}
+      data-field-kind="cartoon"
+      className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-navy [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full"
       aria-hidden="true"
     />
   )

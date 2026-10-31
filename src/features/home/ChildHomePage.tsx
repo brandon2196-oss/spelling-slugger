@@ -1,5 +1,4 @@
-import { toggleFieldKind } from '../../field/fieldChoice'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Button } from '../../components/Button'
 import { Stadium } from '../../components/Page'
@@ -107,22 +106,6 @@ export function ChildHomePage() {
   )
 }
 
-/** Hidden tester toggle: five taps on the heading flips the stadium between cartoon and pixel. */
 function BoothHeading() {
-  const taps = useRef(0)
-  const [flash, setFlash] = useState<string | null>(null)
-  return (
-    <h2
-      className="pixel-text text-gold text-sm mb-3"
-      onClick={() => {
-        taps.current += 1
-        if (taps.current < 5) return
-        taps.current = 0
-        setFlash(`Stadium: ${toggleFieldKind()}`)
-        setTimeout(() => setFlash(null), 1500)
-      }}
-    >
-      {flash ?? 'In the booth tonight'}
-    </h2>
-  )
+  return <h2 className="board-text text-gold text-sm mb-3">In the booth tonight</h2>
 }

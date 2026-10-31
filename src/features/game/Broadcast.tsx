@@ -49,7 +49,7 @@ export function Broadcast({ children, state, player, mode, announcer, caption, a
 
 function LiveTag({ mode }: { mode: BroadcastMode }) {
   return (
-    <div className="live-tag pixel-text mb-[2%] mr-[2%] inline-flex items-center gap-[0.6em] rounded-sm px-[0.7em] py-[0.4em] uppercase" aria-hidden="true">
+    <div className="live-tag board-text mb-[2%] mr-[2%] inline-flex items-center gap-[0.6em] rounded-sm px-[0.7em] py-[0.4em] uppercase" aria-hidden="true">
       <span className="live-dot" />
       <span>Live</span>
       <span className="opacity-80">{MODE_LABEL[mode]}</span>
@@ -60,7 +60,7 @@ function LiveTag({ mode }: { mode: BroadcastMode }) {
 function CaptionBar({ text }: { text: string | null }) {
   if (!text) return null
   return (
-    <div role="status" aria-label="Commentary" className="caption-bar pixel-text w-full px-[1.2em] py-[0.8em]">
+    <div role="status" aria-label="Commentary" className="caption-bar board-text w-full px-[1.2em] py-[0.8em]">
       <span className="caption-mark mr-[0.8em]" aria-hidden="true">&gt;</span>
       {text}
     </div>
@@ -73,7 +73,7 @@ export function AnnouncerWindow({ name, portrait, speaking }: BroadcastProps['an
     <div
       data-testid="announcer-window"
       data-speaking={speaking && !quiet ? '1' : undefined}
-      className="announcer-window pixel-text inline-flex flex-col items-stretch rounded-sm overflow-hidden"
+      className="announcer-window board-text inline-flex flex-col items-stretch rounded-sm overflow-hidden"
     >
       <div className="portrait p-[0.5em]" aria-hidden="true">
         <BoothPortrait id={portrait} />

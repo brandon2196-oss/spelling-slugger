@@ -66,7 +66,7 @@ export function Highlight({ play, word, look, animate = motionScale() === 1 }: {
   return (
     <section aria-label="Highlight" data-testid="highlight" className="mt-6 rounded-md postgame-cell p-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="pixel-text text-xs uppercase text-gold">Play of the game</h2>
+        <h2 className="board-text text-xs uppercase text-gold">Play of the game</h2>
         <button type="button" className="underline text-sm text-chalk/80" onClick={() => setSkipped(true)}>Skip</button>
       </div>
       {animate ? (
@@ -74,7 +74,7 @@ export function Highlight({ play, word, look, animate = motionScale() === 1 }: {
           <Suspense fallback={<div className="aspect-[4/3] w-full bg-grass-dark" aria-hidden="true" />}>
             <Field look={look} bases={play.before} controllerRef={fieldRef} />
           </Suspense>
-          {board ? <p className="pixel-text absolute inset-x-0 bottom-2 text-center text-gold text-sm [text-shadow:0_2px_0_#000]">{board}</p> : null}
+          {board ? <p className="board-text absolute inset-x-0 bottom-2 text-center text-gold text-sm [text-shadow:0_2px_0_#000]">{board}</p> : null}
         </div>
       ) : null}
       <p className="mt-2 text-chalk" data-testid="highlight-caption">{caption}</p>

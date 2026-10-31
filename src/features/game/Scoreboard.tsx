@@ -16,7 +16,7 @@ export function Scoreboard({ state, player, visitors }: { state: GameState; play
   // The line score lags the engine: the game screen reveals the Visitors' inning during the inning-end play.
   const shown = visitors ?? state.visitors
   return (
-    <section aria-label="Scoreboard" className="score-bug pixel-text inline-flex flex-col rounded-sm uppercase">
+    <section aria-label="Scoreboard" className="score-bug board-text inline-flex flex-col rounded-sm uppercase">
       <div className="flex items-stretch">
         {player ? (
           <div className="bug-plate flex items-center gap-[0.6em] px-[0.8em] py-[0.4em]">
