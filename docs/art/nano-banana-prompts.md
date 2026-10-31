@@ -107,7 +107,10 @@ If a layer edit drifts from the master (the wall moves, the diamond changes shap
 Same image, same camera, at night: dark blue sky, light towers switched on, stadium lit.
 ```
 
-### B3. The kid's batter (one chat, upload the style sheet first)
+### B3. The kid's batter
+
+> Facing (fixed 2026-10-31, see `facing-handoff.md`): stance, swings, take-walk, slump and hair face RIGHT toward the mound. run and trot stay LEFT-facing; code flips them per leg.
+ (one chat, upload the style sheet first)
 
 Every batter prompt starts with this block. Paste it each time:
 
@@ -123,37 +126,37 @@ File: `art-src/batter/turnaround.png`
 
 **B3.2** File: `art-src/batter/stance-idle.png` (4 cells)
 ```
-[block] A sprite sheet of 4 frames in one row, equal square cells, side view facing left, batting stance. The only motion is a small bat waggle: bat up, bat slightly back, bat up, bat slightly forward. Feet on the same baseline in every cell, body in the same place. 2K wide.
+[block] A sprite sheet of 4 frames in one row, equal square cells, side view facing right toward the pitcher's mound (right-handed batter standing in the left batter's box, as seen from behind home plate), batting stance. Lefties are mirrored in code; never draw a lefty. The only motion is a small bat waggle: bat up, bat slightly back, bat up, bat slightly forward. Feet on the same baseline in every cell, body in the same place. 2K wide.
 ```
 
 **B3.3** File: `art-src/batter/swing-miss.png` (8 cells)
 ```
-[block] A sprite sheet of 8 frames in one row, equal square cells, side view facing left: a full baseball swing that misses. Frame 1 stance, 2 load back, 3 stride, 4 bat starts forward, 5 bat level at the plate, 6 bat past the plate, 7 bat wrapped around the back, 8 off balance follow-through. Feet on the same baseline in every cell. 2K wide.
+[block] A sprite sheet of 8 frames in one row, equal square cells, side view facing right, same facing as stance-idle: a full baseball swing that misses. Frame 1 stance, 2 load back, 3 stride, 4 bat starts forward, 5 bat level at the plate, 6 bat past the plate, 7 bat wrapped around the back, 8 off balance follow-through. Feet on the same baseline in every cell. 2K wide.
 ```
 
 **B3.4** File: `art-src/batter/swing-contact.png` (8 cells)
 ```
-[block] A sprite sheet of 8 frames in one row, equal square cells, side view facing left: a full baseball swing that connects. Frames 1 to 3 same as a swing, frame 4 the bat meets a white ball at the plate with a small impact star, frame 5 the ball leaves to the upper left and the bat continues, 6 and 7 follow-through, 8 first running step toward the left. Feet on the same baseline in every cell. 2K wide.
+[block] A sprite sheet of 8 frames in one row, equal square cells, side view facing right, same facing as stance-idle: a full baseball swing that connects. Frames 1 to 3 same as a swing, frame 4 the bat meets a white ball at the plate with a small impact star, frame 5 the ball leaves to the upper right and the bat continues, 6 and 7 follow-through, 8 first running step toward the right. Feet on the same baseline in every cell. 2K wide.
 ```
 
 **B3.5** File: `art-src/batter/take-walk.png` (6 cells)
 ```
-[block] A sprite sheet of 6 frames in one row, equal square cells, side view facing left: the batter drops the bat and begins a relaxed jog to the left. Frame 1 stance, 2 bat lowered, 3 bat on the ground, 4 to 6 jog cycle. Feet on the same baseline. 2K wide.
+[block] A sprite sheet of 6 frames in one row, equal square cells, side view facing right, same facing as stance-idle: the batter drops the bat and begins a relaxed jog to the right. Frame 1 stance, 2 bat lowered, 3 bat on the ground, 4 to 6 jog cycle. Feet on the same baseline. 2K wide.
 ```
 
 **B3.6** File: `art-src/batter/run.png` (6 cells)
 ```
-[block] A sprite sheet of 6 frames in one row, equal square cells, side view facing left: a looping run cycle, no bat, arms pumping. Frame 6 flows back into frame 1. Feet on the same baseline. 2K wide.
+[block] A sprite sheet of 6 frames in one row, equal square cells, side view facing LEFT (keep left: code flips it on rightward legs home to first and first to second): a looping run cycle, no bat, arms pumping. Frame 6 flows back into frame 1. Feet on the same baseline. 2K wide.
 ```
 
 **B3.7** File: `art-src/batter/trot.png` (6 cells)
 ```
-[block] A sprite sheet of 6 frames in one row, equal square cells, side view facing left: a slow happy home-run trot, no bat, one fist raised. Loops. Feet on the same baseline. 2K wide.
+[block] A sprite sheet of 6 frames in one row, equal square cells, side view facing LEFT (keep left: code flips it on rightward legs): a slow happy home-run trot, no bat, one fist raised. Loops. Feet on the same baseline. 2K wide.
 ```
 
 **B3.8** File: `art-src/batter/strikeout-slump.png` (4 cells)
 ```
-[block] A sprite sheet of 4 frames in one row, equal square cells, side view facing left: after a strikeout, shoulders drop, head tilts down, bat hangs, then holds still. Not crying, just disappointed. Feet on the same baseline. 2K wide.
+[block] A sprite sheet of 4 frames in one row, equal square cells, side view facing right, same facing as stance-idle: after a strikeout, shoulders drop, head tilts down, bat hangs, then holds still. Not crying, just disappointed. Feet on the same baseline. 2K wide.
 ```
 
 **B3.9** File: `art-src/batter/celebrate.png` (6 cells)
@@ -164,7 +167,7 @@ File: `art-src/batter/turnaround.png`
 **B3.10 Hair overlays** (4 images)
 Files: `art-src/batter/hair-short.png`, `hair-long.png`, `hair-curly.png`, `hair-buzz.png`
 ```
-[block] Show the character's head only, side view facing left, the same head as the turnaround, bald, wearing the cap, with the hair drawn as a separate shape in purple #8000FF around the cap edge. Four versions in one row: short hair, long hair to the shoulders, curly hair, buzz cut. Same head position in every cell. 2K wide.
+[block] Show the character's head only, side view facing right (matching stance-idle), the same head as the turnaround, bald, wearing the cap, with the hair drawn as a separate shape in purple #8000FF around the cap edge. Four versions in one row: short hair, long hair to the shoulders, curly hair, buzz cut. Same head position in every cell. 2K wide.
 ```
 
 ### B4. Pitcher (one chat, upload the style sheet first)
@@ -189,7 +192,10 @@ Match this style exactly. A cartoon baseball pitcher on the visiting team, big h
 [block] A sprite sheet of 4 frames in one row, equal square cells, front view: the pitcher turns to watch a ball fly over his head, hands on hips by the last frame. Same baseline. 2K wide.
 ```
 
-### B5. Fielders (one chat, upload the style sheet first)
+### B5. Fielders
+
+> Facing (fixed 2026-10-31): the camera is behind home plate, so fielders must face the CAMERA (front three-quarter). The old back three-quarter art is wrong and cannot be flipped in code. Only watch-hr stays a back view.
+ (one chat, upload the style sheet first)
 
 Block:
 ```
@@ -198,22 +204,22 @@ Match this style exactly. Two cartoon baseball fielders on the visiting team, on
 
 **B5.1** File: `art-src/fielders/fielder-idle.png` (4 cells, both bodies)
 ```
-[block] A sprite sheet with 2 rows of 4 equal square cells, top row the tall fielder, bottom row the stocky fielder, back three-quarter view as seen from behind home plate: ready stance, knees bent, small bounce. Same baseline per row. 2K wide.
+[block] A sprite sheet with 2 rows of 4 equal square cells, top row the tall fielder, bottom row the stocky fielder, front three-quarter view facing the camera, as seen from behind home plate (the fielder looks toward home plate and the viewer; we see the face and chest, never the back): ready stance, knees bent, small bounce. Same baseline per row. 2K wide.
 ```
 
 **B5.2** File: `art-src/fielders/fielder-chase.png` (6 cells, both bodies)
 ```
-[block] A sprite sheet with 2 rows of 6 equal square cells, top row tall, bottom row stocky, back three-quarter view: a looping run away from the camera chasing a ball, glove out. Same baseline per row. 2K wide.
+[block] A sprite sheet with 2 rows of 6 equal square cells, top row tall, bottom row stocky, front three-quarter view facing the camera, as seen from behind home plate: a looping run sideways toward the viewer chasing a ball, face visible, glove out. Same baseline per row. 2K wide.
 ```
 
 **B5.3** File: `art-src/fielders/fielder-catch.png` (6 cells, both bodies)
 ```
-[block] A sprite sheet with 2 rows of 6 equal square cells, top row tall, bottom row stocky, back three-quarter view: the fielder reaches up and catches a ball in the glove, then holds it up. Same baseline per row. 2K wide.
+[block] A sprite sheet with 2 rows of 6 equal square cells, top row tall, bottom row stocky, front three-quarter view facing the camera, as seen from behind home plate: the fielder reaches up and catches a ball in the glove, then holds it up. Same baseline per row. 2K wide.
 ```
 
 **B5.4** File: `art-src/fielders/fielder-watch-hr.png` (4 cells, both bodies)
 ```
-[block] A sprite sheet with 2 rows of 4 equal square cells, top row tall, bottom row stocky, back view: the fielder looks up and back, watching a ball sail over the wall, shoulders slump by the last frame. Same baseline per row. 2K wide.
+[block] A sprite sheet with 2 rows of 4 equal square cells, top row tall, bottom row stocky, back view (the one fielder clip that stays a back view: the fielder has turned around to watch the ball leave): the fielder looks up and back, watching a ball sail over the wall, shoulders slump by the last frame. Same baseline per row. 2K wide.
 ```
 
 ### B6. Catcher and umpire (one chat, upload the style sheet first)

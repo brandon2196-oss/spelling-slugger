@@ -52,3 +52,11 @@ export function basesDiff(before: Bases, after: Bases, outcome: Outcome, runsSco
   void runsScored
   return moves
 }
+
+/**
+ * Horizontal scale for a runner on one leg. Packed run/trot art faces LEFT, so a rightward leg flips (-1).
+ * Set outright per leg; never multiplied with the lefty batter mirror (runners are their own figs).
+ */
+export function runnerScaleX(from: Point, to: Point): 1 | -1 {
+  return to.x > from.x ? -1 : 1
+}
