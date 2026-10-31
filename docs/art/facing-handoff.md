@@ -2,13 +2,15 @@
 
 Bots do not generate art. Brandon makes these in Nano Banana (upload the B1 style sheet first, one chat per group), saves the files at the paths below, and a bot packs them (`npm run pack-art`) and opens an art PR.
 
+Fielders are kid teammates the same age as the batter (about 8 to 10), not adults.
+
 Why: the camera is behind home plate looking out. Fielders were drawn from behind (back three-quarter), so they show their backs to the plate; flipping cannot fix a back view. The batter stance was drawn facing the camera/left instead of toward the mound. Catcher and umpire (B6, back view) are already correct. Runners are fixed in code (run/trot art faces left; code flips on rightward legs).
 
 ## Fielders (one chat). Paste each prompt with `[block]` replaced by the block
 
 Block:
 ```
-Match this style exactly. Two cartoon baseball fielders on the visiting team, one tall and thin, one short and stocky, plain gray uniform with black trim and black cap, brown gloves, normal skin and hair colors, thick black outlines, flat fills. Flat solid #00FF00 background. No text, no logos, no watermark.
+Match this style exactly. Two cartoon kid baseball fielders on the visiting team, same age as the kid batter (about 8 to 10 years old), big heads, short bodies, oversized hands and gloves, one taller and thinner kid, one shorter and stockier kid, plain gray uniform with black trim and black cap, brown gloves, normal kid skin and hair colors, no facial hair, no mustaches, no adult proportions, thick black outlines, flat fills. Flat solid #00FF00 background. No text, no logos, no watermark.
 ```
 
 **B5.1** save to `art-src/fielders/fielder-idle.png`
