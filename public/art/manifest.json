@@ -1315,6 +1315,21 @@
       "path": "art/booth/jackDalton-mouth-open.png",
       "status": "ready",
       "size": 512
+    },
+    "menu-bigRed": {
+      "path": "art/booth/menu-bigRed.png",
+      "status": "ready",
+      "size": 512
+    },
+    "menu-jackDalton": {
+      "path": "art/booth/menu-jackDalton.png",
+      "status": "ready",
+      "size": 512
+    },
+    "menu-quiet": {
+      "path": "art/booth/menu-quiet.png",
+      "status": "ready",
+      "size": 512
     }
   },
   "chrome": {

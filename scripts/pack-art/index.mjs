@@ -354,6 +354,12 @@ async function booth(m) {
     await save(`booth/${key}.png`, await resize(await keyed(`booth/${key}.png`), 512, 512, 'contain'))
     m.booth[key].status = 'ready'
   }
+  // Kid-home announcer row: booth-window poses (menu only; the game booth keeps the mouth frames).
+  for (const who of ['bigRed', 'jackDalton', 'quiet']) {
+    const key = `menu-${who}`
+    await save(`booth/${key}.png`, await resize(await keyed(`booth/${key}.png`), 512, 512, 'contain'))
+    m.booth[key].status = 'ready'
+  }
 }
 
 // ------------------------------------------------------------------ main
