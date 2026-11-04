@@ -9,7 +9,7 @@ const state: GameState = {
   outs: 2,
   inning: 2,
   bases: { first: true, second: false, third: true },
-  tallies: { runs: 5, hits: 4, homeRuns: 0, singles: 1, doubles: 3, walks: 0, strikeouts: 2, totalStrikes: 7, firstTry: 3, secondTry: 1, thirdTry: 0, missed: 2 },
+  tallies: { runs: 5, hits: 4, homeRuns: 0, grandSlams: 0, singles: 1, doubles: 3, walks: 0, strikeouts: 2, totalStrikes: 7, firstTry: 3, secondTry: 1, thirdTry: 0, missed: 2 },
   atBats: [],
   status: 'active',
   gameId: 'g1',

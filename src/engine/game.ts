@@ -18,6 +18,7 @@ const ZERO_TALLIES: Tallies = {
   singles: 0,
   doubles: 0,
   homeRuns: 0,
+  grandSlams: 0,
   walks: 0,
   strikeouts: 0,
   totalStrikes: 0,
@@ -63,6 +64,7 @@ function tallyOutcome(t: Tallies, outcome: Outcome, attemptNumber: number, runs:
   switch (outcome) {
     case 'homeRun':
       next.homeRuns += 1
+      if (runs === 4) next.grandSlams += 1
       next.hits += 1
       break
     case 'double':
@@ -167,6 +169,7 @@ export function submitAnswer(state: GameState, text: string): { state: GameState
       outcome,
       attempts,
       runsScored: runs,
+      grandSlam: outcome === 'homeRun' && runs === 4,
       basesBefore: { ...state.bases },
       basesAfter: bases,
       outsAfter: outs,

@@ -26,7 +26,7 @@ export function highlightCaption(p: HighlightPlay): string {
 /** The chosen play as the engine event it was, so playSequence drives the replay like a live play. */
 export function highlightEvent(p: HighlightPlay, word: GameWord): SubmitEvent {
   return {
-    kind: 'at-bat-complete', outcome: p.outcome, attempts: [], runsScored: p.runs, basesBefore: p.before, basesAfter: p.after,
+    kind: 'at-bat-complete', outcome: p.outcome, attempts: [], runsScored: p.runs, grandSlam: p.outcome === 'homeRun' && p.runs === 4, basesBefore: p.before, basesAfter: p.after,
     outsAfter: 0, inningEnded: false, nextInning: 0, gameOver: false, correctSpelling: p.word, word,
     visitorRunsThisInning: null, visitorsBefore: 0, homeTotal: 0, gameResult: null,
   }

@@ -153,3 +153,23 @@ it('a hard word spelled on the first try is a home run and is tallied', () => {
   expect(event.kind === 'at-bat-complete' && event.outcome).toBe('homeRun')
   expect(state.tallies).toMatchObject({ homeRuns: 1, hits: 1, runs: 1, firstTry: 1 })
 })
+
+describe('grand slams', () => {
+  const w = (position: number, text: string, difficulty: 'easy' | 'medium' | 'hard'): GameWord =>
+    ({ position, text, sentence: null, source: 'current', sourceWordId: null, difficulty })
+  it('a bases-loaded home run is a grand slam', () => {
+    // three second-try easy words load the bases with walks, then a first-try hard word clears them
+    let s = createGame([w(0, 'a', 'easy'), w(1, 'b', 'easy'), w(2, 'c', 'easy'), w(3, 'rhythm', 'hard')])
+    for (const t of ['a', 'b', 'c']) s = play(s, 'x', t).state
+    expect(s.bases).toEqual({ first: true, second: true, third: true })
+    const { state, event } = submitAnswer(s, 'rhythm')
+    expect(event.kind === 'at-bat-complete' && event.runsScored).toBe(4)
+    expect(event.kind === 'at-bat-complete' && event.grandSlam).toBe(true)
+    expect(state.tallies).toMatchObject({ homeRuns: 1, grandSlams: 1 })
+  })
+  it('a home run with fewer than three on is not a grand slam', () => {
+    const { state, event } = submitAnswer(createGame([w(0, 'rhythm', 'hard')]), 'rhythm')
+    expect(event.kind === 'at-bat-complete' && event.grandSlam).toBe(false)
+    expect(state.tallies).toMatchObject({ homeRuns: 1, grandSlams: 0 })
+  })
+})

@@ -42,6 +42,7 @@ export function StatsPage() {
         <Tile label="Practice sessions" value={t.practice} />
         <Tile label="High score" value={`${t.highScore} runs`} />
         <Tile label="First-try rate" value={`${t.firstTryRate}%`} />
+        <Tile label="Grand slams" value={t.grandSlams} />
       </div>
 
       <div className="rounded-2xl bg-white border border-navy/10 p-4 text-navy" data-testid="season-row">

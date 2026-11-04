@@ -59,6 +59,8 @@ export function ResultsPage() {
   const result = record.result ?? (state ? (state.tallies.runs >= state.visitors.reduce((a, b) => a + b, 0) ? 'win' : 'loss') : null)
   const play = state ? bestPlay(state) : null
   const playWord = play ? record.words.find((w) => w.position === play.position) : undefined
+  // Older saved summaries predate grandSlams; fall back to the rebuilt at-bats.
+  const grandSlams = s.grandSlams ?? (state ? state.atBats.filter((ab) => ab.outcome === 'homeRun' && ab.runsScored === 4).length : 0)
   const newBest = best === null ? s.runs > 0 : s.runs > best
 
   async function playAgain() {
@@ -97,7 +99,7 @@ export function ResultsPage() {
   }
 
   const rows: [string, string | number][] = [
-    ['Hits', s.hits], ['Home runs', s.homeRuns ?? 0], ['Doubles', s.doubles], ['Singles', s.singles], ['Walks', s.walks], ['Strikeouts', s.strikeouts],
+    ['Hits', s.hits], ['Home runs', s.homeRuns ?? 0], ['Grand slams', grandSlams], ['Doubles', s.doubles], ['Singles', s.singles], ['Walks', s.walks], ['Strikeouts', s.strikeouts],
     ['Total strikes', s.totalStrikes], ['First try', s.firstTry], ['Second try', s.secondTry], ['Third try', s.thirdTry],
     ['First-try accuracy', `${s.firstTryAccuracy}%`],
   ]
@@ -118,6 +120,11 @@ export function ResultsPage() {
           </h1>
           {result ? (
             <p data-testid="result" className={`board-text mt-4 text-2xl uppercase ${result === 'win' ? 'text-gold' : 'text-chalk'}`}>{result === 'win' ? 'Win' : 'Loss'}</p>
+          ) : null}
+          {grandSlams > 0 ? (
+            <p data-testid="grand-slam" className="board-text mt-3 inline-block rounded-md bg-gold px-3 py-2 text-lg uppercase text-navy">
+              Grand slam!{grandSlams > 1 ? ` ×${grandSlams}` : ''}
+            </p>
           ) : null}
           {state ? <LineScore state={state} visitors={state.visitors} home={player?.teamName || 'Slammers'} className="mt-3 text-base" /> : null}
           {season ? <p className="mt-2 text-chalk/80" data-testid="season-record">Record: {season}</p> : null}

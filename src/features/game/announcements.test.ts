@@ -4,7 +4,7 @@ import { announcementsFor } from './announcements'
 
 const word = { position: 0, text: 'cat', sentence: null, source: 'current' as const, sourceWordId: null, difficulty: 'medium' as const }
 const done = (over: Partial<Extract<SubmitEvent, { kind: 'at-bat-complete' }>>): SubmitEvent => ({
-  kind: 'at-bat-complete', outcome: 'double', attempts: [], runsScored: 0, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
+  kind: 'at-bat-complete', outcome: 'double', attempts: [], runsScored: 0, grandSlam: false, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
   outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'cat', word, visitorRunsThisInning: null, visitorsBefore: 0, homeTotal: 0, gameResult: null, ...over,
 })
 
@@ -27,7 +27,7 @@ describe('announcementsFor', () => {
     expect(announcementsFor({ kind: 'ignored', reason: 'blank' })).toEqual([])
   })
   it('calls a home run', () => {
-    const ev = { kind: 'at-bat-complete', outcome: 'homeRun', attempts: [] as never[], runsScored: 1, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
+    const ev = { kind: 'at-bat-complete', outcome: 'homeRun', attempts: [] as never[], runsScored: 1, grandSlam: false, basesBefore: EMPTY_BASES, basesAfter: EMPTY_BASES,
       outsAfter: 0, inningEnded: false, nextInning: 1, gameOver: false, correctSpelling: 'rhythm',
       visitorRunsThisInning: null, visitorsBefore: 0, homeTotal: 0, gameResult: null,
       word: { position: 0, text: 'rhythm', sentence: null, source: 'current', sourceWordId: null, difficulty: 'hard' } } as const
