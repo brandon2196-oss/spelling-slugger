@@ -60,6 +60,56 @@ describe('ResultsPage', () => {
     expect(label.nextElementSibling?.textContent).toBe('2')
   })
 
+  async function slamGame(strip: boolean) {
+    localStorage.clear()
+    const store = createLocalStore()
+    const p = await store.createPlayer(cooper)
+    const l = await store.createWordList(p.id, { title: 'L', weekStart: '2026-10-19', words: ['cat', 'dog', 'fish', 'bird'].map((text) => ({ text, sentence: null, difficulty: 'hard' as const })) })
+    const g = await startPracticeGame(store, p.id, l.id, seededRng(1))
+    // hard words: three third-try walks load the bases, then a first-try home run clears them
+    for (const w of g.words) {
+      if (w.position < 3) {
+        await store.recordAttempt(g.id, { position: w.position, attemptNumber: 1, text: 'x', correct: false, outcome: null })
+        await store.recordAttempt(g.id, { position: w.position, attemptNumber: 2, text: 'x', correct: false, outcome: null })
+        await store.recordAttempt(g.id, { position: w.position, attemptNumber: 3, text: w.text, correct: true, outcome: 'walk' })
+      } else await store.recordAttempt(g.id, { position: w.position, attemptNumber: 1, text: w.text, correct: true, outcome: 'homeRun' })
+    }
+    const saved = await store.getGame(g.id)
+    const summary = summarize(rebuild(saved!.words, saved!.attempts))
+    if (strip) delete (summary as Partial<typeof summary>).grandSlams
+    await store.completeGame(g.id, summary)
+    const router = createMemoryRouter([{ path: '/game/:gameId/results', element: <ResultsPage /> }], { initialEntries: [`/game/${g.id}/results`] })
+    render(
+      <StoreContext.Provider value={store}>
+        <RouterProvider router={router} />
+      </StoreContext.Provider>,
+    )
+  }
+  it('shows a Grand slams row and a GRAND SLAM badge when one landed', async () => {
+    await slamGame(false)
+    const label = await screen.findByText('Grand slams')
+    expect(label.nextElementSibling?.textContent).toBe('1')
+    expect(screen.getByTestId('grand-slam')).toHaveTextContent(/grand slam!/i)
+  })
+  it('derives grand slams from the at-bats when an old summary lacks the field', async () => {
+    await slamGame(true)
+    const label = await screen.findByText('Grand slams')
+    expect(label.nextElementSibling?.textContent).toBe('1')
+    expect(screen.getByTestId('grand-slam')).toBeInTheDocument()
+  })
+  it('shows no badge and a zero row without a grand slam', async () => {
+    localStorage.clear()
+    const store = createLocalStore()
+    const p = await store.createPlayer(cooper)
+    const l = await store.createWordList(p.id, { title: 'L', weekStart: '2026-10-19', words: ['cat'].map((text) => ({ text, sentence: null })) })
+    const g = await startPracticeGame(store, p.id, l.id, seededRng(1))
+    await store.recordAttempt(g.id, { position: 0, attemptNumber: 1, text: 'cat', correct: true, outcome: 'homeRun' })
+    const router = createMemoryRouter([{ path: '/game/:gameId/results', element: <ResultsPage /> }], { initialEntries: [`/game/${g.id}/results`] })
+    render(<StoreContext.Provider value={store}><RouterProvider router={router} /></StoreContext.Provider>)
+    const label = await screen.findByText('Grand slams')
+    expect(label.nextElementSibling?.textContent).toBe('0')
+    expect(screen.queryByTestId('grand-slam')).toBeNull()
+  })
   it('offers a one-tap practice of only this game\'s missed words', async () => {
     localStorage.clear()
     const store = createLocalStore()

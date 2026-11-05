@@ -1,6 +1,7 @@
 /** Pure aggregations over completed games for the parent dashboard. */
 import type { GameRecord } from '../../data/types'
 import { normalize } from '../../engine/grade'
+import { rebuild } from '../../engine/replay'
 
 export interface WordStat {
   text: string
@@ -98,7 +99,17 @@ export function reviewRetention(games: GameRecord[]): number | null {
   return total === 0 ? null : Math.round((first / total) * 100)
 }
 
-export function totals(games: GameRecord[]): { games: number; practice: number; highScore: number; firstTryRate: number } {
+/** Grand slams in one game: the saved summary, or rebuilt from attempts for summaries that predate the field. */
+function gameGrandSlams(g: GameRecord): number {
+  if (typeof g.summary?.grandSlams === 'number') return g.summary.grandSlams
+  try {
+    return rebuild(g.words, g.attempts, g.id).atBats.filter((ab) => ab.outcome === 'homeRun' && ab.runsScored === 4).length
+  } catch {
+    return 0
+  }
+}
+
+export function totals(games: GameRecord[]): { games: number; practice: number; highScore: number; firstTryRate: number; grandSlams: number } {
   const weekly = official(games)
   const practice = completed(games).filter((g) => g.mode !== 'weekly')
   return {
@@ -106,5 +117,6 @@ export function totals(games: GameRecord[]): { games: number; practice: number; 
     practice: practice.length,
     highScore: weekly.length ? Math.max(...weekly.map((g) => g.summary?.runs ?? 0)) : 0,
     firstTryRate: firstTryPct(weekly),
+    grandSlams: weekly.reduce((n, g) => n + gameGrandSlams(g), 0),
   }
 }

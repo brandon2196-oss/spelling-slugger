@@ -45,6 +45,8 @@ export interface Tallies {
   runs: number
   hits: number
   homeRuns: number
+  /** Home runs with the bases loaded (four runs on one swing). */
+  grandSlams: number
   singles: number
   doubles: number
   walks: number
@@ -82,6 +84,8 @@ export type SubmitEvent =
       outcome: Outcome
       attempts: Attempt[]
       runsScored: number
+      /** A bases-loaded home run. */
+      grandSlam: boolean
       basesBefore: Bases
       basesAfter: Bases
       outsAfter: number

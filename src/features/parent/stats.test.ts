@@ -6,7 +6,7 @@ const gw = (texts: string[], review: string[] = []): GameWord[] =>
   texts.map((text, position) => ({ position, text, sentence: null, source: review.includes(text) ? 'review' : 'current', sourceWordId: null, difficulty: 'medium' as const }))
 
 /** answers: per word, number of wrong tries before right (3 = strikeout). */
-function game(id: string, listId: string | null, words: string[], wrong: number[], opts: { review?: string[]; mode?: GameRecord['mode']; runs?: number; startedAt?: string } = {}): GameRecord {
+function game(id: string, listId: string | null, words: string[], wrong: number[], opts: { review?: string[]; mode?: GameRecord['mode']; runs?: number; startedAt?: string; grandSlams?: number } = {}): GameRecord {
   const attempts: StoredAttempt[] = []
   words.forEach((w, position) => {
     const n = wrong[position] ?? 0
@@ -16,7 +16,7 @@ function game(id: string, listId: string | null, words: string[], wrong: number[
   const firstTry = wrong.filter((n) => n === 0).length
   return {
     id, playerId: 'p', listId, mode: opts.mode ?? 'weekly', status: 'complete', words: gw(words, opts.review), attempts, warnings: [],
-    summary: { runs: opts.runs ?? 0, hits: 0, homeRuns: 0, singles: 0, doubles: 0, walks: 0, strikeouts: 0, totalStrikes: 0, firstTry, secondTry: 0, thirdTry: 0, missed: 0,
+    summary: { runs: opts.runs ?? 0, hits: 0, homeRuns: 0, grandSlams: opts.grandSlams ?? 0, singles: 0, doubles: 0, walks: 0, strikeouts: 0, totalStrikes: 0, firstTry, secondTry: 0, thirdTry: 0, missed: 0,
       firstTryAccuracy: Math.round((firstTry / words.length) * 100), current: { total: 0, firstTry: 0, missed: 0 }, review: { total: 0, firstTry: 0, missed: 0 }, missedWords: [] },
     result: null, visitorRuns: null,
     startedAt: opts.startedAt ?? '2026-10-20T00:00:00Z', completedAt: '2026-10-20T00:10:00Z',
@@ -74,7 +74,16 @@ describe('reviewRetention', () => {
 
 describe('totals', () => {
   it('counts games, practice sessions, high score and first-try rate', () => {
-    expect(totals(games)).toEqual({ games: 3, practice: 1, highScore: 3, firstTryRate: 56 })
+    expect(totals(games)).toEqual({ games: 3, practice: 1, highScore: 3, firstTryRate: 56, grandSlams: 0 })
+  })
+  it('sums grand slams over weekly games, rebuilding old summaries that lack the field', () => {
+    const slam = game('g5', 'L1', ['a', 'b', 'c', 'd'], [0, 0, 0, 0], { grandSlams: 2 })
+    // hard words: three third-try walks load the bases, then a first-try home run (replayed from attempts)
+    const old = game('g6', 'L1', ['a', 'b', 'c', 'd'], [2, 2, 2, 0])
+    old.words = old.words.map((w) => ({ ...w, difficulty: 'hard' as const }))
+    delete (old.summary as Partial<NonNullable<GameRecord['summary']>>).grandSlams
+    const practice = game('g7', 'L1', ['a'], [0], { mode: 'practice', grandSlams: 5 })
+    expect(totals([slam, old, practice]).grandSlams).toBe(3)
   })
 })
 
